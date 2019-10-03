@@ -1,0 +1,48 @@
+{
+    "definitions": {},
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "$id": "http://example.com/root.json",
+    "type": "object",
+    "title": "The Root Schema",
+    "required": [
+        "job_states"
+    ],
+    "properties": {
+        "job_states": {
+            "$id": "#/properties/job_states",
+            "type": "array",
+            "title": "The Job_states Schema",
+            "items": {
+                "$id": "#/properties/job_states/items",
+                "type": "object",
+                "title": "The Items Schema",
+                "required": [
+                    "code",
+                    "description"
+                ],
+                "properties": {
+                    "code": {
+                        "$id": "#/properties/job_states/items/properties/code",
+                        "type": "string",
+                        "title": "The Code Schema",
+                        "default": "",
+                        "examples": [
+                            "queued"
+                        ],
+                        "pattern": "^(.*)$"
+                    },
+                    "description": {
+                        "$id": "#/properties/job_states/items/properties/description",
+                        "type": "string",
+                        "title": "The Description Schema",
+                        "default": "",
+                        "examples": [
+                            "The job has been accepted by the execution engine and has been queued for execution"
+                        ],
+                        "pattern": "^(.*)$"
+                    }
+                }
+            }
+        }
+    }
+}

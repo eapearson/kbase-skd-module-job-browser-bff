@@ -1,0 +1,25 @@
+[{
+    "jobs": [{
+        "job_id": "abc",
+        "type": "narrative",
+        "owner": "mmouse",
+        "status": "running",
+        "queued_at": 100,
+        "started_at": 200,
+        "finished_at": 300,
+        "app": {
+            "module_name": "Module",
+            "function_name": "func1",
+            "title": "My amazing method"
+        },
+        "narrative": {
+            "workspace_id": 100,
+            "workspace_name": "mmouse:def",
+            "title": "My amazing narrative",
+            "is_deleted": false
+        },
+        "client_groups": ["njs"]
+
+    }],
+    "total_count": 200
+}]

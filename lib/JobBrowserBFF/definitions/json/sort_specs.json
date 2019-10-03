@@ -1,0 +1,22 @@
+[
+    {
+        "key": "narrative",
+        "fields": ["narrative.title", "queued_at"],
+        "description": "Alphabetical sort by narrative title, with a secondary sort on the queue time."
+    },
+    {
+        "key": "app",
+        "fields": ["app.module", "app.title"],
+        "description": "Alphabetical sort by the app's module name and title"
+    },
+    {
+        "key": "submitted",
+        "fields": ["queued_at", "run_at"],
+        "description": "Numeric sort by the apps submission (queue) time, and in the unlikely event that two jobs were started at precisely the same time, the run time is used secondarily"
+    },
+    {
+        "key": "status",
+        "fields": ["job_status"],
+        "description": "A special sort which orders by job status codes in the following order: queued, running, finished, errored_queued, errored_running, canceled_queued, canceled_running"
+    }
+]

@@ -1,0 +1,239 @@
+{
+    "definitions": {},
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "$id": "http://example.com/root.json",
+    "type": "object",
+    "title": "The Root Schema",
+    "required": [
+        "jobs",
+        "total_count"
+    ],
+    "properties": {
+        "jobs": {
+            "$id": "#/properties/jobs",
+            "type": "array",
+            "title": "The Jobs Schema",
+            "items": {
+                "$id": "#/properties/jobs/items",
+                "type": "object",
+                "title": "The Items Schema",
+                "required": [
+                    "job_id",
+                    "type",
+                    "owner",
+                    "status",
+                    "queued_at",
+                    "started_at",
+                    "finished_at",
+                    "app",
+                    "client_groups"
+                ],
+                "properties": {
+                    "job_id": {
+                        "$id": "#/properties/jobs/items/properties/job_id",
+                        "type": "string",
+                        "title": "The Job_id Schema",
+                        "default": "",
+                        "examples": [
+                            "abc"
+                        ],
+                        "pattern": "^(.*)$"
+                    },
+                    "type": {
+                        "$id": "#/properties/jobs/items/properties/type",
+                        "type": "string",
+                        "title": "The Type Schema",
+                        "default": "",
+                        "examples": [
+                            "narrative"
+                        ],
+                        "pattern": "^(.*)$"
+                    },
+                    "owner": {
+                        "$id": "#/properties/jobs/items/properties/owner",
+                        "type": "object",
+                        "title": "The Owner Schema",
+                        "required": [
+                            "username",
+                            "realname"
+                        ],
+                        "properties": {
+                            "username": {
+                                "$id": "#/properties/jobs/items/properties/owner/properties/username",
+                                "type": "string",
+                                "default": "",
+                                "examples": [
+                                    "mmouse"
+                                ],
+                                "pattern": "^(.*)$"
+                            },
+                            "realname": {
+                                "$id": "#/properties/jobs/items/properties/owner/properties/realname",
+                                "type": "string",
+                                "default": "",
+                                "examples": [
+                                    "Mickey Mouse"
+                                ],
+                                "pattern": "^(.*)$"
+                            }
+                        }
+                    },
+                    "status": {
+                        "$id": "#/properties/jobs/items/properties/status",
+                        "type": "string",
+                        "title": "The Status Schema",
+                        "default": "",
+                        "examples": [
+                            "running"
+                        ],
+                        "pattern": "^(.*)$"
+                    },
+                    "queued_at": {
+                        "$id": "#/properties/jobs/items/properties/queued_at",
+                        "type": "integer",
+                        "title": "The Queued_at Schema",
+                        "default": 0,
+                        "examples": [
+                            100
+                        ]
+                    },
+                    "started_at": {
+                        "$id": "#/properties/jobs/items/properties/started_at",
+                        "type": ["integer", "null"],
+                        "title": "The Started_at Schema",
+                        "default": 0,
+                        "examples": [
+                            200
+                        ]
+                    },
+                    "finished_at": {
+                        "$id": "#/properties/jobs/items/properties/finished_at",
+                        "type": ["integer", "null"],
+                        "title": "The Finished_at Schema",
+                        "default": 0,
+                        "examples": [
+                            300
+                        ]
+                    },
+                    "app": {
+                        "$id": "#/properties/jobs/items/properties/app",
+                        "type": ["object", "null"],
+                        "title": "The App Schema",
+                        "required": [
+                            "module_name",
+                            "function_name",
+                            "title"
+                        ],
+                        "properties": {
+                            "module_name": {
+                                "$id": "#/properties/jobs/items/properties/app/properties/module_name",
+                                "type": "string",
+                                "title": "The Module_name Schema",
+                                "default": "",
+                                "examples": [
+                                    "Module"
+                                ],
+                                "pattern": "^(.*)$"
+                            },
+                            "function_name": {
+                                "$id": "#/properties/jobs/items/properties/app/properties/function_name",
+                                "type": "string",
+                                "title": "The Function_name Schema",
+                                "default": "",
+                                "examples": [
+                                    "func1"
+                                ],
+                                "pattern": "^(.*)$"
+                            },
+                            "title": {
+                                "$id": "#/properties/jobs/items/properties/app/properties/title",
+                                "type": "string",
+                                "title": "The Title Schema",
+                                "default": "",
+                                "examples": [
+                                    "My amazing method"
+                                ],
+                                "pattern": "^(.*)$"
+                            }
+                        }
+                    },
+                    "narrative": {
+                        "$id": "#/properties/jobs/items/properties/narrative",
+                        "type": "object",
+                        "title": "The Narrative Schema",
+                        "required": [
+                            "workspace_id",
+                            "workspace_name",
+                            "title",
+                            "is_deleted"
+                        ],
+                        "properties": {
+                            "workspace_id": {
+                                "$id": "#/properties/jobs/items/properties/narrative/properties/workspace_id",
+                                "type": "integer",
+                                "title": "The Workspace_id Schema",
+                                "default": 0,
+                                "examples": [
+                                    100
+                                ]
+                            },
+                            "workspace_name": {
+                                "$id": "#/properties/jobs/items/properties/narrative/properties/workspace_name",
+                                "type": "string",
+                                "title": "The Workspace_name Schema",
+                                "default": "",
+                                "examples": [
+                                    "mmouse:def"
+                                ],
+                                "pattern": "^(.*)$"
+                            },
+                            "title": {
+                                "$id": "#/properties/jobs/items/properties/narrative/properties/title",
+                                "type": "string",
+                                "title": "The Title Schema",
+                                "default": "",
+                                "examples": [
+                                    "My amazing narrative"
+                                ],
+                                "pattern": "^(.*)$"
+                            },
+                            "is_deleted": {
+                                "$id": "#/properties/jobs/items/properties/narrative/properties/is_deleted",
+                                "type": "boolean",
+                                "title": "The Is_deleted Schema",
+                                "default": false,
+                                "examples": [
+                                    false
+                                ]
+                            }
+                        }
+                    },
+                    "client_groups": {
+                        "$id": "#/properties/jobs/items/properties/client_groups",
+                        "type": "array",
+                        "title": "The Client_groups Schema",
+                        "items": {
+                            "$id": "#/properties/jobs/items/properties/client_groups/items",
+                            "type": "string",
+                            "title": "The Items Schema",
+                            "default": "",
+                            "examples": [
+                                "njs"
+                            ],
+                            "pattern": "^(.*)$"
+                        }
+                    }
+                }
+            }
+        },
+        "total_count": {
+            "$id": "#/properties/total_count",
+            "type": "integer",
+            "title": "The Total_count Schema",
+            "default": 0,
+            "examples": [
+                200
+            ]
+        }
+    }
+}

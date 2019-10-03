@@ -1,0 +1,166 @@
+{
+    "definitions": {},
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "$id": "http://example.com/root.json",
+    "type": "object",
+    "title": "The Root Schema",
+    "required": [
+    ],
+    "properties": {
+        "users": {
+            "$id": "#/properties/users",
+            "type": "array",
+            "title": "The Users Schema",
+            "items": {
+                "$id": "#/properties/users/items",
+                "type": "string",
+                "title": "The Items Schema",
+                "default": "",
+                "examples": [
+                    "mmouse",
+                    "dduck"
+                ],
+                "pattern": "^(.*)$"
+            }
+        },
+        "jobs": {
+            "$id": "#/properties/jobs",
+            "type": "array",
+            "title": "The Jobs Schema",
+            "items": {
+                "$id": "#/properties/jobs/items",
+                "type": "string",
+                "title": "The Items Schema",
+                "default": "",
+                "examples": [
+                    "job1",
+                    "job2"
+                ],
+                "pattern": "^(.*)$"
+            }
+        },
+        "sort": {
+            "$id": "#/properties/sort",
+            "type": "array",
+            "title": "The Sort Schema",
+            "items": {
+                "$id": "#/properties/sort/items",
+                "type": "object",
+                "title": "The Items Schema",
+                "required": [
+                    "key",
+                    "direction"
+                ],
+                "properties": {
+                    "key": {
+                        "$id": "#/properties/sort/items/properties/key",
+                        "type": "string",
+                        "title": "The Key Schema",
+                        "default": "",
+                        "examples": [
+                            "name"
+                        ],
+                        "pattern": "^(.*)$"
+                    },
+                    "direction": {
+                        "$id": "#/properties/sort/items/properties/direction",
+                        "type": "string",
+                        "title": "The Direction Schema",
+                        "default": "",
+                        "examples": [
+                            "ascending"
+                        ],
+                        "pattern": "^(.*)$"
+                    }
+                }
+            }
+        },
+        "search": {
+            "$id": "#/properties/search",
+            "type": "object",
+            "title": "The Search Schema",
+            "required": [
+                "terms"
+            ],
+            "properties": {
+                "terms": {
+                    "$id": "#/properties/search/properties/terms",
+                    "type": "array",
+                    "title": "The Terms Schema",
+                    "items": {
+                        "$id": "#/properties/search/properties/terms/items",
+                        "type": "string",
+                        "title": "The Items Schema",
+                        "default": "",
+                        "examples": [
+                            "cheese"
+                        ],
+                        "pattern": "^(.*)$"
+                    }
+                }
+            }
+        },
+        "date_range": {
+            "$id": "#/properties/date_range",
+            "type": "object",
+            "title": "The Date_range Schema",
+            "required": [
+                "from",
+                "to"
+            ],
+            "properties": {
+                "from": {
+                    "$id": "#/properties/date_range/properties/from",
+                    "type": "integer",
+                    "title": "The From Schema",
+                    "default": 0,
+                    "examples": [
+                        0
+                    ]
+                },
+                "to": {
+                    "$id": "#/properties/date_range/properties/to",
+                    "type": "integer",
+                    "title": "The To Schema",
+                    "default": 0,
+                    "examples": [
+                        1000
+                    ]
+                }
+            }
+        },
+        "client_groups": {
+            "$id": "#/properties/client_groups",
+            "type": "array",
+            "title": "The Client_groups Schema",
+            "items": {
+                "$id": "#/properties/client_groups/items",
+                "type": "string",
+                "title": "The Items Schema",
+                "default": "",
+                "examples": [
+                    "njs"
+                ],
+                "pattern": "^(.*)$"
+            }
+        },
+        "offset": {
+            "$id": "#/properties/offset",
+            "type": "integer",
+            "title": "The Offset Schema",
+            "default": 0,
+            "examples": [
+                0
+            ]
+        },
+        "limit": {
+            "$id": "#/properties/limit",
+            "type": "integer",
+            "title": "The Limit Schema",
+            "default": 0,
+            "examples": [
+                100
+            ]
+        }
+    }
+}

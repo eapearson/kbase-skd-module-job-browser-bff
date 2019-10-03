@@ -1,0 +1,34 @@
+[
+    {
+        "field": "job_id",
+        "description": "The Job ID"
+    },
+    {
+        "field": "narrative.title",
+        "description": "The narrative title"
+    },
+    {
+        "field": "app.module",
+        "description": "The app's module name"
+    },
+    {
+        "field": "app.function",
+        "description": "The app's function name"
+    },
+    {
+        "field": "app.title",
+        "description": "The app functions title"
+    },
+    {
+        "field": "client_group",
+        "description": "The client group list"
+    },
+    {
+        "field": "owner.username",
+        "description": "The job owner's username"
+    },
+    {
+        "field": "owner.realname",
+        "description": "The job owner's real name"
+    }
+]

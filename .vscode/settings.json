@@ -1,0 +1,15 @@
+{
+    "prettier.arrowParens": "always",
+    "prettier.eslintIntegration": true,
+    "prettier.printWidth": 120,
+    "prettier.singleQuote": true,
+    "prettier.tabWidth": 4,
+    "editor.detectIndentation": false,
+    "eslint.workingDirectories": [
+        {
+            "changeProcessCWD": true
+        }
+    ],
+    "python.pythonPath": "/usr/bin/python3",
+    "editor.formatOnSave": false
+}

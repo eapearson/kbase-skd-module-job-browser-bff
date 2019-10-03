@@ -1,0 +1,48 @@
+{
+    "definitions": {},
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "$id": "http://example.com/root.json",
+    "type": "object",
+    "title": "The Root Schema",
+    "required": [
+        "job_types"
+    ],
+    "properties": {
+        "job_types": {
+            "$id": "#/properties/job_types",
+            "type": "array",
+            "title": "The Job_types Schema",
+            "items": {
+                "$id": "#/properties/job_types/items",
+                "type": "object",
+                "title": "The Items Schema",
+                "required": [
+                    "code",
+                    "description"
+                ],
+                "properties": {
+                    "code": {
+                        "$id": "#/properties/job_types/items/properties/code",
+                        "type": "string",
+                        "title": "The Code Schema",
+                        "default": "",
+                        "examples": [
+                            "narrative"
+                        ],
+                        "pattern": "^(.*)$"
+                    },
+                    "description": {
+                        "$id": "#/properties/job_types/items/properties/description",
+                        "type": "string",
+                        "title": "The Description Schema",
+                        "default": "",
+                        "examples": [
+                            "The job was spawned from a Narrative"
+                        ],
+                        "pattern": "^(.*)$"
+                    }
+                }
+            }
+        }
+    }
+}

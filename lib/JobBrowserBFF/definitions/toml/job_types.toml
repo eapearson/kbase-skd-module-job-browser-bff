@@ -1,0 +1,11 @@
+[[definitions]]
+code = "narrative"
+description = "The job was spawned from a Narrative"
+
+[[definitions]]
+code = "export"
+description = "The job was spawned by an export request"
+
+[[definitions]]
+code = "unknown"
+description = "The job type could not be determined"

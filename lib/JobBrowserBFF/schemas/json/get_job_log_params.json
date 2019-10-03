@@ -1,0 +1,70 @@
+{
+    "definitions": {},
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "$id": "http://example.com/root.json",
+    "type": "object",
+    "title": "The Root Schema",
+    "required": [
+        "job_id"
+    ],
+    "properties": {
+        "job_id": {
+            "$id": "#/properties/job_id",
+            "type": "string",
+            "title": "The Job_id Schema",
+            "default": "",
+            "examples": [
+                "abc"
+            ],
+            "pattern": "^(.*)$"
+        },
+        "search": {
+            "$id": "#/properties/search",
+            "type": "array",
+            "title": "The Search Schema",
+            "items": {
+                "$id": "#/properties/search/items",
+                "type": "string",
+                "title": "The Items Schema",
+                "default": "",
+                "examples": [
+                    "stuff"
+                ],
+                "pattern": "^(.*)$"
+            }
+        },
+        "level": {
+            "$id": "#/properties/level",
+            "type": "array",
+            "title": "The Level Schema",
+            "items": {
+                "$id": "#/properties/level/items",
+                "type": "string",
+                "title": "The Items Schema",
+                "default": "",
+                "examples": [
+                    "error"
+                ],
+                "pattern": "^(.*)$"
+            }
+        },
+        "offset": {
+            "$id": "#/properties/offset",
+            "type": "integer",
+            "title": "The Offset Schema",
+            "default": 0,
+            "examples": [
+                0
+            ]
+        },
+        "limit": {
+            "$id": "#/properties/limit",
+            "type": "integer",
+            "title": "The Limit Schema",
+            "default": 0,
+            "examples": [
+                100
+            ]
+        }
+    }
+}

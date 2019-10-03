@@ -1,0 +1,65 @@
+{
+    "definitions": {},
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "$id": "http://example.com/root.json",
+    "type": "object",
+    "title": "The Root Schema",
+    "required": [
+        "sort_specs"
+    ],
+    "properties": {
+        "sort_specs": {
+            "$id": "#/properties/sort_specs",
+            "type": "array",
+            "title": "The Sort_specs Schema",
+            "items": {
+                "$id": "#/properties/sort_specs/items",
+                "type": "object",
+                "title": "The Items Schema",
+                "required": [
+                    "key",
+                    "fields",
+                    "description"
+                ],
+                "properties": {
+                    "key": {
+                        "$id": "#/properties/sort_specs/items/properties/key",
+                        "type": "string",
+                        "title": "The Key Schema",
+                        "default": "",
+                        "examples": [
+                            "narrative"
+                        ],
+                        "pattern": "^(.*)$"
+                    },
+                    "fields": {
+                        "$id": "#/properties/sort_specs/items/properties/fields",
+                        "type": "array",
+                        "title": "The Fields Schema",
+                        "items": {
+                            "$id": "#/properties/sort_specs/items/properties/fields/items",
+                            "type": "string",
+                            "title": "The Items Schema",
+                            "default": "",
+                            "examples": [
+                                "narrative.title",
+                                "queued_at"
+                            ],
+                            "pattern": "^(.*)$"
+                        }
+                    },
+                    "description": {
+                        "$id": "#/properties/sort_specs/items/properties/description",
+                        "type": "string",
+                        "title": "The Description Schema",
+                        "default": "",
+                        "examples": [
+                            "Alphabetical sort by narrative title, with a secondary sort on the queue time."
+                        ],
+                        "pattern": "^(.*)$"
+                    }
+                }
+            }
+        }
+    }
+}

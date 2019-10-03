@@ -1,0 +1,12 @@
+[
+    {
+        "code": "default",
+        "order": 1,
+        "description": "A log entry with no level assigned"
+    },
+    {
+        "code": "error",
+        "order": 2,
+        "description": "A log entry marked as an error message"
+    }
+]

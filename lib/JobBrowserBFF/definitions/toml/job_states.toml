@@ -1,0 +1,28 @@
+[[definitions]]
+code = "queued"
+description = "The job has been accepted by the execution engine and has been queued for execution"
+
+[[definitions]]
+code = "running"
+description = "The job is executing"
+notes = "The log should be available"
+
+[[definitions]]
+code = "completed"
+description = "The job has finished successfully"
+
+[[definitions]]
+code = "error_queued"
+description = "The job has finished with an error while it was in the queue; it was never run"
+
+[[definitions]]
+code = "error_running"
+description = "the job has finished with an error while it was running."
+
+[[definitions]]
+code = "canceled_queued"
+description = "The job was canceled, either by the user or an admin, while it was still in the queue"
+
+[[definitions]]
+code = "canceled_running"
+description = "The job was canceled, either by the user or an admin, while it was running"

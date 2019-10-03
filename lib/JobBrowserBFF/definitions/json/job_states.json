@@ -1,0 +1,31 @@
+[
+    {
+        "code": "queued",
+        "description": "The job has been accepted by the execution engine and has been queued for execution."
+    },
+    {
+        "code": "running",
+        "description": "The job is executing",
+        "notes": "Logs should be available"
+    },
+    {
+        "code": "completed",
+        "description": "The job has finished successfully"
+    },
+    {
+        "code": "errored_queued",
+        "description": "The job has finished with an error while it was in the queue; it was never run"
+    },
+    {
+        "code": "errored_running",
+        "description": "the job has finished with an error while it was running."
+    },
+    {
+        "code": "canceled_queued",
+        "description": "The job was canceled, either by the user or an admin, while it was still in the queue"
+    },
+    {
+        "code": "canceled_running",
+        "description": "The job was canceled, either by the user or an admin, while it was running"
+    }
+]

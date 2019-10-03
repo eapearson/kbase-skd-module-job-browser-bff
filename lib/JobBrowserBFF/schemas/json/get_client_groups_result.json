@@ -1,0 +1,48 @@
+{
+    "definitions": {},
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "$id": "http://example.com/root.json",
+    "type": "object",
+    "title": "The Root Schema",
+    "required": [
+        "client_groups"
+    ],
+    "properties": {
+        "client_groups": {
+            "$id": "#/properties/client_groups",
+            "type": "array",
+            "title": "The Client_groups Schema",
+            "items": {
+                "$id": "#/properties/client_groups/items",
+                "type": "object",
+                "title": "The Items Schema",
+                "required": [
+                    "code",
+                    "description"
+                ],
+                "properties": {
+                    "code": {
+                        "$id": "#/properties/client_groups/items/properties/code",
+                        "type": "string",
+                        "title": "The Code Schema",
+                        "default": "",
+                        "examples": [
+                            "njs"
+                        ],
+                        "pattern": "^(.*)$"
+                    },
+                    "description": {
+                        "$id": "#/properties/client_groups/items/properties/description",
+                        "type": "string",
+                        "title": "The Description Schema",
+                        "default": "",
+                        "examples": [
+                            "Narrative Job Service"
+                        ],
+                        "pattern": "^(.*)$"
+                    }
+                }
+            }
+        }
+    }
+}

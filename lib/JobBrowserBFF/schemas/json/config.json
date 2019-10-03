@@ -1,0 +1,154 @@
+{
+    "definitions": {},
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "$id": "http://example.com/root.json",
+    "type": "object",
+    "title": "The Root Schema",
+    "required": [
+        "kbase-endpoint",
+        "job-service-url",
+        "workspace-url",
+        "shock-url",
+        "handle-service-url",
+        "srv-wiz-url",
+        "njsw-url",
+        "nms-url",
+        "auth-service-url",
+        "auth-service-url-allow-insecure",
+        "scratch",
+        "auth-url",
+        "catalog-url"
+    ],
+    "properties": {
+        "kbase-endpoint": {
+            "$id": "#/properties/kbase-endpoint",
+            "type": "string",
+            "title": "The Kbase-endpoint Schema",
+            "default": "",
+            "examples": [
+                "https://ci.kbase.us/services"
+            ],
+            "pattern": "^(.*)$"
+        },
+        "job-service-url": {
+            "$id": "#/properties/job-service-url",
+            "type": "string",
+            "title": "The Job-service-url Schema",
+            "default": "",
+            "examples": [
+                "https://ci.kbase.us/services/userandjobstate"
+            ],
+            "pattern": "^(.*)$"
+        },
+        "workspace-url": {
+            "$id": "#/properties/workspace-url",
+            "type": "string",
+            "title": "The Workspace-url Schema",
+            "default": "",
+            "examples": [
+                "https://ci.kbase.us/services/ws"
+            ],
+            "pattern": "^(.*)$"
+        },
+        "shock-url": {
+            "$id": "#/properties/shock-url",
+            "type": "string",
+            "title": "The Shock-url Schema",
+            "default": "",
+            "examples": [
+                "https://ci.kbase.us/services/shock-api"
+            ],
+            "pattern": "^(.*)$"
+        },
+        "handle-service-url": {
+            "$id": "#/properties/handle-service-url",
+            "type": "string",
+            "title": "The Handle-service-url Schema",
+            "default": "",
+            "examples": [
+                "https://ci.kbase.us/services/handle_service"
+            ],
+            "pattern": "^(.*)$"
+        },
+        "srv-wiz-url": {
+            "$id": "#/properties/srv-wiz-url",
+            "type": "string",
+            "title": "The Srv-wiz-url Schema",
+            "default": "",
+            "examples": [
+                "https://ci.kbase.us/services/service_wizard"
+            ],
+            "pattern": "^(.*)$"
+        },
+        "njsw-url": {
+            "$id": "#/properties/njsw-url",
+            "type": "string",
+            "title": "The Njsw-url Schema",
+            "default": "",
+            "examples": [
+                "https://ci.kbase.us/services/njs_wrapper"
+            ],
+            "pattern": "^(.*)$"
+        },
+        "nms-url": {
+            "$id": "#/properties/nms-url",
+            "type": "string",
+            "title": "The Nms-url Schema",
+            "default": "",
+            "examples": [
+                "https://ci.kbase.us/services/narrative_method_store/rpc"
+            ],
+            "pattern": "^(.*)$"
+        },
+        "auth-service-url": {
+            "$id": "#/properties/auth-service-url",
+            "type": "string",
+            "title": "The Auth-service-url Schema",
+            "default": "",
+            "examples": [
+                "https://ci.kbase.us/services/auth/api/legacy/KBase/Sessions/Login"
+            ],
+            "pattern": "^(.*)$"
+        },
+        "auth-service-url-allow-insecure": {
+            "$id": "#/properties/auth-service-url-allow-insecure",
+            "type": "string",
+            "title": "The Auth-service-url-allow-insecure Schema",
+            "default": "",
+            "examples": [
+                "false"
+            ],
+            "pattern": "^(.*)$"
+        },
+        "scratch": {
+            "$id": "#/properties/scratch",
+            "type": "string",
+            "title": "The Scratch Schema",
+            "default": "",
+            "examples": [
+                "/kb/module/work/tmp"
+            ],
+            "pattern": "^(.*)$"
+        },
+        "auth-url": {
+            "$id": "#/properties/auth-url",
+            "type": "string",
+            "title": "The Auth-url Schema",
+            "default": "",
+            "examples": [
+                "https://ci.kbase.us/services/auth"
+            ],
+            "pattern": "^(.*)$"
+        },
+        "catalog-url": {
+            "$id": "#/properties/catalog-url",
+            "type": "string",
+            "title": "The Catalog-url Schema",
+            "default": "",
+            "examples": [
+                "https://ci.kbase.us/services/catalog"
+            ],
+            "pattern": "^(.*)$"
+        }
+    }
+}

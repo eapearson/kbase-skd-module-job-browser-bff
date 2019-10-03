@@ -1,0 +1,10 @@
+[
+    {
+        "log": [{
+            "entry_number": 1,
+            "entry": "my log entry",
+            "level": "error"
+        }],
+        "total_count": 100
+    }
+]

@@ -1,0 +1,30 @@
+[
+    {
+        "code": "njs",
+        "description": "Narrative Job Service"
+    },
+    {
+        "code": "kb_upload",
+        "description": "For running uploaders"
+    },
+    {
+        "code": "bigmem",
+        "description": ""
+    },
+    {
+        "code": "extreme",
+        "description": ""
+    },
+    {
+        "code": "bigmemlong",
+        "description": ""
+    },
+    {
+        "code": "hpc",
+        "description": ""
+    },
+    {
+        "code": "extreme",
+        "description": ""
+    }
+]

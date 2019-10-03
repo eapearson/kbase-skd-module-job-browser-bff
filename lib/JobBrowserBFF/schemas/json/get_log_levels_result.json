@@ -1,0 +1,58 @@
+{
+    "definitions": {},
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "$id": "http://example.com/root.json",
+    "type": "object",
+    "title": "The Root Schema",
+    "required": [
+        "log_levels"
+    ],
+    "properties": {
+        "log_levels": {
+            "$id": "#/properties/log_levels",
+            "type": "array",
+            "title": "The Log_levels Schema",
+            "items": {
+                "$id": "#/properties/log_levels/items",
+                "type": "object",
+                "title": "The Items Schema",
+                "required": [
+                    "code",
+                    "order",
+                    "description"
+                ],
+                "properties": {
+                    "code": {
+                        "$id": "#/properties/log_levels/items/properties/code",
+                        "type": "string",
+                        "title": "The Code Schema",
+                        "default": "",
+                        "examples": [
+                            "default"
+                        ],
+                        "pattern": "^(.*)$"
+                    },
+                    "order": {
+                        "$id": "#/properties/log_levels/items/properties/order",
+                        "type": "integer",
+                        "title": "The Order Schema",
+                        "default": 0,
+                        "examples": [
+                            1
+                        ]
+                    },
+                    "description": {
+                        "$id": "#/properties/log_levels/items/properties/description",
+                        "type": "string",
+                        "title": "The Description Schema",
+                        "default": "",
+                        "examples": [
+                            "A log entry with no level assigned"
+                        ],
+                        "pattern": "^(.*)$"
+                    }
+                }
+            }
+        }
+    }
+}

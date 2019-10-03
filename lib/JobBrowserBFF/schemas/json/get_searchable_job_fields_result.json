@@ -1,0 +1,48 @@
+{
+    "definitions": {},
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "$id": "http://example.com/root.json",
+    "type": "object",
+    "title": "The Root Schema",
+    "required": [
+        "searchable_job_fields"
+    ],
+    "properties": {
+        "searchable_job_fields": {
+            "$id": "#/properties/searchable_job_fields",
+            "type": "array",
+            "title": "The Searchable_job_fields Schema",
+            "items": {
+                "$id": "#/properties/searchable_job_fields/items",
+                "type": "object",
+                "title": "The Items Schema",
+                "required": [
+                    "field",
+                    "description"
+                ],
+                "properties": {
+                    "field": {
+                        "$id": "#/properties/searchable_job_fields/items/properties/field",
+                        "type": "string",
+                        "title": "The Field Schema",
+                        "default": "",
+                        "examples": [
+                            "job_id"
+                        ],
+                        "pattern": "^(.*)$"
+                    },
+                    "description": {
+                        "$id": "#/properties/searchable_job_fields/items/properties/description",
+                        "type": "string",
+                        "title": "The Description Schema",
+                        "default": "",
+                        "examples": [
+                            "The Job ID"
+                        ],
+                        "pattern": "^(.*)$"
+                    }
+                }
+            }
+        }
+    }
+}

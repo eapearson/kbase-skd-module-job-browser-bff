@@ -1,0 +1,68 @@
+{
+    "definitions": {},
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "$id": "http://example.com/root.json",
+    "type": "object",
+    "title": "The Root Schema",
+    "required": [
+        "log",
+        "total_count"
+    ],
+    "properties": {
+        "log": {
+            "$id": "#/properties/log",
+            "type": "array",
+            "title": "The Log Schema",
+            "items": {
+                "$id": "#/properties/log/items",
+                "type": "object",
+                "title": "The Items Schema",
+                "required": [
+                    "entry_number",
+                    "entry",
+                    "level"
+                ],
+                "properties": {
+                    "entry_number": {
+                        "$id": "#/properties/log/items/properties/entry_number",
+                        "type": "integer",
+                        "title": "The Entry_number Schema",
+                        "default": 0,
+                        "examples": [
+                            1
+                        ]
+                    },
+                    "entry": {
+                        "$id": "#/properties/log/items/properties/entry",
+                        "type": "string",
+                        "title": "The Entry Schema",
+                        "default": "",
+                        "examples": [
+                            "my log entry"
+                        ],
+                        "pattern": "^(.*)$"
+                    },
+                    "level": {
+                        "$id": "#/properties/log/items/properties/level",
+                        "type": "string",
+                        "title": "The Level Schema",
+                        "default": "",
+                        "examples": [
+                            "error"
+                        ],
+                        "pattern": "^(.*)$"
+                    }
+                }
+            }
+        },
+        "total_count": {
+            "$id": "#/properties/total_count",
+            "type": "integer",
+            "title": "The Total_count Schema",
+            "default": 0,
+            "examples": [
+                100
+            ]
+        }
+    }
+}
