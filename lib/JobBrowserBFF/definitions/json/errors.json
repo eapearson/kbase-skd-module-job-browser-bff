@@ -1,0 +1,50 @@
+[
+    {
+        "code": -32700,
+        "message": "Parse error",
+        "description": "Invalid JSON was received by the server. An error occurred on the server while parsing the JSON text.",
+        "data": []
+    },
+    {
+        "code": -32600	,
+        "message": "Invalid Request",
+        "description": "The JSON sent is not a valid Request object.",
+        "data": []
+    },
+    {
+        "code": -32601,
+        "message": "Method not found",
+        "description": "The method does not exist / is not available.",
+        "data": []
+    },
+    {
+        "code": -32602,
+        "message": "Invalid params",
+        "description": "Invalid method parameter(s).",
+        "data": ["schema_error", "schema_path", "schema_value"]
+    },
+    {
+        "code": -32603,
+        "message": "Internal error",
+        "description": "Internal JSON-RPC error.",
+        "data": []
+    },
+    {
+        "code": 10,
+        "message": "Job not found",
+        "description": "The requested job could not be found.",
+        "data": ["job_id"]
+    },
+    {
+        "code": 20,
+        "message": "Inactive job cannot be canceled",
+        "description": "Job could not be canceled because it is not active",
+        "data": ["job_id", "status"]
+    },
+    {
+        "code": 30,
+        "message": "Insufficient privileges to cancel job",
+        "description": "Job could not be canceled due to insufficient privileges",
+        "data": ["job_id"]
+    }
+]

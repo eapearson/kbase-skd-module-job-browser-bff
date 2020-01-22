@@ -1,11 +1,12 @@
 {
     "definitions": {},
     "$schema": "http://json-schema.org/draft-07/schema#",
-    "$id": "http://example.com/root.json",
     "type": "object",
     "title": "The Root Schema",
     "required": [
-        "job_id"
+        "job_id",
+        "offset",
+        "limit"
     ],
     "properties": {
         "job_id": {
@@ -55,7 +56,8 @@
             "default": 0,
             "examples": [
                 0
-            ]
+            ],
+            "minimum": 0
         },
         "limit": {
             "$id": "#/properties/limit",
@@ -64,7 +66,12 @@
             "default": 0,
             "examples": [
                 100
-            ]
+            ],
+            "minimum": 0
+        },
+        "timeout": {
+            "type": "integer",
+            "minimumExclusive": 0
         }
     }
 }

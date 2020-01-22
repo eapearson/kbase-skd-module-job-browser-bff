@@ -1,7 +1,6 @@
 {
     "definitions": {},
     "$schema": "http://json-schema.org/draft-07/schema#",
-    "$id": "http://example.com/root.json",
     "type": "object",
     "title": "The Root Schema",
     "required": [
@@ -20,6 +19,14 @@
         "catalog-url"
     ],
     "properties": {
+        "upstream-service": {
+            "type": "string",
+            "enum": ["ee2", "metrics", "mock"]
+        },
+        "default-timeout": {
+            "type": "integer",
+            "minimum": 0
+        },
         "kbase-endpoint": {
             "$id": "#/properties/kbase-endpoint",
             "type": "string",
@@ -87,6 +94,16 @@
             "default": "",
             "examples": [
                 "https://ci.kbase.us/services/njs_wrapper"
+            ],
+            "pattern": "^(.*)$"
+        },
+        "ee2-url": {
+            "$id": "#/properties/ee2-url",
+            "type": "string",
+            "title": "The ee2-url Schema",
+            "default": "",
+            "examples": [
+                "https://ci.kbase.us/services/execution_engine2"
             ],
             "pattern": "^(.*)$"
         },

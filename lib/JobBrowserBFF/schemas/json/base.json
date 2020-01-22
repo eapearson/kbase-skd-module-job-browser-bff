@@ -1,0 +1,579 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "type": "object",
+    "title": "The Base Schema",
+    "definitions": {
+        "jsonrpc_2_error": {
+            "type": "object",
+            "title": "A JSONRPC compatible error",
+            "required": [
+                "code", "message"
+            ],
+            "additionalProperties": false,
+            "properties": {
+                "code": {
+                    "type": "integer"
+                },
+                "message": {
+                    "type": "string"
+                },
+                "data": {
+                    "type": ["object", "null"],
+                    "properties": {
+                    }
+                }
+            }
+        },
+        "jsonrpc_11_error": {
+            "type": "object",
+            "title": "A JSONRPC error compatible with kbase legacy apps",
+            "required": [
+                "code", "message"
+            ],
+            "additionalProperties": false,
+            "properties": {
+                "code": {
+                    "type": "integer"
+                },
+                "message": {
+                    "type": "string"
+                },
+                "error": {
+                    "type": ["object", "string", "null"],
+                    "properties": {
+                    }
+                }
+            }
+        },
+        "error": {
+            "type": "object",
+            "title": "A job error",
+            "required": [
+                "code", "message"
+            ],
+            "additionalProperties": false,
+            "properties": {
+                "code": {
+                    "type": "integer",
+                    "enum": [0, 1, 2, 3, 4, 5]
+                },
+                "message": {
+                    "type": "string"
+                },
+                "service_error": {
+                    "oneOf": [
+                        {"$ref": "#/definitions/jsonrpc_2_error"},
+                        {"$ref": "#/definitions/jsonrpc_11_error"}
+                    ]
+                }
+            }
+        },
+        "termination_reason": {
+            "type": "object",
+            "title": "A job termination reason",
+            "required": [
+                "code"
+            ],
+            "additionalProperties": false,
+            "properties": {
+                "code": {
+                    "type": "integer",
+                    "enum": [0, 1, 2]
+                },
+                "message": {
+                    "type": "string"
+                }
+            }
+        },
+        "job_state_create": {
+            "type": "object",
+            "title": "Job has been created",
+            "required": [
+                "status",
+                "create_at"
+            ],
+            "additionalProperties": false,
+            "properties": {
+                "status": {
+                    "type": "string",
+                    "const": "create"                
+                },
+                "create_at": {
+                    "type": "integer"
+                }
+            }
+        },
+        "job_state_queue": {
+            "type": "object",
+            "title": "Job has been queued",
+            "required": [
+                "status",
+                "create_at",
+                "queue_at"
+            ],
+            "additionalProperties": false,
+            "properties": {
+                "status": {
+                    "type": "string",
+                    "const": "queue"
+                },
+                "create_at": {
+                    "type": "integer"
+                },
+                "queue_at": {
+                    "type": "integer"
+                },
+                "client_group": {
+                    "type": ["string", "null"]
+                }
+            }
+        },
+        "job_state_run": {
+            "type": "object",
+            "title": "Job is running",
+            "required": [
+                "status",
+                "create_at",
+                "queue_at",
+                "run_at"
+            ],
+            "additionalProperties": false,
+            "properties": {
+                "status": {
+                    "type": "string",
+                    "const": "run"
+                },
+                "create_at": {
+                    "type": "integer"
+                },
+                "queue_at": {
+                    "type": "integer"
+                },
+                "run_at": {
+                    "type": "integer"
+                },
+                "client_group": {
+                    "type": ["string", "null"]
+                }
+            }
+        },
+        "job_state_complete": {
+            "type": "object",
+            "title": "Job is finished successfully",
+            "required": [
+                "status",
+                "create_at",
+                "queue_at",
+                "run_at",
+                "finish_at"
+            ],
+            "additionalProperties": false,
+            "properties": {
+                "status": {
+                    "type": "string",
+                    "const": "complete"
+                },
+                "create_at": {
+                    "type": "integer"
+                },
+                "queue_at": {
+                    "type": "integer"
+                },
+                "run_at": {
+                    "type": "integer"
+                },
+                "finish_at": {
+                    "type": "integer"
+                },
+                "client_group": {
+                    "type": ["string", "null"]
+                }
+            }
+        },
+        "job_state_error": {
+            "type": "object",
+            "title": "Job is finished with error",
+            "required": [
+                "status",
+                "create_at",
+                "finish_at",
+                "error"
+            ],
+            "additionalProperties": false,
+            "properties": {
+                "status": {
+                    "type": "string",
+                    "const": "error"
+                },
+                "create_at": {
+                    "type": "integer"
+                },
+                "queue_at": {
+                    "type": "integer"
+                },
+                "run_at": {
+                    "type": "integer"
+                },
+                "finish_at": {
+                    "type": "integer"
+                },
+                "error": {
+                    "$ref": "#/definitions/error"
+                },
+                "client_group": {
+                    "type": ["string", "null"]
+                }
+            }
+        },
+        "job_state_terminate": {
+            "type": "object",
+            "title": "Job is finished by termination",
+            "required": [
+                "status",
+                "create_at",
+                "finish_at",
+                "reason"
+            ],
+            "additionalProperties": false,
+            "properties": {
+                "status": {
+                    "type": "string",
+                    "const": "terminate"
+                },
+                "create_at": {
+                    "type": "integer"
+                },
+                "queue_at": {
+                    "type": "integer"
+                },
+                "run_at": {
+                    "type": "integer"
+                },
+                "finish_at": {
+                    "type": "integer"
+                },
+                "reason": {
+                    "$ref": "#/definitions/termination_reason"
+                },
+                "client_group": {
+                    "type": ["string", "null"]
+                }
+            }
+        },
+        "job_state": {
+            "type": "object",
+            "title": "Job State",
+            "oneOf": [
+                {
+                    "$ref": "#/definitions/job_state_create"
+                },
+                {
+                    "$ref": "#/definitions/job_state_queue"
+                },
+                {
+                    "$ref": "#/definitions/job_state_run"
+                },
+                {
+                    "$ref": "#/definitions/job_state_complete"
+                },
+                {
+                    "$ref": "#/definitions/job_state_error"
+                },
+                {
+                    "$ref": "#/definitions/job_state_terminate"
+                }
+            ] 
+        },
+        "job_context_narrative": {
+            "type": "object",
+            "title": "The context",
+            "required": [
+                "type", "workspace"
+            ],
+            "additionalProperties": false,
+            "properties": {
+                "type": {
+                    "type": "string",
+                    "const": "narrative"
+                },
+                "workspace": {
+                    "type": "object",
+                    "required": [
+                        "id",
+                        "is_accessible"
+                    ],
+                    "additionalProperties": false,
+                    "properties": {
+                        "id": {
+                            "type": "number"
+                        },
+                        "is_accessible": {
+                            "type": "boolean",
+                            "const": true
+                        },
+                        "is_deleted": {
+                            "type": "boolean"
+                        },
+                        "name": {
+                            "type": "string"
+                        }
+                    }
+                },
+                "narrative": {
+                    "type": "object",
+                    "required": [
+                        "title"
+                    ],
+                    "additionalProperties": false,
+                    "properties": {
+                        "title": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "job_context_workspace": {
+            "type": "object",
+            "title": "The workspace context",
+            "required": [
+                "type", "workspace"
+            ],
+            "additionalProperties": false,
+            "properties": {
+                "type": {
+                    "type": "string",
+                    "const": "workspace"
+                },
+                "workspace": {
+                    "type": "object",
+                    "required": [
+                        "id", "is_accessible"
+                    ],
+                    "additionalProperties": false,
+                    "properties": {
+                        "id": {
+                            "type": "number"
+                        },
+                        "name": {
+                            "type": "string"
+                        },
+                        "is_accessible": {
+                            "type": "boolean"
+                        },
+                        "is_deleted": {
+                            "type": "boolean"
+                        }
+                    }
+                }
+            }
+        },
+        "job_context_export": {
+            "type": "object",
+            "title": "The export context",
+            "required": [
+                "type"
+            ],
+            "additionalProperties": false,
+            "properties": {
+                "type": {
+                    "type": "string",
+                    "const": "export"
+                }
+            }
+        },
+        "job_context_unknown": {
+            "type": "object",
+            "title": "The unknown context",
+            "required": [
+                "type"
+            ],
+            "additionalProperties": false,
+            "properties": {
+                "type": {
+                    "type": "string",
+                    "const": "unknown"
+                }
+            }
+        },
+        "job_info": {
+            "type": "object",
+            "title": "The Items Schema",
+            "required": [
+                "job_id",
+                "owner",
+                "state",
+                "app",
+                "context"
+            ],
+            "additionalProperties": false,
+            "properties": {
+                "job_id": {
+                    "$id": "#/properties/jobs/items/properties/job_id",
+                    "type": "string",
+                    "title": "The Job_id Schema",
+                    "default": "",
+                    "examples": [
+                        "abc"
+                    ],
+                    "pattern": "^(.*)$"
+                },
+                "owner": {
+                    "$id": "#/properties/jobs/items/properties/owner",
+                    "type": "object",
+                    "title": "The Owner Schema",
+                    "required": [
+                        "username",
+                        "realname"
+                    ],
+                    "properties": {
+                        "username": {
+                            "$id": "#/properties/jobs/items/properties/owner/properties/username",
+                            "type": "string",
+                            "default": "",
+                            "examples": [
+                                "mmouse"
+                            ],
+                            "pattern": "^(.*)$"
+                        },
+                        "realname": {
+                            "$id": "#/properties/jobs/items/properties/owner/properties/realname",
+                            "type": "string",
+                            "default": "",
+                            "examples": [
+                                "Mickey Mouse"
+                            ],
+                            "pattern": "^(.*)$"
+                        }
+                    }
+                },
+                "state": {
+                    "$ref": "#/definitions/job_state"
+                },
+                "app": {
+                    "$id": "#/properties/jobs/items/properties/app",
+                    "type": ["object", "null"],
+                    "title": "The App Schema",
+                    "required": [
+                        "id",
+                        "module_name",
+                        "function_name",
+                        "title",
+                        "client_groups"
+                    ],
+                    "properties": {
+                        "id": {
+                            "type": "string",
+                            "title": "The App ID"
+                        },
+                        "module_name": {
+                            "$id": "#/properties/jobs/items/properties/app/properties/module_name",
+                            "type": "string",
+                            "title": "The Module_name Schema",
+                            "default": "",
+                            "examples": [
+                                "Module"
+                            ],
+                            "pattern": "^(.*)$"
+                        },
+                        "function_name": {
+                            "$id": "#/properties/jobs/items/properties/app/properties/function_name",
+                            "type": "string",
+                            "title": "The Function_name Schema",
+                            "default": "",
+                            "examples": [
+                                "func1"
+                            ],
+                            "pattern": "^(.*)$"
+                        },
+                        "title": {
+                            "$id": "#/properties/jobs/items/properties/app/properties/title",
+                            "type": "string",
+                            "title": "The Title Schema",
+                            "default": "",
+                            "examples": [
+                                "My amazing method"
+                            ],
+                            "pattern": "^(.*)$"
+                        },
+                        "client_groups": {
+                            "type": "array",
+                            "default": [],
+                            "items": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                },
+                "context": {
+                    "type": "object",
+                    "oneOf": [
+                        {
+                            "$ref": "#/definitions/job_context_narrative"
+                        },
+                        {
+                            "$ref": "#/definitions/job_context_workspace"
+                        },
+                        {
+                            "$ref": "#/definitions/job_context_export"
+                        },
+                        {
+                            "$ref": "#/definitions/job_context_unknown"
+                        }
+                    ]
+                }
+            }
+        },
+        "job_filter": {
+            "type": "object",
+            "title": "A job filter",
+            "required": [],
+            "additionalProperties": false,
+            "properties": {
+                "workspace_id": {
+                    "type": ["array"],
+                    "items": {
+                        "type": "number"
+                    }
+                },
+                "status": {
+                    "type": ["array"],
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "username": {
+                    "type": ["array"],
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "app_id": {
+                    "type": ["array"],
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                
+                "job_id": {
+                    "type": ["array"],
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "error_code": {
+                    "type": ["array"],
+                    "items": {
+                        "type": "number"
+                    }
+                },
+                "terminated_code": {
+                    "type": ["array"],
+                    "items": {
+                        "type": "number"
+                    }
+                }
+            }
+        }
+    }
+}

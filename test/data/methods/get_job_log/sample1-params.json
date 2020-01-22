@@ -1,9 +1,0 @@
-[
-    {
-        "job_id": "abc",
-        "search": ["stuff"],
-        "level": ["error"],
-        "offset": 0,
-        "limit": 100
-    }
-]

@@ -1,0 +1,8 @@
+{
+    "job_types": [
+        {
+            "code": "abc",
+            "description": "A B C"
+        }
+    ]
+}

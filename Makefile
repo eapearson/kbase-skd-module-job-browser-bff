@@ -25,6 +25,7 @@ compile:
 		--out $(LIB_DIR) \
 		--pysrvname $(SERVICE_CAPS).$(SERVICE_CAPS)Server \
 		--pyimplname $(SERVICE_CAPS).$(SERVICE_CAPS)Impl;
+	@python3 scripts/fix-impl.py
 
 build:
 	@chmod +x $(SCRIPTS_DIR)/entrypoint.sh
@@ -45,7 +46,8 @@ build-startup-script:
 	@echo 'script_dir=$$(dirname "$$(readlink -f "$$0")")' >> $(SCRIPTS_DIR)/$(STARTUP_SCRIPT_NAME)
 	@echo 'export KB_DEPLOYMENT_CONFIG=$$script_dir/../deploy.cfg' >> $(SCRIPTS_DIR)/$(STARTUP_SCRIPT_NAME)
 	@echo 'export PYTHONPATH=$$script_dir/../$(LIB_DIR):$$PATH:$$PYTHONPATH' >> $(SCRIPTS_DIR)/$(STARTUP_SCRIPT_NAME)
-	@echo 'uwsgi --master --processes 5 --threads 5 --http :5000 --wsgi-file $$script_dir/../$(LIB_DIR)/$(SERVICE_CAPS)/$(SERVICE_CAPS)Server.py' >> $(SCRIPTS_DIR)/$(STARTUP_SCRIPT_NAME)
+	# NB: Using the fixed _Server not the sdk generated one.
+	@echo 'uwsgi --master --processes 5 --threads 5 --http :5000 --uid kbmodule --wsgi-file $$script_dir/../$(LIB_DIR)/$(SERVICE_CAPS)/$(SERVICE_CAPS)_JSONRPCServer.py' >> $(SCRIPTS_DIR)/$(STARTUP_SCRIPT_NAME)
 	@chmod +x $(SCRIPTS_DIR)/$(STARTUP_SCRIPT_NAME)
 
 build-test-script:
@@ -59,7 +61,10 @@ build-test-script:
 	@echo 'echo "...done removing temp files."' >> $(TEST_DIR)/$(TEST_SCRIPT_NAME)
 	@echo 'export PYTHONPATH=$$script_dir/../$(LIB_DIR):$$PATH:$$PYTHONPATH' >> $(TEST_DIR)/$(TEST_SCRIPT_NAME)
 	@echo 'cd $$script_dir/../$(TEST_DIR)/enabled' >> $(TEST_DIR)/$(TEST_SCRIPT_NAME)
+	@echo 'echo "Starting mock servers..."' >> $(TEST_DIR)/$(TEST_SCRIPT_NAME)
 	@echo 'python3 -m MockServers.run_server --port 5001 --host "localhost" &' >> $(TEST_DIR)/$(TEST_SCRIPT_NAME)
+	@echo 'echo "...done"' >> $(TEST_DIR)/$(TEST_SCRIPT_NAME)
+	@echo 'echo "Running tests..."' >> $(TEST_DIR)/$(TEST_SCRIPT_NAME)
 	@echo 'python3 -m nose --with-coverage --cover-package=$(SERVICE_CAPS) --cover-html --cover-html-dir=/kb/module/work/test_coverage --nocapture  --nologcapture .' >> $(TEST_DIR)/$(TEST_SCRIPT_NAME)
 	@chmod +x $(TEST_DIR)/$(TEST_SCRIPT_NAME)
 
@@ -72,10 +77,18 @@ test:
 clean:
 	@rm -rfv $(LBIN_DIR)
 
-docker-image-dev:
+dev-image:
 	@echo "> Creating local image for development or testing"
 	@bash scripts/build-docker-image-dev.sh	
 
-run-docker-image-dev:
+run-dev-image:
 	@echo "> Running the already-built docker image"
-	@bash scripts/run-docker-image-dev.sh	
+	@bash scripts/run-docker-image-dev.sh
+
+run-dev-mongo:
+	@echo "> Running local mongo container for testing/development"
+	@bash scripts/start-mongo-for-tests.sh
+
+run-local-tests:
+	@echo "> Running tests via sdk"
+	PATH="${PATH}":`pwd`/../kb_sdk/bin && kb-sdk test

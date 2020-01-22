@@ -1,0 +1,9 @@
+{
+    "log_levels": [
+        {
+            "code": "abc",
+            "order": 1,
+            "description": "A B C"
+        }
+    ]
+}

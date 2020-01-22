@@ -5,9 +5,9 @@ A very basic KBase auth client for the Python server.
 
 @author: gaprice@lbl.gov
 '''
-import time as _time
-import requests as _requests
-import threading as _threading
+import time 
+import requests 
+import threading 
 import hashlib
 
 
@@ -16,33 +16,43 @@ class TokenCache(object):
 
     _MAX_TIME_SEC = 5 * 60  # 5 min
 
-    _lock = _threading.RLock()
+    _lock = threading.RLock()
 
     def __init__(self, maxsize=2000):
         self._cache = {}
         self._maxsize = maxsize
         self._halfmax = maxsize / 2  # int division to round down
 
+    def token_expired(self, cached_at):
+        if time.time() - cached_at > self._MAX_TIME_SEC:
+            return True
+        return False
+
     def get_user(self, token):
-        token = hashlib.sha256(token.encode('utf-8')).hexdigest()
+        encoded_token = self.encode_token(token)
         with self._lock:
-            usertime = self._cache.get(token)
-        if not usertime:
+            token_info = self._cache.get(token)
+        if not token_info:
             return None
 
-        user, intime = usertime
-        if _time.time() - intime > self._MAX_TIME_SEC:
+        username, cached_at = token_info
+        if self.token_expired(cached_at):
             return None
-        return user
+        
+        return username
 
-    def add_valid_token(self, token, user):
+    def encode_token(self, token):
+        return hashlib.sha256(token.encode('utf-8')).hexdigest()
+
+    def add_valid_token(self, token, username):
         if not token:
             raise ValueError('Must supply token')
-        if not user:
-            raise ValueError('Must supply user')
-        token = hashlib.sha256(token.encode('utf-8')).hexdigest()
+        if not username:
+            raise ValueError('Must supply username')
+
+        encoded_token = self.encode_token(token)
         with self._lock:
-            self._cache[token] = [user, _time.time()]
+            self._cache[encoded_token] = [username, time.time()]
             if len(self._cache) > self._maxsize:
                 sorted_items = sorted(
                     list(self._cache.items()),
@@ -67,6 +77,9 @@ class KBaseAuth(object):
         Constructor
         '''
         self._authurl = auth_url
+        # TODO: is it really a good idea to have a default url? I think we
+        #       should just fail if no url is provided; otherwise bad code,
+        #       probably NOT in production, will call production.
         if not self._authurl:
             self._authurl = self._LOGIN_URL
         self._cache = TokenCache()
@@ -74,21 +87,25 @@ class KBaseAuth(object):
     def get_user(self, token):
         if not token:
             raise ValueError('Must supply token')
-        user = self._cache.get_user(token)
-        if user:
-            return user
+
+        username = self._cache.get_user(token)
+        if username:
+            return username
 
         d = {'token': token, 'fields': 'user_id'}
-        ret = _requests.post(self._authurl, data=d)
+        ret = requests.post(self._authurl, data=d)
         if not ret.ok:
             try:
                 err = ret.json()
             except Exception as e:
                 ret.raise_for_status()
-            raise ValueError('Error connecting to auth service: {} {}\n{}'
-                             .format(ret.status_code, ret.reason,
-                                     err['error']['message']))
+            message = 'Error connecting to auth service: {} {}\n{}\n{}'.format(
+                    ret.status_code,
+                    ret.reason,
+                    err['error']['message'],
+                    self._authurl)
+            raise ValueError(message)
 
-        user = ret.json()['user_id']
-        self._cache.add_valid_token(token, user)
-        return user
+        username = ret.json()['user_id']
+        self._cache.add_valid_token(token, username)
+        return username

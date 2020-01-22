@@ -1,0 +1,35 @@
+{
+    "definitions": {},
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "type": "object",
+    "title": "The Root Schema",
+    "required": [
+        "jobs",
+        "total_count"
+    ],
+    "properties": {
+        "jobs": {
+            "type": "array",
+            "title": "The Jobs Schema",
+            "items": {
+                "$ref": "base.json#definitions/job_info"
+            }
+        },
+        "total_count": {
+            "type": "integer",
+            "title": "The Total_count Schema",
+            "default": 0,
+            "examples": [
+                200
+            ]
+        },
+        "found_count": {
+            "type": "integer",
+            "title": "The Found count Schema",
+            "default": 0,
+            "examples": [
+                22
+            ]
+        }
+    }
+}

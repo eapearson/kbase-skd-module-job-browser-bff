@@ -1,0 +1,30 @@
+{
+    "users": [
+        "mmouse",
+        "dduck"
+    ],
+    "jobs": [
+        "job1",
+        "job2"
+    ],
+    "sort": [
+        {
+            "key": "created",
+            "direction": "ascending"
+        }
+    ],
+    "search": {
+        "terms": [
+            "cheese"
+        ]
+    },
+    "time_span": {
+        "from": 0,
+        "to": 1000
+    },
+    "client_groups": [
+        "njs"
+    ],
+    "offset": 0,
+    "limit": 100
+}

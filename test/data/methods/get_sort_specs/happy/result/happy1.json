@@ -1,0 +1,9 @@
+{
+    "sort_specs": [
+        {
+            "key": "sort_key",
+            "fields": ["state.queued_at", "context.narrative.title"],
+            "description": "Sort by queue time"
+        }
+    ]
+}

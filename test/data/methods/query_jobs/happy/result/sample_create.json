@@ -1,0 +1,37 @@
+{
+    "jobs": [
+        {
+            "job_id": "5d769018aa5a4d298c5dc97a",
+            "owner": {
+                "username": "eapearson",
+                "realname": "Erik Pearson"
+            },
+            "state": {
+                "status": "create",
+                "create_at": 1568051224316
+            },
+            "context": {
+                "type": "narrative",
+                "workspace": {
+                    "id": 43676,
+                    "is_accessible": true,
+                    "is_deleted": false
+                },
+                "narrative": {
+                    "title": "Another job browser test"
+                }
+            },
+            "app": {
+                "id": "ProkkaAnnotation/annotate_contigs",
+                "module_name": "ProkkaAnnotation",
+                "function_name": "annotate_contigs",
+                "title": "Annotate Assembly and ReAnnotate Genomes with Prokka v1.12",
+                "client_groups": [
+                    "njs"
+                ]
+            }
+        }
+    ],
+    "total_count": 1,
+    "found_count": 1
+}

@@ -25,9 +25,9 @@ The request structure is like:
 }
 ```
 
-The `id` is generally ignored, the `version` is always `"1.1"`, and the `method` must be a valid sdk service app identifier in the format `ModuleName.function_name`, where `Module` is the module name (usually ProperCased) and `function` is the function name (usually snake_cased.)
+The `id` is generally ignored, the `version` is always `"1.1"`, and the `method` must be a valid sdk service app identifier in the format `ModuleName.function_name`, where `Module` is the module name (usually PascalCased) and `function` is the function name (usually snake_cased.)
 
-The `params` is an array of values, according to the JSONRPC spec. KBase only utilizes the first parameter , which is typically, but not always, an object. In this service, the first parameter is always an object.
+The `params` is an array of values. KBase only utilizes the first parameter, which is typically, but not always, an object. In this service, the first parameter is always an object.
 
 The return structure has one of two forms, the result of a successful execution or an error.
 
@@ -44,7 +44,7 @@ A successful response looks like:
 }
 ```
 
-The `id` and `version` comments are the same as for the request. The `result` field is similar to the request params in that it is always an array. We typically only use the first array element to return a result, and that is true for this service. The result may be any json value, but is typically an object. In this service, it is always an object, even for simple results.
+The `id` and `version` comments are the same as for the request. The `result` field is similar to the request params in that it is always an array. KBase typically only uses the first array element to return a result, and that is true for this service. The result may be any json value, but is typically an object. In this service, it is always an object, even for simple results.
 
 An error response looks like:
 
@@ -62,80 +62,19 @@ An error response looks like:
 }
 ```
 
-Specific error codes are reserved for JSONRPC usage, as specified in the [spec]( https://www.jsonrpc.org/specification#error_object) and in the libraries used to implement JSONRPC for the service. E.g. in the case of Python, the library is [`jsonrpcbase`](https://github.com/level12/jsonrpcbase/blob/39f5f66206fe9fa536fcd059ba9984033e5768b3/jsonrpcbase.py#L485).
+Specific error `code`s are reserved for JSONRPC usage, as specified in the [spec]( https://www.jsonrpc.org/specification#error_object) and in the libraries used to implement JSONRPC for the service. E.g. in the case of Python, the library is [`jsonrpcbase`](https://github.com/level12/jsonrpcbase/blob/39f5f66206fe9fa536fcd059ba9984033e5768b3/jsonrpcbase.py#L485).
 
-### Errors
+Error codes are described in detail below.
 
-This service may produce four types of errors.
+THe `message` is a short phrase or sentence which describes the error succinctly. It may be shown to an end user or a developer, so the language should be crafted appropriately.
 
-1. Built-in (and JSONRPC 2.0 compliant) errors:
+The `data` property is an object with undefined properties. It should be used to provide information relevant to the type of error. A common field is `trace`, which may be used to provide stacktrace as an array of strings.
 
-Several types of errors may be thrown by the SDK-provided code or the execution engine runtime itself. This includes -32700 (parse error), -32600 (invalid request), -32601 (method not found), -32602 (invalid parameters), -32603 (internal error).
+Individual errors described in the documentation for this module will also describe the data structure returned.
 
-> TODO: check where these are emitted, if at all.
+Standard and module-specific errors are describedin the [errors](./errors.md) document.
 
-E.g.
 
-```json
-EXAMPLE HERE
-```
-
-1. Uncaught exceptions
-
-Runtime errors which are thrown as exceptions (in exception based languages) and are not caught by user code will be caught by the top level service method dispatcher. When caught, exceptions produce an error structure and issues a 500 response.  Note that some services intentionally "throw" runtime errors (in the sense of, e.g. in Python raising an exception) with the intention that they be caught by the sdk server layer (which will have the code -32700, which is incorrect). This codebase does not, rather either the standard code is returned or an application specific code defined in this document.
-
-> TODO: it is actually more complex than this, in terms of how specific exception types are caught and handled.
-
-E.g.
-
-```json
-EXAMPLE HERE
-```
-
-1. SDK Internal Errors
-
-Certain runtime errors which are not caught by the message dispatcher, but are rather problems with the SDK server layer, may result in a plain text response body and a 500 response code. This should be considered a bug in the SDK.
-
-The SDK execution engine may detect problems and issue an error response. Such errors include errors parsing the json request. [Are they returned as 500?]
-
-E.g.
-
-```json
-EXAMPLE HERE
-```
-
-4. Service Errors
-
-Finally, errors encountered in the service itself , such as providing an invalid parameter or an unexpected condition of fetched data, will result in either an error with a standard code or a code specific to the service itself. These errors do not result in a 500 response, but rather a 200.
-
-> consider a 400 response?
-
-E.g. an error structure may look like:
-
-```json
-{
-  "code": 40000,
-  "message": "No job found for the provided job id '5d769018aa5a4d298c5dc97a'",
-  "data": {
-       "source": "JobBrowserBFF.get_job",
-       "trace": [
-            "some",
-            "stack",
-            "trace"
-       ]
-  }
-}
-```
-
-Important features of this error structure:
-
-- an error code is emitted. This allows the client code to handle this error explicitly.
-- a display message is provided
-- the JSONRPC standard field `data` is used to provide some useful context:
-  - the source provides a more human-grokkable context than the stack trace. It is intentionally simple, so that layered errors may be more easily understood. (Layered or wrapped errors are not proposed yet.)
-  - a standard stack trace as provided by the language runtime, if available
-
-A service method may populate the data field with arbitrary data which is meaningful to the specific error.
 
 ## API
 
@@ -153,13 +92,13 @@ A service method may populate the data field with arbitrary data which is meanin
 
 ### `get_jobs`
 
-Given one or more job ids, return the associated job information.
+Given one or more job ids, return the associated job information in the same order as job ids are provided. Any job id for which job information cannot be found will be represented with a null value in the same position.
 
 #### Parameters
 
 | Name    | Type           | Required? | Description                               |
 | ------- | -------------- | --------- | ----------------------------------------- |
-| job_ids | Array\<string> | yes       | The unique identifier assigned to the job |
+| job_ids | Array\<string> or null | yes       | The unique identifier assigned to the job |
 
 E.g.
 
@@ -169,7 +108,7 @@ E.g.
 }
 ```
 
-##### `job_id`s
+##### `job_ids`
 
 Each job is assigned a unique identifier when it is accepted by the job service. It is a string value and should be considered opaque.
 
@@ -181,59 +120,95 @@ E.g.:
 
 ```json
 [{
-    "job_id": "5d769018aa5a4d298c5dc97a",
-    "type": "narrative",
-    "state": "completed",
-    "owner": {
-        "username": "eapearson",
-        "realname": "Erik Pearson"
-    },
-    "queued_at": 1568051224317,
-    "started_at": 1568051233294,
-    "finished_at": 1568051547380,
-    "app": {
-        "module_name": "ProkkaAnnotation",
-        "function_name": "annotate_contigs",
-        "title": "Annotate Assembly and ReAnnotate Genomes with Prokka v1.12"
-    },
-    "narrative": {
-         "workspace_id": 43676,
-         "workspace_name": "eapearson:narrative_1564775265770",
-         "title": "Another job browser test",
-         "is_deleted": false,
-     },
-     "client_groups": [
-        "njs"
-    ]
+    "jobs": [{
+        "job_id": "5d769018aa5a4d298c5dc97a",
+        "owner": {
+            "username": "eapearson",
+            "realname": "Erik Pearson"
+        },
+        "state": {
+            "type": "complete",
+            "create_at": 1568051224316,
+            "queue_at": 1568051224318,
+            "run_at": 1568051233294,
+            "finish_at": 1568051547380
+        },
+        "context": {
+            "type": "narrative",
+            "workspace": {
+                "id": 43676,
+                "is_accessible": true,
+                "is_deleted": false
+            },
+            "narrative": {
+                "title": "Another job browser test"
+            }
+        },
+        "app": {
+            "module_name": "ProkkaAnnotation",
+            "function_name": "annotate_contigs",
+            "title": "Annotate Assembly and ReAnnotate Genomes with Prokka v1.12"
+        },
+        "client_groups": [
+            "njs"
+        ]
+    }],
+    "total_count": 1
 }]
 ```
 
-A job may exist in one of several states, which is recorded in the `"status"` field. These states are described herein because the state determines the shape of the job info object.
+##### job_id
 
-queued 
+Every job accepted by the job service is immediately assigned a job id. The job id should be treated as an opaque (devoid of structure) string.
+
+##### type
+
+Jobs are typically spawned from narratives, but there are cases in which jobs are not or in which the job information is incomplete and the narrative is unknown. The `type` field allows us to categories jobs into the following categories:
+
+narrative
+: Job was spawned from a a narrative; the job state will contain the narratives workspace information and the narrative title
+
+workspace
+: The job was spawned from a non-narrative workspace, or an inaccessible workspace about which nothing can be determined, due to the insufficient authorization.
+
+unknown
+: No workspace information is available for the job at all; this should be rare, but instances exist so we must handle it.
+
+##### owner
+
+Every job was spawned by a KBase user, who is responsible for that job and considered to be its owner. 
+
+##### status
+
+A job may exist in one of several states, which is recorded in the `"status"` field. These states are described here because the state determines the shape of the job info object.
+
+create
+: Job has been accepted by the job service, but no action has been taken yet.
+
+queue
 : Job has been accepted and is in the job queue for a given client group, awaiting its turn to run
 
-running
+run
 : Job has been pulled from the queue and is now executing.
 
-completed
-: Job has run and successfully completed
+complete
+: Job has run and successfully finished
 
-errored_queued
-: Job was queued, but was interrupted by an error while it was queued. Most likely this will be due to a system error.
+error
+: Job has stopped with an error; the error is recorded in the job state; an associated code in the job state describes the error.
 
-errored_running
-: Job was running, but was interrupted by an error while running. This may be an app error or a system error
-
-canceled_queued
-: Job was queued, but was canceled (either by the user or a sysadmin) while it was queued.
-
-canceled_running
-: Job was running, but was canceled (either by the user or a sysadmin) while it was queued.
+terminate:
+: Job has stopped due to human intervention - either the user or administrator canceled it, or some other process did so; an associated termination code in the job state provides the reason.
 
 The job state determines the structure of the job info object returned. For instance, a job which is currently `queued` will have no `run_at` or `finish_at` time.
 
-##### queued
+##### create_at
+
+Examples:
+
+##### create
+
+When a job is initially created it is in the create state.
 
 ```json
 {
@@ -243,26 +218,62 @@ The job state determines the structure of the job info object returned. For inst
         "username": "eapearson",
         "realname": "Erik Pearson"
     },
-    "status": "queued",
-    "queued_at": 1568051224317,
-      "app": {
+    "status": "create",
+    "create_at": 1568051224317,
+    "app": {
         "module": "ProkkaAnnotation",
         "function": "annotate_contigs",
         "title": "Annotate Assembly and ReAnnotate Genomes with Prokka v1.12"
     },
-     "narrative": {
+    "workspace": {
          "id": 43676,
          "name": "eapearson:narrative_1564775265770",
-         "title": "Another job browser test",
+         "is_accessible": true,
          "is_deleted": false,
-     },
-     "client_groups": [
+         "narrative": {
+             "title": "Another job browser test",
+         }
+    },
+    "client_groups": [
         "njs"
     ]
 }
 ```
 
-##### running
+##### queue
+
+```json
+{
+    "job_id": "5d769018aa5a4d298c5dc97a",
+    "type": "narrative",
+    "owner": {
+        "username": "eapearson",
+        "realname": "Erik Pearson"
+    },
+    "status": "queue",
+    "create_at": 1568051224317,
+    "queue_at": 1568051224317,
+    "app": {
+        "module": "ProkkaAnnotation",
+        "function": "annotate_contigs",
+        "title": "Annotate Assembly and ReAnnotate Genomes with Prokka v1.12"
+    },
+    "workspace": {
+         "id": 43676,
+         "name": "eapearson:narrative_1564775265770",
+         "is_accessible": true,
+         "is_deleted": false,
+         "narrative": {
+             "title": "Another job browser test",
+         }
+    },
+    "client_groups": [
+        "njs"
+    ]
+}
+```
+
+##### run
 
 The running state is similar to the queued, with the addition of the "started_at" time which represents the moment the execution engine started running the indicated app.
 
@@ -294,7 +305,7 @@ The running state is similar to the queued, with the addition of the "started_at
 }
 ```
 
-##### completed
+##### complete
 
 The completed state is similar to the queued state, with the addition of the "finished_at" time which represents the moment the execution engine started running the indicated app.
 
@@ -309,134 +320,6 @@ Other states which represent a "finished" app run will also contain the "finishe
         "realname": "Erik Pearson"
     },
     "status": "queued",
-    "queued_at": 1568051224317,
-    "started_at": 1568051233294,
-    "finished_at": 1568051547380,
-    "app": {
-        "module": "ProkkaAnnotation",
-        "function": "annotate_contigs",
-        "title": "Annotate Assembly and ReAnnotate Genomes with Prokka v1.12"
-    },
-     "narrative": {
-         "id": 43676,
-         "name": "eapearson:narrative_1564775265770",
-         "title": "Another job browser test",
-         "is_deleted": false,
-     },
-     "client_groups": [
-        "njs"
-    ]
-}
-```
-
-##### errored_queued
-
-Note that errored messages are similar to the state in the second part of the status id (_queued or _running), with the addition of the error property, which contains a string error message.
-
-```json
-{
-    "job_id": "5d769018aa5a4d298c5dc97a",
-    "job_type": "narrative",
-    "owner": {
-        "username": "eapearson",
-        "realname": "Erik Pearson"
-    },
-    "status": "errored_queued",
-    "queued_at": 1568051224317,
-    "finished_at": 1568051547380,
-    "app": {
-        "module": "ProkkaAnnotation",
-        "function": "annotate_contigs",
-        "title": "Annotate Assembly and ReAnnotate Genomes with Prokka v1.12"
-    },
-     "narrative": {
-         "id": 43676,
-         "name": "eapearson:narrative_1564775265770",
-         "title": "Another job browser test",
-         "is_deleted": false,
-     },
-     "client_groups": [
-        "njs"
-    ],
-    "error": "An error occurred with the queueer"
-}
-```
-
-##### errored_running
-
-```json
-{
-    "job_id": "5d769018aa5a4d298c5dc97a",
-    "job_type": "narrative",
-    "owner": {
-        "username": "eapearson",
-        "realname": "Erik Pearson"
-    },
-    "status": "errored_queued",
-    "queued_at": 1568051224317,
-    "started_at": 1568051233294,
-    "finished_at": 1568051547380,
-    "app": {
-        "module": "ProkkaAnnotation",
-        "function": "annotate_contigs",
-        "title": "Annotate Assembly and ReAnnotate Genomes with Prokka v1.12"
-    },
-     "narrative": {
-         "id": 43676,
-         "name": "eapearson:narrative_1564775265770",
-         "title": "Another job browser test",
-         "is_deleted": false,
-     },
-     "client_groups": [
-        "njs"
-    ],
-    "error": "An error running the job"
-}
-```
-
-##### canceled_queued
-
-Note that canceled jobs are similar to errored jobs, with the exception that there is no error property.
-
-```json
-{
-    "job_id": "5d769018aa5a4d298c5dc97a",
-    "job_type": "narrative",
-    "owner": {
-        "username": "eapearson",
-        "realname": "Erik Pearson"
-    },
-    "status": "canceled_queued",
-    "queued_at": 1568051224317,
-    "finished_at": 1568051547380,
-    "app": {
-        "module": "ProkkaAnnotation",
-        "function": "annotate_contigs",
-        "title": "Annotate Assembly and ReAnnotate Genomes with Prokka v1.12"
-    },
-     "narrative": {
-         "id": 43676,
-         "name": "eapearson:narrative_1564775265770",
-         "title": "Another job browser test",
-         "is_deleted": false,
-     },
-     "client_groups": [
-        "njs"
-    ]
-}
-```
-
-##### canceled_running
-
-```json
-{
-    "job_id": "5d769018aa5a4d298c5dc97a",
-    "job_type": "narrative",
-    "owner": {
-        "username": "eapearson",
-        "realname": "Erik Pearson"
-    },
-    "status": "errored_running",
     "queued_at": 1568051224317,
     "started_at": 1568051233294,
     "finished_at": 1568051547380,
@@ -493,7 +376,7 @@ The individual jobs returned match the structure defined for [`get_job`](#get_jo
 | jobs       | Array\<string> | no        | If provided, filter returned jobs matching the ids in the provided list                                                              |
 | sort          | SortSpec       | no        | If provided, indicates a sort order to apply to the queried jobs; see the section below for details.                                 |
 | search        | SearchSpec     | no        | If provided, indicates a search condition used to filter jobs; see the section below for details                                     |
-| date_range    | DateRangeSpec  | no        | If provided, restricts the search by a date range applied to jobs (see below)                                                        |
+| timespan    | TimespanSpec  | no        | If provided, restricts the search by a date range applied to jobs (see below)                                                        |
 | client_groups | Array\<string> | no        | If provided, include only jobs whose client groups intersect with this list of client group ids                                      |
 | offset        | integer        | no        | If provided, this indicates the starting position within the queried jobs to return the list of jobs; if not provided, defaults to 0 |
 | limit         | integer        | no        | If provided, indicates the maximum number of jobs to be returned in the results; defaults to 100                                     |
@@ -550,15 +433,15 @@ E.g.
 
 may match all jobs with owner "jsmith" which are run for apps in the "fba_tools" module.
 
-##### `date_range`
+##### `time_span`
 
-The `date_range` parameter provides a date range which, when present, restricts the returned jobs to those which fall within the given range.
+The `time_span` parameter provides a date range which, when present, restricts the returned jobs to those which fall within the given range.
 
 E.g. this restricts the jobs to those which were active from 1/1/2019 up to 2/1/2019.
 
 ```json
 {
-    "date_range": {
+    "time_span": {
         "from": 1546300800,
         "to": 1548979200
     }
@@ -814,7 +697,7 @@ Returned when the specified job does not exist.
 
 ```json
 {
-    "code": 40000,
+    "code": 10,
     "message": "A job with this id could not be found, thus it could not be canceled",
     "data": {
         "job_id": "5d769018aa5a4d298c5dc97a"
@@ -828,7 +711,7 @@ Returned when the specified job is not in an "active" state, which is either "qu
 
 ```json
 {
-    "code": 40001,
+    "code": 20,
     "message": "This job is not active, thus it could not be canceled",
     "data": {
         "job_id": "5d769018aa5a4d298c5dc97a",
@@ -843,7 +726,7 @@ Returned when attempting to cancel another user's job but the current user does 
 
 ```json
 {
-    "code": 40002,
+    "code": 21,
     "message": "Permission denied to cancel this job",
     "data": {
         "job_id": "5d769018aa5a4d298c5dc97a",

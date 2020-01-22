@@ -31,18 +31,19 @@ RUN apk upgrade --update-cache --available && \
 
 # install python dependencies for the service runtime.
 RUN pip3 install \
-    cffi==1.12.3 \
+    cffi==1.13.2 \
     coverage==4.5.4 \
-    jinja2==2.10.1 \
+    jinja2==2.10.3 \
     jsonrpcbase==0.2.0 \
     ndg-httpsclient==0.5.1 \
     nose==1.3.7 \
-    python-dateutil==2.8.0 \
-    pytz==2019.2 \
+    python-dateutil==2.8.1 \
+    pytz==2019.3 \
     requests==2.22.0 \
     uwsgi==2.0.18 \
     toml==0.10.0 \
-    jsonschema==3.0.2
+    jsonschema==3.2.0 \
+    pymongo==3.9.0
 
 COPY --from=builder /kb/module /kb/module
 

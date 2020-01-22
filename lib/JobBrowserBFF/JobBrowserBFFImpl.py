@@ -1,11 +1,10 @@
 # -*- coding: utf-8 -*-
 #BEGIN_HEADER
 import logging
-import os
-import re
 from JobBrowserBFF.Validation import Validation
-from JobBrowserBFF.Model import Model, raw_job_to_job
+from JobBrowserBFF.model.Model import Model
 from JobBrowserBFF.definitions.Definitions import Definitions
+import json
 #END_HEADER
 
 
@@ -26,7 +25,7 @@ class JobBrowserBFF:
     ######################################### noqa
     VERSION = "0.0.1"
     GIT_URL = ""
-    GIT_COMMIT_HASH = "HEAD"
+    GIT_COMMIT_HASH = "868cf6f3455e12850b50c1d7207e43cff5c0b916"
 
     #BEGIN_CLASS_HEADER
     #END_CLASS_HEADER
@@ -35,219 +34,170 @@ class JobBrowserBFF:
     # be found
     def __init__(self, config):
         #BEGIN_CONSTRUCTOR
+        self.validation = Validation(load_schemas=True)
+       
+
+        # fix up the config because, as an INI file, everything is a string...
+        config['default-timeout'] = int(config['default-timeout'])
+
+        self.validation.validate_config(config)
+        self.config = config
+        
         self.shared_folder = config['scratch']
         logging.basicConfig(format='%(created)s %(levelname)s: %(message)s',
                             level=logging.INFO)
         
-        self.validation = Validation(load_schemas=True)
         self.definitions = Definitions(load=True)
-
-        self.validation.validate_config(config)
-        self.config = config
         #END_CONSTRUCTOR
         pass
 
 
     def get_jobs(self, ctx, params):
         """
-        :param params: instance of type "GetJobsParams" (****************** *
-           get_jobs ******************) -> structure: parameter "job_ids" of
-           list of type "JobID" (Core types)
+        :param params: instance of type "GetJobsParams" (get_jobs Given a set
+           of job ids, returns the job information for each job, in the same
+           order as the ids were provided. As with other methods, this one
+           takes an "admin" parameter which indicates whether the call is
+           intended for administrator usage or not. If for administrator
+           usage, the token provided in the call must be associated with an
+           account with admin privileges for the upstream service. An error
+           with code 50 is returned otherwise. Params: - job_ids: a list of
+           job ids to look up and provide information about - admin: a
+           boolean indicating whether the request is for a admin usage or not
+           Returns: - jobs - list of JobStatus Throws: - 10 - Job not found:
+           If the any of the given job ids are not found) -> structure:
+           parameter "job_ids" of list of type "JobID" (Core types),
+           parameter "admin" of type "bool" (Type synonym conveniences)
         :returns: instance of type "GetJobsResult" -> structure: parameter
            "jobs" of list of type "JobInfo" -> structure: parameter "job_id"
-           of type "JobID" (Core types), parameter "type" of type "JobType"
-           (narrative, export, workspace, unknown), parameter "owner" of type
-           "User" -> structure: parameter "UserID" of String, parameter
-           "realname" of String, parameter "status" of type "JobStatus"
-           (queued, running, completed, errored_queued, errored_running,
-           canceled_queued, canceled_running), parameter "queued_at" of type
-           "epoch_time", parameter "started_at" of type "epoch_time",
-           parameter "finished_at" of type "epoch_time", parameter "app" of
-           type "AppInfo" -> structure: parameter "module_name" of String,
-           parameter "function_name" of String, parameter "title" of String,
-           parameter "narrative" of type "NarrativeInfo" -> structure:
-           parameter "workspace_id" of Long, parameter "workspace_name" of
-           String, parameter "title" of String, parameter "is_deleted" of
-           type "bool" (Type synonym conveniences), parameter "client_groups"
-           of list of type "ClientGroup" (njs, bigmem, bigmemlong, kb_import,
-           ...)
+           of type "JobID" (Core types), parameter "owner" of type "User" ->
+           structure: parameter "UserID" of String, parameter "realname" of
+           String, parameter "state" of type "JobState" (Superset of all
+           fields used to represent job state See the TS typing and
+           json-schema) -> structure: parameter "status" of type "JobStatus"
+           (create | queue | run | complete | error | terminate), parameter
+           "create_at" of type "epoch_time", parameter "queue_at" of type
+           "epoch_time", parameter "run_at" of type "epoch_time", parameter
+           "finish_at" of type "epoch_time", parameter "client_group" of type
+           "ClientGroup" (njs, bigmem, bigmemlong, kb_import, ...), parameter
+           "error" of type "JobError" -> structure: parameter "code" of type
+           "JobErrorCode", parameter "message" of String, parameter
+           "service_error" of type "JSONRPC11Error" -> structure: parameter
+           "code" of Long, parameter "message" of String, parameter "error"
+           of unspecified object, parameter "termination" of type
+           "JobTermination" -> structure: parameter "code" of type
+           "JobTerminationCode", parameter "message" of String, parameter
+           "app" of type "AppInfo" -> structure: parameter "module_name" of
+           String, parameter "function_name" of String, parameter "title" of
+           String, parameter "client_groups" of list of String, parameter
+           "context" of type "JobContext" -> structure: parameter "type" of
+           type "JobContextType" (narrative, export, workspace, unknown),
+           parameter "workspace" of type "WorkspaceInfo" (represents the
+           context in which the job was spawned. should collapse to
+           narrative, perhaps, when all is said and done, but at the moment
+           there are: narrative, export, workspace, unknown) -> structure:
+           parameter "id" of Long, parameter "is_accessible" of type "bool"
+           (Type synonym conveniences), parameter "name" of String, parameter
+           "is_deleted" of type "bool" (Type synonym conveniences), parameter
+           "narrative" of type "NarrativeInfo" -> structure: parameter
+           "title" of String, parameter "is_temporary" of type "bool" (Type
+           synonym conveniences)
         """
         # ctx is the context object
         # return variables are: result
         #BEGIN get_jobs
         self.validation.validate_params('get_jobs', params)
 
-        # ecall to kb_Metrics.get_job to get the raw job info
-        model = Model(config=self.config,
-                      token=ctx['token'],
-                      username=ctx['user_id'])
-
-        jobs = []
-
-        # Where possible we do a batch request.
-        usernames = set()
-        app_ids = set()
-        raw_jobs = []
-
-        for job_id in params['job_ids']:
-            raw_job = model.get_job(job_id=job_id)
-
-            usernames.add(raw_job['user'])
-            app_ids.add(raw_job['app_id'])
-            raw_jobs.append(raw_job)
-
-        # Get a dict of unique users for this set of jobs
-        users_map = model.get_users(list(usernames))
-
-        # Get a dict of unique apps for this set of jobs.
-        apps_map = dict()
-        apps = model.get_apps(list(app_ids))
-        for app in apps:
-            apps_map[app['id']] = app
-
-        # Now join them all together.
-        for raw_job in raw_jobs:
-            job = raw_job_to_job(raw_job, apps_map[raw_job['app_id']], users_map[raw_job['user']])
-            jobs.append(job)
+        model = Model(config=self.config, context=ctx, timeout=params['timeout']).get_model(ctx)
+        
+        jobs = model.get_jobs(params)
 
         result = {
             'jobs': jobs
         }
-        self.validation.validate_result('get_jobs', result)
 
+        self.validation.validate_result('get_jobs', result)
         #END get_jobs
 
-        # At some point might do deeper type checking...
-        if not isinstance(result, dict):
-            raise ValueError('Method get_jobs return value ' +
-                             'result is not type dict as required.')
-        # return the results
+        
         return [result]
 
     def query_jobs(self, ctx, params):
         """
-        :param params: instance of type "QueryJobsParams" -> structure:
-           parameter "users" of list of type "UserID", parameter "jobs" of
-           list of type "JobID" (Core types), parameter "sort" of list of
-           type "SortSpec" -> structure: parameter "key" of type "SortKey"
-           (behaves as an enum: narrative, app, submitted, status), parameter
-           "direction" of type "SortDirection" (behaves as an enum:
-           ascending, descending), parameter "search" of type "SearchSpec" ->
-           structure: parameter "terms" of list of String, parameter
-           "date_range" of type "DateRangeSpec" -> structure: parameter
-           "from" of type "epoch_time", parameter "to" of type "epoch_time",
-           parameter "client_groups" of list of type "ClientGroup" (njs,
-           bigmem, bigmemlong, kb_import, ...), parameter "offset" of Long,
-           parameter "limit" of Long
+        :param params: instance of type "QueryJobsParams" (TODO: expand to
+           match the filtering, sorting, searching of kb_metrics) ->
+           structure: parameter "jobs" of list of type "JobID" (Core types),
+           parameter "sort" of list of type "SortSpec" -> structure:
+           parameter "key" of type "SortKey" (behaves as an enum: narrative,
+           app, submitted, status), parameter "direction" of type
+           "SortDirection" (behaves as an enum: ascending, descending),
+           parameter "search" of type "SearchSpec" -> structure: parameter
+           "terms" of list of String, parameter "filter" of type "FilterSpec"
+           -> structure: parameter "workspace_id" of list of Long, parameter
+           "status" of list of String, parameter "username" of list of
+           String, parameter "app_id" of list of String, parameter "job_id"
+           of list of String, parameter "error_code" of list of Long,
+           parameter "terminated_code" of list of Long, parameter "time_span"
+           of type "TimeSpanSpec" -> structure: parameter "from" of type
+           "epoch_time", parameter "to" of type "epoch_time", parameter
+           "client_groups" of list of type "ClientGroup" (njs, bigmem,
+           bigmemlong, kb_import, ...), parameter "offset" of Long, parameter
+           "limit" of Long, parameter "admin" of type "bool" (Type synonym
+           conveniences)
         :returns: instance of type "QueryJobsResult" -> structure: parameter
            "jobs" of list of type "JobInfo" -> structure: parameter "job_id"
-           of type "JobID" (Core types), parameter "type" of type "JobType"
-           (narrative, export, workspace, unknown), parameter "owner" of type
-           "User" -> structure: parameter "UserID" of String, parameter
-           "realname" of String, parameter "status" of type "JobStatus"
-           (queued, running, completed, errored_queued, errored_running,
-           canceled_queued, canceled_running), parameter "queued_at" of type
-           "epoch_time", parameter "started_at" of type "epoch_time",
-           parameter "finished_at" of type "epoch_time", parameter "app" of
-           type "AppInfo" -> structure: parameter "module_name" of String,
-           parameter "function_name" of String, parameter "title" of String,
-           parameter "narrative" of type "NarrativeInfo" -> structure:
-           parameter "workspace_id" of Long, parameter "workspace_name" of
-           String, parameter "title" of String, parameter "is_deleted" of
-           type "bool" (Type synonym conveniences), parameter "client_groups"
-           of list of type "ClientGroup" (njs, bigmem, bigmemlong, kb_import,
-           ...)
+           of type "JobID" (Core types), parameter "owner" of type "User" ->
+           structure: parameter "UserID" of String, parameter "realname" of
+           String, parameter "state" of type "JobState" (Superset of all
+           fields used to represent job state See the TS typing and
+           json-schema) -> structure: parameter "status" of type "JobStatus"
+           (create | queue | run | complete | error | terminate), parameter
+           "create_at" of type "epoch_time", parameter "queue_at" of type
+           "epoch_time", parameter "run_at" of type "epoch_time", parameter
+           "finish_at" of type "epoch_time", parameter "client_group" of type
+           "ClientGroup" (njs, bigmem, bigmemlong, kb_import, ...), parameter
+           "error" of type "JobError" -> structure: parameter "code" of type
+           "JobErrorCode", parameter "message" of String, parameter
+           "service_error" of type "JSONRPC11Error" -> structure: parameter
+           "code" of Long, parameter "message" of String, parameter "error"
+           of unspecified object, parameter "termination" of type
+           "JobTermination" -> structure: parameter "code" of type
+           "JobTerminationCode", parameter "message" of String, parameter
+           "app" of type "AppInfo" -> structure: parameter "module_name" of
+           String, parameter "function_name" of String, parameter "title" of
+           String, parameter "client_groups" of list of String, parameter
+           "context" of type "JobContext" -> structure: parameter "type" of
+           type "JobContextType" (narrative, export, workspace, unknown),
+           parameter "workspace" of type "WorkspaceInfo" (represents the
+           context in which the job was spawned. should collapse to
+           narrative, perhaps, when all is said and done, but at the moment
+           there are: narrative, export, workspace, unknown) -> structure:
+           parameter "id" of Long, parameter "is_accessible" of type "bool"
+           (Type synonym conveniences), parameter "name" of String, parameter
+           "is_deleted" of type "bool" (Type synonym conveniences), parameter
+           "narrative" of type "NarrativeInfo" -> structure: parameter
+           "title" of String, parameter "is_temporary" of type "bool" (Type
+           synonym conveniences), parameter "found_count" of Long, parameter
+           "total_count" of Long
         """
         # ctx is the context object
         # return variables are: result
         #BEGIN query_jobs
         self.validation.validate_params('query_jobs', params)
 
-        model = Model(config=self.config,
-                      token=ctx['token'],
-                      username=ctx['user_id'])
-
-        result = model.query_jobs(
-            current_user = ctx['user_id'],
-            users=params.get('users', None),
-            offset=params.get('offset', 0),
-            limit=params.get('limit', 10),
-            date_range=params.get('date_range', None)
-        )
-
-        raw_jobs = result['jobs']
-        total_count = result['total_count']
-
-        # Where possible we do a batch request.
-        usernames = set()
-        app_ids = set()
-        workspace_ids = set()
-
-        for raw_job in raw_jobs:
-            usernames.add(raw_job['user'])
-            if 'app_id' in raw_job:
-                app_ids.add(raw_job['app_id'])
-            if 'wsid' in raw_job:
-                workspace_ids.add(raw_job['wsid'])
-
-        # Get a dict of unique users for this set of jobs
-        users_map = model.get_users(list(usernames))
-
-        # Get a dict of unique users for this set of jobs.
-        apps_map = dict()
-        apps = model.get_apps(list(app_ids))
-        for app in apps:
-            apps_map[app['id']] = app
-
-        workspace_map = dict()
-        workspaces = model.get_workspaces(list(workspace_ids))
-        for workspace in workspaces:
-            workspace_map[workspace['id']] = workspace
+        model = Model(self.config, ctx).get_model(ctx)
+        jobs, found_count, total_count = model.query_jobs(params)
         
-        # Now join them all together.
-        jobs = []
-        for raw_job in raw_jobs:
-            if 'app_id' in raw_job:
-                app = apps_map.get(raw_job['app_id'], None)
-            else:
-                app = None
-            user = users_map.get(raw_job['user'], None)
-            workspace = workspace_map.get(raw_job.get('wsid', None), None)
-            job = raw_job_to_job(raw_job, app, user, workspace)
-            jobs.append(job)
-
-        # Now apply filtering
-        if 'search' in params:
-            filter = map(lambda x: re.compile(x, re.IGNORECASE), params['search'])
-            filtered_jobs = []
-            for job in jobs:
-                for expr in filter:
-                    if (re.search(expr, job['owner']['realname']) or
-                        re.search(expr, re.job['app']['title']) or
-                        re.search(expr, re.job['narrative']['title'])):
-                        filtered_jobs.append(job)
-        else:
-            filtered_jobs = jobs
-
-        # Now apply sorting
-        # TODO: do sorting!
-
-        # Now DONE!
-
         result = {
-            'jobs': filtered_jobs,
-            # TODO: this is a lie
+            'jobs': jobs,
+            'found_count': found_count,
             'total_count': total_count
         }
 
         self.validation.validate_result('query_jobs', result)
         #END query_jobs
 
-        # At some point might do deeper type checking...
-        if not isinstance(result, dict):
-            raise ValueError('Method query_jobs return value ' +
-                             'result is not type dict as required.')
-        # return the results
+        
         return [result]
 
     def get_job_log(self, ctx, params):
@@ -260,66 +210,59 @@ class JobBrowserBFF:
            "limit" of Long
         :returns: instance of type "GetJobLogResult" -> structure: parameter
            "log" of list of type "LogEntry" -> structure: parameter
-           "entry_number" of Long, parameter "entry" of String, parameter
-           "level" of type "LogLevel" (enum-like: default, error)
+           "entry_number" of Long, parameter "created" of Long, parameter
+           "entry" of String, parameter "level" of type "LogLevel"
+           (enum-like: default, error), parameter "total_count" of Long
         """
         # ctx is the context object
         # return variables are: result
         #BEGIN get_job_log
         self.validation.validate_params('get_job_log', params)
 
-        model = Model(config=self.config,
-                      token=ctx['token'],
-                      username=ctx['user_id'])
+        model = Model(config=self.config, context=ctx, timeout=params['timeout']).get_model(ctx)
 
         result = model.get_job_log(
             params['job_id'],
             search=params.get('search', None),
             level=params.get('level', None),
-            offset=params.get('offset', 0),
-            limit=params.get('limit', 10))
+            offset=params['offset'],
+            limit=params['limit'])
 
         self.validation.validate_result('get_job_log', result)
         #END get_job_log
 
-        # At some point might do deeper type checking...
-        if not isinstance(result, dict):
-            raise ValueError('Method get_job_log return value ' +
-                             'result is not type dict as required.')
-        # return the results
+        
         return [result]
 
     def cancel_job(self, ctx, params):
         """
-        :param params: instance of type "CancelJobParams" (********* *
-           cancel_job *********) -> structure: parameter "job_id" of type
-           "JobID" (Core types)
-        :returns: instance of type "CancelJobResult" -> structure: parameter
-           "canceled" of type "bool" (Type synonym conveniences)
+        :param params: instance of type "CancelJobParams" (cancel_job Given a
+           job id, attempt to cancel the associated job. Params: - job_id:
+           The id for the job to cancel Returns: - nothing. Throws: - 10 -
+           Job not found: If the given job id was not found Note that
+           attempting to cancel a job which is not cancelable will not throw
+           an error. This behavior may change in the future. At present one
+           upstream service (njsw) ignore this condition, but another (ee2)
+           returns an error. For ee2 that error is ignored.) -> structure:
+           parameter "job_id" of type "JobID" (Core types), parameter "code"
+           of type "JobTerminationCode"
+        :returns: instance of type "CancelJobResult" -> structure:
         """
         # ctx is the context object
         # return variables are: result
         #BEGIN cancel_job
         self.validation.validate_params('cancel_job', params)
 
-        model = Model(config=self.config,
-                      token=ctx['token'],
-                      username=ctx['user_id'])
+        model = Model(config=self.config, context=ctx, timeout=params['timeout']).get_model(ctx)
 
-        canceled = model.cancel_job(params['job_id'])
+        # Note no return value.
+        model.cancel_job(params['job_id'])
 
-        result = {
-            'canceled': canceled
-        }
-
+        result = {}
         self.validation.validate_result('cancel_job', result)
         #END cancel_job
 
-        # At some point might do deeper type checking...
-        if not isinstance(result, dict):
-            raise ValueError('Method cancel_job return value ' +
-                             'result is not type dict as required.')
-        # return the results
+        
         return [result]
 
     def get_job_types(self, ctx):
@@ -339,11 +282,7 @@ class JobBrowserBFF:
         self.validation.validate_result('get_job_types', result)
         #END get_job_types
 
-        # At some point might do deeper type checking...
-        if not isinstance(result, dict):
-            raise ValueError('Method get_job_types return value ' +
-                             'result is not type dict as required.')
-        # return the results
+        
         return [result]
 
     def get_job_states(self, ctx):
@@ -362,11 +301,7 @@ class JobBrowserBFF:
         self.validation.validate_result('get_job_states', result)
         #END get_job_states
 
-        # At some point might do deeper type checking...
-        if not isinstance(result, dict):
-            raise ValueError('Method get_job_states return value ' +
-                             'result is not type dict as required.')
-        # return the results
+        
         return [result]
 
     def get_client_groups(self, ctx):
@@ -385,11 +320,7 @@ class JobBrowserBFF:
         self.validation.validate_result('get_client_groups', result)
         #END get_client_groups
 
-        # At some point might do deeper type checking...
-        if not isinstance(result, dict):
-            raise ValueError('Method get_client_groups return value ' +
-                             'result is not type dict as required.')
-        # return the results
+        
         return [result]
 
     def get_searchable_job_fields(self, ctx):
@@ -408,11 +339,7 @@ class JobBrowserBFF:
         self.validation.validate_result('get_searchable_job_fields', result)
         #END get_searchable_job_fields
 
-        # At some point might do deeper type checking...
-        if not isinstance(result, dict):
-            raise ValueError('Method get_searchable_job_fields return value ' +
-                             'result is not type dict as required.')
-        # return the results
+        
         return [result]
 
     def get_sort_specs(self, ctx):
@@ -431,11 +358,7 @@ class JobBrowserBFF:
         self.validation.validate_result('get_sort_specs', result)
         #END get_sort_specs
 
-        # At some point might do deeper type checking...
-        if not isinstance(result, dict):
-            raise ValueError('Method get_sort_specs return value ' +
-                             'result is not type dict as required.')
-        # return the results
+        
         return [result]
 
     def get_log_levels(self, ctx):
@@ -454,11 +377,7 @@ class JobBrowserBFF:
         self.validation.validate_result('get_log_levels', result)
         #END get_log_levels
 
-        # At some point might do deeper type checking...
-        if not isinstance(result, dict):
-            raise ValueError('Method get_log_levels return value ' +
-                             'result is not type dict as required.')
-        # return the results
+        
         return [result]
 
     def is_admin(self, ctx):
@@ -470,20 +389,14 @@ class JobBrowserBFF:
         # ctx is the context object
         # return variables are: result
         #BEGIN is_admin
-        model = Model(config=self.config,
-                      token=ctx['token'],
-                      username=ctx['user_id'])
+        model = Model(self.config, ctx).get_model(ctx)
 
-        is_admin = model.is_metrics_admin()
+        is_admin = model.is_admin()
         result = {'is_admin': is_admin}
         self.validation.validate_result('is_admin', result)
         #END is_admin
 
-        # At some point might do deeper type checking...
-        if not isinstance(result, dict):
-            raise ValueError('Method is_admin return value ' +
-                             'result is not type dict as required.')
-        # return the results
+        
         return [result]
     def status(self, ctx):
         #BEGIN_STATUS

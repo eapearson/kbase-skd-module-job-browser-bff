@@ -1,21 +1,31 @@
 import requests
 import json
 import uuid
+import urllib3
 
 from biokbase.Errors import ServiceError
 
 class GenericClient(object):
-    def __init__(self, module=None, url=None, token=None):
+    def __init__(self, module=None, url=None, token=None, timeout=None):
         if module is None:
             raise ValueError('The "module" argument is required')
         if url is None:
             raise ValueError('The "url" argument is required')
+        if timeout is None:
+            raise ValueError('The "timeout" argument is required')
 
         self.module = module
         self.token = token
         self.url = url
+        # Note that we operate with ms time normally, but requests uses
+        # seconds float.
+        self.timeout = timeout
 
-    def call_func(self, func_name, params=None):
+    def get_timeout(self, timeout):
+        timeout = timeout or self.timeout
+        return timeout / 1000
+
+    def call_func(self, func_name, params=None, timeout=None):
         if not isinstance(func_name, str):
             raise ValueError('"func_name" must be a string')
 
@@ -37,8 +47,25 @@ class GenericClient(object):
         if self.token:
             header['Authorization'] = self.token
 
-        # TODO: wrap in try .. except
-        r = requests.post(self.url, headers=header, data=json.dumps(call_params), timeout=60)
+        timeout = self.get_timeout(timeout)
+        try:
+            r = requests.post(self.url, headers=header, data=json.dumps(call_params), timeout=timeout)
+        except requests.exceptions.ReadTimeout as rte:
+            raise ServiceError(
+                code=100,
+                message='Timeout calling service endpoint',
+                data={
+                    'url': self.url,
+                    'headers': header,
+                    'timeout': timeout
+                })
+        except Exception as ex:
+            raise ServiceError(code=100, message='Error calling service endpoint: ' + ex.message,
+                data={
+                    'url': self.url,
+                    'headers': header,                    
+                })
+
         if r.headers.get('content-type', '').startswith('application/json'):
             try:
                 response = r.json()
@@ -49,12 +76,14 @@ class GenericClient(object):
             if error:
                 # Better be a JSON RPC 2.0 Error structure
                 # TODO: adjust to improved service error.
-                print(error)
                 error_data = {
                     'stack': error.get('error'),
                     'name': error.get('name')
                 }
-                raise ServiceError(code=error.get('code'), message=error.get('message'), data=error_data)
+                raise ServiceError(
+                    code=error.get('code'),
+                    message=error.get('message', error.get('name')),
+                    data=error_data)
 
             result = response.get('result')
 

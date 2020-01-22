@@ -1,0 +1,149 @@
+{
+    "definitions": {},
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "type": "object",
+    "title": "The Root Schema",
+    "required": [
+        "time_span",
+        "offset",
+        "limit"
+    ],
+    "properties": {
+        "user": {
+            "type": "string",
+            "title": "The Users Schema",
+            "examples": [
+                "mmouse",
+                "dduck"
+            ]
+        },
+        "jobs": {
+            "type": "array",
+            "title": "The Jobs Schema",
+            "items": {
+                "type": "string",
+                "title": "The Items Schema",
+                "default": "",
+                "examples": [
+                    "job1",
+                    "job2"
+                ],
+                "pattern": "^(.*)$"
+            }
+        },
+        "sort": {
+            "type": "array",
+            "title": "The Sort Schema",
+            "minItems": 1,
+            "maxItems": 1,
+            "items": {
+                "type": "object",
+                "title": "The Items Schema",
+                "required": [
+                    "key",
+                    "direction"
+                ],
+                "properties": {
+                    "key": {
+                        "type": "string",
+                        "title": "The Key Schema",
+                        "enum": ["created"],
+                        "default": "",
+                        "examples": [
+                            "name"
+                        ],
+                        "pattern": "^(.*)$"
+                    },
+                    "direction": {
+                        "type": "string",
+                        "title": "The Direction Schema",
+                        "enum": ["ascending", "descending"],
+                        "default": "",
+                        "examples": [
+                            "ascending"
+                        ],
+                        "pattern": "^(.*)$"
+                    }
+                }
+            }
+        },
+        "search": {
+            "type": "object",
+            "title": "The Search Schema",
+            "required": [
+                "terms"
+            ],
+            "properties": {
+                "terms": {
+                    "type": "array",
+                    "title": "The Terms Schema",
+                    "items": {
+                        "type": "string",
+                        "title": "The Items Schema",
+                        "default": "",
+                        "examples": [
+                            "cheese"
+                        ],
+                        "pattern": "^(.*)$"
+                    }
+                }
+            }
+        },
+        "time_span": {
+            "type": "object",
+            "title": "The time_span Schema",
+            "required": [
+                "from",
+                "to"
+            ],
+            "properties": {
+                "from": {
+                    "type": "integer",
+                    "title": "The From Schema",
+                    "default": 0,
+                    "examples": [
+                        0
+                    ]
+                },
+                "to": {
+                    "type": "integer",
+                    "title": "The To Schema",
+                    "default": 0,
+                    "examples": [
+                        1000
+                    ]
+                }
+            }
+        },
+        "client_groups": {
+            "type": "array",
+            "title": "The Client_groups Schema",
+            "items": {
+                "$id": "#/properties/client_groups/items",
+                "type": "string",
+                "title": "The Items Schema",
+                "default": "",
+                "examples": [
+                    "njs"
+                ],
+                "pattern": "^(.*)$"
+            }
+        },
+        "offset": {
+            "type": "integer",
+            "title": "The Offset Schema",
+            "default": 0,
+            "examples": [
+                0
+            ]
+        },
+        "limit": {
+            "type": "integer",
+            "title": "The Limit Schema",
+            "default": 0,
+            "examples": [
+                100
+            ]
+        }
+    }
+}

@@ -20,8 +20,8 @@
         "description": "The app functions title"
     },
     {
-        "field": "client_group",
-        "description": "The client group list"
+        "field": "node_class",
+        "description": "The class of node the job was run on"
     },
     {
         "field": "owner.username",

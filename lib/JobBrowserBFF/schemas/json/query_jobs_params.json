@@ -1,43 +1,61 @@
 {
     "definitions": {},
     "$schema": "http://json-schema.org/draft-07/schema#",
-    "$id": "http://example.com/root.json",
     "type": "object",
     "title": "The Root Schema",
     "required": [
+        "time_span",
+        "offset",
+        "limit"
     ],
+    "additionalProperties": false,
     "properties": {
-        "users": {
-            "$id": "#/properties/users",
-            "type": "array",
-            "title": "The Users Schema",
-            "items": {
-                "$id": "#/properties/users/items",
-                "type": "string",
-                "title": "The Items Schema",
-                "default": "",
-                "examples": [
-                    "mmouse",
-                    "dduck"
-                ],
-                "pattern": "^(.*)$"
+        "time_span": {
+            "$id": "#/properties/time_span",
+            "type": "object",
+            "title": "The time_span Schema",
+            "required": [
+                "from",
+                "to"
+            ],
+            "properties": {
+                "from": {
+                    "$id": "#/properties/time_span/properties/from",
+                    "type": "integer",
+                    "title": "The From Schema",
+                    "default": 0,
+                    "examples": [
+                        0
+                    ]
+                },
+                "to": {
+                    "$id": "#/properties/time_span/properties/to",
+                    "type": "integer",
+                    "title": "The To Schema",
+                    "default": 0,
+                    "examples": [
+                        1000
+                    ]
+                }
             }
         },
-        "jobs": {
-            "$id": "#/properties/jobs",
-            "type": "array",
-            "title": "The Jobs Schema",
-            "items": {
-                "$id": "#/properties/jobs/items",
-                "type": "string",
-                "title": "The Items Schema",
-                "default": "",
-                "examples": [
-                    "job1",
-                    "job2"
-                ],
-                "pattern": "^(.*)$"
-            }
+        "offset": {
+            "$id": "#/properties/offset",
+            "type": "integer",
+            "title": "The Offset Schema",
+            "default": 0,
+            "examples": [
+                0
+            ]
+        },
+        "limit": {
+            "$id": "#/properties/limit",
+            "type": "integer",
+            "title": "The Limit Schema",
+            "default": 0,
+            "examples": [
+                100
+            ]
         },
         "sort": {
             "$id": "#/properties/sort",
@@ -100,67 +118,19 @@
                 }
             }
         },
-        "date_range": {
-            "$id": "#/properties/date_range",
-            "type": "object",
-            "title": "The Date_range Schema",
-            "required": [
-                "from",
-                "to"
-            ],
-            "properties": {
-                "from": {
-                    "$id": "#/properties/date_range/properties/from",
-                    "type": "integer",
-                    "title": "The From Schema",
-                    "default": 0,
-                    "examples": [
-                        0
-                    ]
-                },
-                "to": {
-                    "$id": "#/properties/date_range/properties/to",
-                    "type": "integer",
-                    "title": "The To Schema",
-                    "default": 0,
-                    "examples": [
-                        1000
-                    ]
-                }
-            }
+        "filter": {
+            "$ref": "base.json#definitions/job_filter"
         },
-        "client_groups": {
-            "$id": "#/properties/client_groups",
-            "type": "array",
-            "title": "The Client_groups Schema",
-            "items": {
-                "$id": "#/properties/client_groups/items",
-                "type": "string",
-                "title": "The Items Schema",
-                "default": "",
-                "examples": [
-                    "njs"
-                ],
-                "pattern": "^(.*)$"
-            }
-        },
-        "offset": {
-            "$id": "#/properties/offset",
+        "timeout": {
             "type": "integer",
-            "title": "The Offset Schema",
             "default": 0,
             "examples": [
-                0
+                10000
             ]
         },
-        "limit": {
-            "$id": "#/properties/limit",
+        "admin": {
             "type": "integer",
-            "title": "The Limit Schema",
-            "default": 0,
-            "examples": [
-                100
-            ]
+            "enum": [0, 1]
         }
     }
 }

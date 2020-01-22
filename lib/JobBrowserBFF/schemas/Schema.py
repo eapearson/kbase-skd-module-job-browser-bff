@@ -1,4 +1,4 @@
-from jsonschema import validate
+from jsonschema import validate, RefResolver
 from jsonschema.exceptions import ValidationError
 import os
 import json
@@ -13,17 +13,22 @@ class SchemaError(Exception):
 
 class Schema(object):
     def __init__(self, schema_dir=None, load_schemas=False):
-        if schema_dir is not None or load_schemas:
-            self.schemas = self.load(schema_dir)
+        if schema_dir is not None:
+            self.schema_dir = os.path.abspath(schema_dir)
+        else:
+            self.schema_dir = os.path.abspath(os.path.dirname(__file__) + '/' +  DEFAULT_SCHEMA_DIR)
+
+        self.resolver = RefResolver('file://{}/'.format(self.schema_dir), None)
+
+        if load_schemas:
+            self.schemas = self.load(self.schema_dir)
         else:
             self.schemas = {}
 
     def load(self, schema_dir=None):
-        if schema_dir is None:
-            schema_dir = os.path.dirname(__file__) + '/' +  DEFAULT_SCHEMA_DIR
         schemas = {}
-        for file_name in os.listdir(schema_dir):
-            file_path = os.path.join(schema_dir, file_name)
+        for file_name in os.listdir(self.schema_dir):
+            file_path = os.path.join(self.schema_dir, file_name)
             file_base_name = os.path.splitext(file_name)[0]
 
             with open(file_path) as f:
@@ -36,10 +41,10 @@ class Schema(object):
         if schema is None:
             raise ValueError('Schema "' + schema_key + '" does not exist')
         try:
-            validate(instance=data, schema=schema)
+            validate(instance=data, schema=schema, resolver=self.resolver)
         except ValidationError as ex:
             message = ex.message
-            path = '.'.join(ex.absolute_schema_path)
+            path = '.'.join(map(str, ex.absolute_schema_path))
             value = ex.validator_value
             raise SchemaError(message, path, value)
 
