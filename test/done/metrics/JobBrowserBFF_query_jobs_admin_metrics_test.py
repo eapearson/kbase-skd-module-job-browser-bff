@@ -5,13 +5,14 @@ from JobBrowserBFF.Validation import Validation
 import unittest
 
 UPSTREAM_SERVICE = 'metrics'
-ENV='ci'
-USER_CLASS='admin'
-TIMEOUT = 10000
-TOTAL_COUNT = 55115
+ENV = 'ci'
+USER_CLASS = 'admin'
+TIMEOUT_MS = 10000
+TOTAL_COUNT = 55137
 FOUND_COUNT = 6465
-TIMESTAMP_FROM = 1496275200000 # 6/1/17
-TIMESTAMP_TO = 1527811200000 # 6/1/18
+TIMESTAMP_FROM = 1496275200000  # 6/1/17
+TIMESTAMP_TO = 1527811200000  # 6/1/18
+
 
 class JobBrowserBFFTest(TestBase):
     # Uncomment to skip this test
@@ -27,7 +28,7 @@ class JobBrowserBFFTest(TestBase):
                 },
                 'offset': 0,
                 'limit': 10,
-                'timeout': TIMEOUT,
+                'timeout': TIMEOUT_MS,
                 'admin': 1
             })
             jobs, found_count, total_count = self.assert_job_query_result_with_count(ret)
@@ -56,7 +57,7 @@ class JobBrowserBFFTest(TestBase):
                 },
                 'offset': 0,
                 'limit': 10,
-                'timeout': TIMEOUT,
+                'timeout': TIMEOUT_MS,
                 'admin': 1
             })
             jobs, found_count, total_count = self.assert_job_query_result_with_count(ret)
@@ -65,7 +66,7 @@ class JobBrowserBFFTest(TestBase):
             self.assertEqual(len(jobs), 10)
             self.is_in_ascending_order(jobs, ['state', 'create_at'])
         except Exception as ex:
-           self.assert_no_exception(ex)
+            self.assert_no_exception(ex)
 
     # Uncomment to skip this test
     # @unittest.skip("skipped test_query_jobs_with_sort_descending_happy")
@@ -86,7 +87,7 @@ class JobBrowserBFFTest(TestBase):
                 },
                 'offset': 0,
                 'limit': 10,
-                'timeout': TIMEOUT,
+                'timeout': TIMEOUT_MS,
                 'admin': 1
             })
             jobs, found_count, total_count = self.assert_job_query_result_with_count(ret)

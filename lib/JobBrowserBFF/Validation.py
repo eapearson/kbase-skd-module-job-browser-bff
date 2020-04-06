@@ -1,9 +1,10 @@
 from jsonrpcbase import InvalidParamsError
 from JobBrowserBFF.schemas.Schema import Schema, SchemaError
 
+
 class Validation(object):
-    def __init__(self, load_schemas=False):
-        self.schema = Schema(load_schemas=load_schemas)
+    def __init__(self, schema_dir=None, load_schemas=None):
+        self.schema = Schema(schema_dir=schema_dir, load_schemas=load_schemas)
 
     def validate_params(self, method_name, data):
         schema_key = method_name + '_params'
@@ -37,4 +38,3 @@ class Validation(object):
                 'schema_path': ex.path,
                 'schema_value': ex.value
             })
-    

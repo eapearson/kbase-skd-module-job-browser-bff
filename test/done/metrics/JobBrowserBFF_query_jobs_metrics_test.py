@@ -5,14 +5,15 @@ from JobBrowserBFF.Validation import Validation
 import unittest
 import json
 
-ENV='ci'
+ENV = 'ci'
 UPSTREAM_SERVICE = 'metrics'
-USER_CLASS='user'
-TIMEOUT = 10000
+USER_CLASS = 'user'
+TIMEOUT_MS = 10000
 TIMESTAMP_FROM = 0
 # 11/1/19
 TIMESTAMP_TO = 1575158400000
 TOTAL_COUNT = 19
+
 
 class JobBrowserBFFTest(TestBase):
     # Uncomment to skip this test
@@ -23,12 +24,12 @@ class JobBrowserBFFTest(TestBase):
             impl, context = self.impl_for(ENV, USER_CLASS)
             ret = impl.query_jobs(context, {
                 'time_span': {
-                    'from': 1496275200000, # 6/1/17
-                    'to': 1527811200000 # 6/1/18
+                    'from': 1496275200000,  # 6/1/17
+                    'to': 1527811200000  # 6/1/18
                 },
                 'offset': 0,
                 'limit': 10,
-                'timeout': TIMEOUT
+                'timeout': TIMEOUT_MS
             })
             jobs, found_count, total_count = self.assert_job_query_result_with_count(ret)
             self.assertEqual(found_count, 8)
@@ -51,19 +52,19 @@ class JobBrowserBFFTest(TestBase):
                     }
                 ],
                 'time_span': {
-                    'from': 1496275200000, # 6/1/17
-                    'to': 1527811200000 # 6/1/18
+                    'from': 1496275200000,  # 6/1/17
+                    'to': 1527811200000  # 6/1/18
                 },
                 'offset': 0,
                 'limit': 10,
-                'timeout': TIMEOUT
+                'timeout': TIMEOUT_MS
             })
             jobs, found_count, total_count = self.assert_job_query_result_with_count(ret)
             self.assertEqual(total_count, TOTAL_COUNT)
             self.assertEqual(found_count, 8)
             self.is_in_ascending_order(jobs, ['state', 'create_at'])
         except Exception as ex:
-           self.assert_no_exception(ex)
+            self.assert_no_exception(ex)
 
     # Uncomment to skip this test
     # @unittest.skip("skipped test_query_jobs_with_sort_descending_happy")
@@ -79,12 +80,12 @@ class JobBrowserBFFTest(TestBase):
                     }
                 ],
                 'time_span': {
-                    'from': 1496275200000, # 6/1/17
-                    'to': 1527811200000 # 6/1/18
+                    'from': 1496275200000,  # 6/1/17
+                    'to': 1527811200000  # 6/1/18
                 },
                 'offset': 0,
                 'limit': 10,
-                'timeout': TIMEOUT
+                'timeout': TIMEOUT_MS
             })
             jobs, found_count, total_count = self.assert_job_query_result_with_count(ret)
             self.assertEqual(total_count, TOTAL_COUNT)
@@ -101,22 +102,7 @@ class JobBrowserBFFTest(TestBase):
             param = {
                 'limit': 1,
             }
-            param2 ={
-                'sort': [
-                    {
-                        'key': 'narrative',
-                        'direction': 'ascending'
-                    }
-                ],
-                'time_span': {
-                    'from': 0, 
-                    'to': 1567371030000 # 9/1/19
-                },
-                'client_groups': ['njs'],
-                'offset': 0,
-                'limit': 10
-            }
-            param3 =  {
+            param2 = {
                 'sort': [
                     {
                         'key': 'narrative',
@@ -125,7 +111,22 @@ class JobBrowserBFFTest(TestBase):
                 ],
                 'time_span': {
                     'from': 0,
-                    'to': 1567371030000 # 9/1/19
+                    'to': 1567371030000  # 9/1/19
+                },
+                'client_groups': ['njs'],
+                'offset': 0,
+                'limit': 10
+            }
+            param3 = {
+                'sort': [
+                    {
+                        'key': 'narrative',
+                        'direction': 'ascending'
+                    }
+                ],
+                'time_span': {
+                    'from': 0,
+                    'to': 1567371030000  # 9/1/19
                 },
                 'offset': 0,
                 # ok
@@ -173,7 +174,7 @@ class JobBrowserBFFTest(TestBase):
                 ],
                 'total_count': 1
             }
-            # , 
+            # ,
             result = validation.validate_result('query_jobs', result1)
             self.assertTrue(True)
         except Exception as ex:
@@ -213,7 +214,8 @@ class JobBrowserBFFTest(TestBase):
             job2 = jobs[3]
             self.assertEqual(job2['job_id'], '5981eee1e4b06f68bf751ee6')
             self.assertEqual(job2['context']['type'], 'narrative')
-            self.assertEqual(job2['context']['narrative']['title'], 'Read-Only Parameters Test [TASK-938]')
+            self.assertEqual(job2['context']['narrative']['title'],
+                             'Read-Only Parameters Test [TASK-938]')
 
             job3 = jobs[15]
             self.assertEqual(job3['job_id'], '57eeefefe4b0b05cf8996c05')
@@ -235,12 +237,12 @@ class JobBrowserBFFTest(TestBase):
 
             base_params = {
                 'time_span': {
-                    'from': 1496275200000, # 6/1/17
-                    'to': 1527811200000 # 6/1/18
+                    'from': 1496275200000,  # 6/1/17
+                    'to': 1527811200000  # 6/1/18
                 },
                 'offset': 0,
                 'limit': 10,
-                'timeout': TIMEOUT,
+                'timeout': TIMEOUT_MS,
             }
 
             cases = [

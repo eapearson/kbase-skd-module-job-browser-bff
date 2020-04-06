@@ -6,12 +6,13 @@ import unittest
 import re
 
 UPSTREAM_SERVICE = 'mock'
-ENV='mock'
-JOB_ID_WITH_LOGS ='59820c93e4b06f68bf751eeb' # non-admin
-JOB_ID_NO_LOGS = '5cf1522aaa5a4d298c5dc2ff' # non-admin
-JOB_ID_NOT_FOUND = '5cf1522aaa5a4d298c5dc2fe' # non-admin
-JOB_ID_NO_PERMISSION = '57ec06aee4b0b05cf8996b89' # access it as non-admin user
-TIMEOUT = 10000
+ENV = 'mock'
+JOB_ID_WITH_LOGS = '59820c93e4b06f68bf751eeb'  # non-admin
+JOB_ID_NO_LOGS = '5cf1522aaa5a4d298c5dc2ff'  # non-admin
+JOB_ID_NOT_FOUND = '5cf1522aaa5a4d298c5dc2fe'  # non-admin
+JOB_ID_NO_PERMISSION = '57ec06aee4b0b05cf8996b89'  # access it as non-admin user
+TIMEOUT_MS = 10000
+
 
 class JobBrowserBFFTest(TestBase):
 
@@ -35,8 +36,8 @@ class JobBrowserBFFTest(TestBase):
                 'job_id': JOB_ID_WITH_LOGS,
                 'offset': 0,
                 'limit': 10,
-                'timeout': TIMEOUT
-                })
+                'timeout': TIMEOUT_MS
+            })
             job_log, total_count = self.assert_job_log_result(ret)
             self.assertEqual(len(job_log), 10)
             self.assertEqual(total_count, 215)
@@ -54,8 +55,8 @@ class JobBrowserBFFTest(TestBase):
                 'job_id': job_id,
                 'offset': 0,
                 'limit': 10,
-                'timeout': TIMEOUT
-                })
+                'timeout': TIMEOUT_MS
+            })
             job_log, total_count = self.assert_job_log_result(ret)
             self.assertEqual(len(job_log), 0)
             self.assertEqual(total_count, 0)
@@ -73,12 +74,13 @@ class JobBrowserBFFTest(TestBase):
                 'job_id': JOB_ID_NO_PERMISSION,
                 'offset': 0,
                 'limit': 10,
-                'timeout': TIMEOUT
-                })
+                'timeout': TIMEOUT_MS
+            })
             print('RET', ret)
             self.assertTrue(False, 'Expected an exception')
         except ServiceError as se:
-            self.assertEqual(se.code, 40, 'Expected error code 40 (permission denied), but received {}'.format(se.code))
+            self.assertEqual(
+                se.code, 40, 'Expected error code 40 (permission denied), but received {}'.format(se.code))
         except Exception as ex:
             self.assert_no_exception(ex)
 
@@ -93,11 +95,12 @@ class JobBrowserBFFTest(TestBase):
                 'job_id': JOB_ID_NOT_FOUND,
                 'offset': 0,
                 'limit': 10,
-                'timeout': TIMEOUT
-                })
+                'timeout': TIMEOUT_MS
+            })
             print('RET', ret)
             self.assertTrue(False, 'Expected an exception')
         except ServiceError as se:
-            self.assertEqual(se.code, 10, 'Expected error code 10 (not found), but received {}'.format(se.code))
+            self.assertEqual(
+                se.code, 10, 'Expected error code 10 (not found), but received {}'.format(se.code))
         except Exception as ex:
             self.assert_no_exception(ex)

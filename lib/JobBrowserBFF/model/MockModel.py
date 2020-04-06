@@ -29,7 +29,8 @@ def raw_log_entry_to_entry(raw_log_entry, entry_number, offset):
         'message': raw_log_entry['message'],
         'level': level
     }
-    
+
+
 class MockModel(object):
     def __init__(self, config, token, timeout, username):
         self.config = config
@@ -65,16 +66,16 @@ class MockModel(object):
     #     result = json.loads(json_util.dumps(jobs_collection.find(filter)))
     #     if len(result) == 0:
     #         return None
-        
+
     #     return result[0]
 
     def fix_workspaces(self, jobs):
         # Now find any workspaces and get info for them (given the current user)
-        
+
         workspace_ids = set()
         for job in jobs:
             if not job['context'].get('workspace'):
-                continue 
+                continue
             workspace_id = job['context']['workspace'].get('id')
             if workspace_id:
                 workspace_ids.add(workspace_id)
@@ -185,7 +186,7 @@ class MockModel(object):
             {'state.create_at': {'$gte': params['time_span']['from']}},
             {'state.create_at': {'$lt': params['time_span']['to']}}
         ]})
-    
+
         # Handle field-specific filters
         if 'filter' in params:
             for key, value in params['filter'].items():
@@ -203,7 +204,7 @@ class MockModel(object):
                     filters.append({'job_id': value})
                 elif key == 'client_group':
                     filters.append({'state.client_group': value})
-                    
+
         # Handle free-text search
         if 'search' in params:
             term_expressions = []
@@ -245,14 +246,13 @@ class MockModel(object):
 
         cursor.skip(params['offset'])
         cursor.limit(params['limit'])
-                                   
+
         # TODO: filter on username and check if admin.
         jobs = json.loads(json_util.dumps(cursor))
 
         # Fix up workspace info relative to the current user.
         self.fix_workspaces(jobs)
 
-        
         return jobs, found_count, total_count
 
     def get_jobs(self, params):
@@ -272,7 +272,7 @@ class MockModel(object):
             })
 
         filters.append({
-            'job_id': {'$in': params['job_ids']}  
+            'job_id': {'$in': params['job_ids']}
         })
 
         query = {'$and': filters}
@@ -292,7 +292,8 @@ class MockModel(object):
 
         response = requests.get(endpoint, headers=header, timeout=self.timeout/1000)
         if response.status_code != 200:
-            raise ServiceError(code=40000, message='Error fetching users', data={'user_id': user_ids})
+            raise ServiceError(code=40000, message='Error fetching users',
+                               data={'user_id': user_ids})
         else:
             try:
                 result = response.json()
@@ -303,7 +304,8 @@ class MockModel(object):
                     }
                 return retval
             except Exception as err:
-                raise ServiceError(code=40000, message='Bad response', data={'user_id': user_ids, 'original_message': str(err)})
+                raise ServiceError(code=40000, message='Bad response', data={
+                                   'user_id': user_ids, 'original_message': str(err)})
 
     def get_client_groups(self):
         url = self.config['catalog-url']
@@ -328,7 +330,7 @@ class MockModel(object):
                     'job_id': job_id
                 }
             )
-        
+
         job = json.loads(json_util.dumps(raw_job))
         if job['owner']['username'] != self.username:
             raise ServiceError(
@@ -341,7 +343,6 @@ class MockModel(object):
             )
 
         return job
-
 
     def get_job_log(self, job_id, offset, limit, search=None, level=None):
         # TODO: enforce perms
@@ -360,7 +361,7 @@ class MockModel(object):
                     'job_id': job_id
                 }
             )
-        
+
         job = json.loads(json_util.dumps(raw_job))
         if job['owner']['username'] != self.username:
             raise ServiceError(
@@ -406,4 +407,3 @@ class MockModel(object):
                     'job_status': job['state']['status']
                 }
             )
-

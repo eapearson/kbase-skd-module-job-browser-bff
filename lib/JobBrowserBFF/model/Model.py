@@ -2,6 +2,7 @@ from JobBrowserBFF.model.KBMetricsModel import KBMetricsModel
 from JobBrowserBFF.model.EE2Model import EE2Model
 from JobBrowserBFF.model.MockModel import MockModel
 
+
 class Model(object):
     def __init__(self, config, context, timeout=None):
         self.config = config

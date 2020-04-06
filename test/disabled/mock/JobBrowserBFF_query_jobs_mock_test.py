@@ -5,14 +5,15 @@ from JobBrowserBFF.Validation import Validation
 import unittest
 
 UPSTREAM_SERVICE = 'mock'
-ENV='ci'
-USER_CLASS='user'
-TIMEOUT = 10000
+ENV = 'ci'
+USER_CLASS = 'user'
+TIMEOUT_MS = 10000
 # 1/1/70
 TIMESTAMP_FROM = 0
 # 11/1/19
 TIMESTAMP_TO = 1575158400000
 TOTAL_COUNT = 19
+
 
 class JobBrowserBFFTest(TestBase):
     # Uncomment to skip this test
@@ -86,7 +87,7 @@ class JobBrowserBFFTest(TestBase):
                 'count': 9
             }
         },
-        {
+            {
             'params': {
                 'filter': {
                     'app': 'RAST_SDK/annotate_contigset'
@@ -244,7 +245,7 @@ class JobBrowserBFFTest(TestBase):
                 'first': '57eeef56e4b0b05cf8996c02',
                 'last': '57f27e81e4b0b05cf8996c28'
             }
-        },{
+        }, {
             'params': {
                 'sort': [
                     {
@@ -279,7 +280,7 @@ class JobBrowserBFFTest(TestBase):
                 jobs, found_count, total_count = self.assert_job_query_result_with_count(ret)
                 self.assertEqual(found_count, case['expected']['found_count'])
                 self.assertEqual(total_count, case['expected']['total_count'])
-                self.assertEqual(len(jobs), case['expected']['count'])  
+                self.assertEqual(len(jobs), case['expected']['count'])
                 self.assertEqual(jobs[0]['job_id'], case['expected']['first'])
                 self.assertEqual(jobs[9]['job_id'], case['expected']['last'])
                 if case['params']['sort'][0]['direction'] == 'ascending':
@@ -425,7 +426,8 @@ class JobBrowserBFFTest(TestBase):
             job2 = jobs[3]
             self.assertEqual(job2['job_id'], '59811465e4b06f68bf751ee0')
             self.assertEqual(job2['context']['type'], 'narrative')
-            self.assertEqual(job2['context']['narrative']['title'], 'TASK-938 - public narrative test')
+            self.assertEqual(job2['context']['narrative']['title'],
+                             'TASK-938 - public narrative test')
 
             job2 = jobs[15]
             self.assertEqual(job2['job_id'], '57eeefb5e4b0b05cf8996c04')

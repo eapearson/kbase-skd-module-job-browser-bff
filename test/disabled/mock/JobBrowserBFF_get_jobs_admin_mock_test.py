@@ -5,9 +5,10 @@ from JobBrowserBFF.Validation import Validation
 import unittest
 
 UPSTREAM_SERVICE = 'mock'
-ENV='mock'
+ENV = 'mock'
 USER_CLASS = 'admin'
-TIMEOUT = 10000
+TIMEOUT_MS = 10000
+
 
 class JobBrowserBFFTest(TestBase):
     # Uncomment to skip this test
@@ -23,7 +24,7 @@ class JobBrowserBFFTest(TestBase):
                 'count': 0
             }
         },
-        {
+            {
             'params': {
                 'job_ids': ['5d94b6f8aa5a4d298c5dc9d7', '5d93ca04aa5a4d298c5dc9d6', '5d93b406aa5a4d298c5dc9d5'],
                 'admin': 1
@@ -34,7 +35,7 @@ class JobBrowserBFFTest(TestBase):
         }
         ]
         base_params = {
-            'timeout': TIMEOUT
+            'timeout': TIMEOUT_MS
         }
         try:
             impl, context = self.impl_for(ENV, USER_CLASS)

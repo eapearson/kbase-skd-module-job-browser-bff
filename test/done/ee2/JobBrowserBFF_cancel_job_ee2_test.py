@@ -4,10 +4,13 @@ from biokbase.Errors import ServiceError
 import unittest
 
 UPSTREAM_SERVICE = 'ee2'
-JOB_ID_HAPPY = '5dd4d3303fabdfb79cbb0f09'
-JOB_ID_NOT_CANCELABLE = '5dd4abecc149b420f9bb0f07'
-JOB_ID_NOT_FOUND = '5dd4abecc149b420f9bb0f06'
+JOB_ID_HAPPY = '5e8285adefac56a4b4bc2b14'
+JOB_ID_NOT_CANCELABLE = '5e8285adefac56a4b4bc2b14'
+JOB_ID_NOT_FOUND = '5e8285adefac56a4b4bc2b13'
 TIMEOUT = 10000
+ENV = 'ci'
+USER_CLASS = 'user'
+
 
 class JobBrowserBFFTest(TestBase):
     # This test is tricky at present, because one has to have an active job to cancel!
@@ -19,13 +22,13 @@ class JobBrowserBFFTest(TestBase):
     def test_cancel_job_happy(self):
         self.set_config('upstream-service', UPSTREAM_SERVICE)
         try:
-            impl, context = self.impl_for('user')
+            impl, context = self.impl_for(ENV, USER_CLASS)
             ret = impl.cancel_job(context, {
                 'job_id': JOB_ID_HAPPY,
                 'timeout': TIMEOUT
             })
             result = ret[0]
-            self.assertIsInstance(result, dict)
+            self.assertIsNone(result)
             # ensure it is empty (a form of void)
             self.assertFalse(result)
         except Exception as ex:
@@ -39,13 +42,13 @@ class JobBrowserBFFTest(TestBase):
         # use unittest2? In any case, the workaround is fine.
         self.set_config('upstream-service', UPSTREAM_SERVICE)
         try:
-            impl, context = self.impl_for('user')
+            impl, context = self.impl_for(ENV, USER_CLASS)
             ret = impl.cancel_job(context, {
                 'job_id': JOB_ID_NOT_CANCELABLE,
                 'timeout': TIMEOUT
             })
             result = ret[0]
-            self.assertIsInstance(result, dict)
+            self.assertIsNone(result)
             # ensure it is empty (a form of void)
             self.assertFalse(result)
         except Exception as ex:
@@ -59,7 +62,7 @@ class JobBrowserBFFTest(TestBase):
         # use unittest2? In any case, the workaround is fine.
         self.set_config('upstream-service', UPSTREAM_SERVICE)
         try:
-            impl, context = self.impl_for('user')
+            impl, context = self.impl_for(ENV, USER_CLASS)
             impl.cancel_job(context, {
                 'job_id': JOB_ID_NOT_FOUND,
                 'timeout': TIMEOUT
@@ -67,7 +70,7 @@ class JobBrowserBFFTest(TestBase):
         except ServiceError as se:
             # This is "job not found", the error which should be returned
             # in this case.
-            self.assertEqual(se.code, 10, 'Service Error should return code "10" - for Job not found')
+            self.assertEqual(
+                se.code, 10, 'Service Error should return code "10" - for Job not found')
         except Exception as ex:
             self.assert_no_exception(ex)
-

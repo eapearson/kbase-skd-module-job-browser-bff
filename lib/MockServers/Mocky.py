@@ -1,8 +1,9 @@
-from http.server import BaseHTTPRequestHandler,HTTPServer
+from http.server import BaseHTTPRequestHandler, HTTPServer
 import json
 import time
 import importlib
 import inspect
+
 
 def class_for_name(module_name, class_name):
     # load the module, will raise ImportError if module cannot be loaded
@@ -11,13 +12,20 @@ def class_for_name(module_name, class_name):
     c = getattr(m, class_name)
     return c
 
+
 class JSONRPCHandler(BaseHTTPRequestHandler):
+
+    def _write_string(self, string_data):
+        self.wfile.write(bytes(string_data, 'utf-8'))
+
+    def _write_json(self, json_data):
+        self.wfile.write(bytes(json.dumps(json_data), 'utf-8'))
 
     def send_server_error(self, response_code, message):
         self.send_response(response_code)
         self.send_header('Content-Type', 'text/plain')
         self.end_headers()
-        self.wfile.write(bytes(message))
+        self._write_string(message)
 
     def send_json_response(self, id, value):
         self.send_response(200)
@@ -28,7 +36,7 @@ class JSONRPCHandler(BaseHTTPRequestHandler):
             'version': '1.1',
             'result': value
         }
-        self.wfile.write(bytes(json.dumps(data)))
+        self._write_json(data)
 
     def send_error_response(self, id, value):
         self.send_response(500)
@@ -39,19 +47,19 @@ class JSONRPCHandler(BaseHTTPRequestHandler):
             'version': '1.1',
             'error': value
         }
-        self.wfile.write(bytes(json.dumps(data)))
+        self._write_json(data)
 
     def send_as_response(self, content_type, value):
         self.send_response(200)
         self.send_header('Content-Type', content_type)
         self.end_headers()
-        self.wfile.write(bytes(value))
+        self._write_string(value)
 
     def send_json_string_response(self, value):
         self.send_response(200)
         self.send_header('Content-Type', 'application/json')
         self.end_headers()
-        self.wfile.write(bytes(value))
+        self._write_string(value)
 
     def validate_input(self, input):
         # convert to json
@@ -67,7 +75,7 @@ class JSONRPCHandler(BaseHTTPRequestHandler):
         version = input_json['version']
         if version != '1.1':
             raise ValueError('Invalid version; expected "1.1", got "%s"' % (version))
-            
+
         if 'id' not in input_json:
             raise ValueError('Missing params field "id"')
 
@@ -77,7 +85,7 @@ class JSONRPCHandler(BaseHTTPRequestHandler):
             raise ValueError('Missing "method" field')
 
         module, method = input_json['method'].split('.')
-        
+
         if 'params' not in input_json:
             raise ValueError('Missing "params" field')
 
@@ -91,7 +99,7 @@ class JSONRPCHandler(BaseHTTPRequestHandler):
         self.send_response(200)
         self.send_header('Content-Type', 'text/plain')
         self.end_headers()
-        self.wfile.write('Quitting Mock Server...')
+        self._write_string('Quitting Mock Server...')
         self.server.stop = True
 
     def do_HEAD(self):
@@ -139,13 +147,12 @@ class JSONRPCHandler(BaseHTTPRequestHandler):
             module_class = getattr(servers_module, class_name)
             if not inspect.isclass(module_class):
                 self.send_error(500, 'RPC module is not a class "%s"' % class_name)
-                return 
-            # 
+                return
+            #
             # module_class = class_for_name('MockServers.Servers', module)
         except Exception as err:
             self.send_error(500, 'Cannot load service module "%s": %s' % (module, err.message))
             return
-
 
         # look up method
         svc = module_class()
@@ -165,13 +172,13 @@ class JSONRPCHandler(BaseHTTPRequestHandler):
                 'data': None
             })
             return
-          
+
         if debug:
             if debug.get('send-as', False):
                 self.send_as_response(debug['send-as'], response_json)
             elif debug.get('send-as-json-string', False):
                 self.send_json_string_response(response_json)
-            else: 
+            else:
                 self.send_error(500, 'Bad debug %s' % (str(debug)))
         elif error:
             self.log_message('error response %s', error)

@@ -4,12 +4,13 @@ from biokbase.Errors import ServiceError
 import unittest
 
 UPSTREAM_SERVICE = 'metrics'
-ENV='ci'
-USER_CLASS='user'
+ENV = 'ci'
+USER_CLASS = 'user'
 JOB_ID_HAPPY = '5b7b8287e4b0d417818a2f97'
 JOB_ID_NOT_CANCELABLE = '5b7b8287e4b0d417818a2f97'
 JOB_ID_NOT_FOUND = '5b7b8287e4b0d417818a2f96'
-TIMEOUT = 10000
+TIMEOUT_MS = 10000
+
 
 class JobBrowserBFFTest(TestBase):
     # This test is tricky at present, because one has to have an active job to cancel!
@@ -22,7 +23,7 @@ class JobBrowserBFFTest(TestBase):
             impl, context = self.impl_for(ENV, USER_CLASS)
             ret = impl.cancel_job(context, {
                 'job_id': JOB_ID_HAPPY,
-                'timeout': TIMEOUT
+                'timeout': TIMEOUT_MS
             })
             result = ret[0]
             self.assertIsInstance(result, dict)
@@ -42,7 +43,7 @@ class JobBrowserBFFTest(TestBase):
             impl, context = self.impl_for(ENV, USER_CLASS)
             ret = impl.cancel_job(context, {
                 'job_id': JOB_ID_NOT_CANCELABLE,
-                'timeout': TIMEOUT
+                'timeout': TIMEOUT_MS
             })
             result = ret[0]
             self.assertIsInstance(result, dict)
@@ -62,12 +63,12 @@ class JobBrowserBFFTest(TestBase):
             impl, context = self.impl_for(ENV, USER_CLASS)
             impl.cancel_job(context, {
                 'job_id': JOB_ID_NOT_FOUND,
-                'timeout': TIMEOUT
+                'timeout': TIMEOUT_MS
             })
         except ServiceError as se:
             # This is "job not found", the error which should be returned
             # in this case.
-            self.assertEqual(se.code, 10, 'Service Error should return code "10" - for Job not found')
+            self.assertEqual(
+                se.code, 10, 'Service Error should return code "10" - for Job not found')
         except Exception as ex:
             self.assert_no_exception(ex)
-       

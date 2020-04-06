@@ -73,17 +73,22 @@ A service method may populate the data field with arbitrary data which is meanin
 
 ## Custom Error Catalog
 
-| Code   | Description                               |
-| ------ | ----------------------------------------- |
-| 01     | Unknown error |
-| 10     | The requested job could not be found                     |
-| 20     | Job could not be canceled because it is not active      |
-| 21     | Job could not be canceled due to insufficient privileges |
-| 30     | The requested job log could not be found |
-| 40     | User does not have access to this job |
-| 50     | Non-admin user attempt to use admin method |
-| 60     | Job is not cancelable |
-| 100    | Request timeout |
+| Code  | Description                                                                       |
+| ----- | --------------------------------------------------------------------------------- |
+| 01    | Unknown error                                                                     |
+| 10    | The requested job could not be found                                              |
+| 20    | Job could not be canceled because it is not active                                |
+| 21    | Job could not be canceled due to insufficient privileges                          |
+| 30    | The requested job log could not be found                                          |
+| 40    | User does not have access to this job                                             |
+| 50    | Non-admin user attempt to use admin method                                        |
+| 60    | Job is not cancelable                                                             |
+| 100   | Request timeout                                                                   |
+| 101   | HTTP Error calling upstream service                                               |
+| 102   | Decoding error in response from upstream service - not json                       |
+| 103   | Unexpected type in upstream service result; must be array or null                 |
+| 104   | Invalid response from upstream service; not application/json, not an error status |
+| 40000 | Unknown error                                                                     |
 
 
 

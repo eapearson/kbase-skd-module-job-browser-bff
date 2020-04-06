@@ -10,6 +10,7 @@ import time
 from datetime import datetime
 import json
 
+
 def raw_job_to_state(raw_job):
     raw_state = raw_job['status']
     if raw_state == 'created':
@@ -19,7 +20,7 @@ def raw_job_to_state(raw_job):
         }
     if raw_state == 'queued':
         return {
-            'type': 'queue',
+            'status': 'queue',
             'create_at': raw_job['created'],
             'queue_at': raw_job['queued'],
             'client_group': None
@@ -90,6 +91,7 @@ def raw_job_to_state(raw_job):
     else:
         raise ValueError('Unrecognized state: ' + raw_state)
 
+
 def raw_job_to_job(raw_job, apps_map, users_map, workspaces_map):
     # Get the additional user info out of the users map
     user_info = users_map.get(raw_job['user'], None)
@@ -103,7 +105,7 @@ def raw_job_to_job(raw_job, apps_map, users_map, workspaces_map):
     client_group = None
     if app is not None:
         app_info = apps_map.get(app['id'], None)
-        
+
         if app_info is None:
             app['title'] = app['id']
             app['client_groups'] = []
@@ -157,6 +159,7 @@ def raw_job_to_job(raw_job, apps_map, users_map, workspaces_map):
                 },
                 'app': app
             }
+            print('HERE!', job)
         elif job_type == 'export':
             job = {
                 'job_id': raw_job['job_id'],
@@ -220,24 +223,27 @@ def raw_job_to_job(raw_job, apps_map, users_map, workspaces_map):
         }
     return job
 
-def raw_log_line_to_entry(raw_log_line, entry_number):
+
+def raw_log_line_to_entry(raw_log_line, entry_number, offset):
     if raw_log_line.get('is_error', False):
         level = 'error'
     else:
         level = 'normal'
     return {
-        'created_at': raw_log_line['ts'],
-        'entry_number': entry_number,
-        'entry': raw_log_line['line'],
+        'logged_at': raw_log_line['ts'],
+        'row': entry_number + offset,
+        'message': raw_log_line['line'],
         'level': level
     }
 
+
 class EE2Model(object):
-    def __init__(self, config, token, timeout):
+    def __init__(self, config, token, timeout, username):
         self.config = config
         self.token = token
         # self.username = username
         self.timeout = timeout
+        self.username = username
 
     #
     # ee2 params:
@@ -297,7 +303,7 @@ class EE2Model(object):
                     # note we save the parsed app id as 'app'
                     raw_job['app'] = app
                     if app is not None:
-                        apps_to_fetch[app['id']] =  app
+                        apps_to_fetch[app['id']] = app
                 else:
                     raw_job['app'] = None
 
@@ -320,7 +326,7 @@ class EE2Model(object):
         workspaces = services.get_workspaces(list(workspace_ids))
         for workspace in workspaces:
             workspace_map[workspace['id']] = workspace
-        
+
         # Now join them all together.
         jobs = []
         for raw_job in raw_jobs:
@@ -329,11 +335,10 @@ class EE2Model(object):
                 jobs.append(job)
             except Exception as ex:
                 print('Error converting job: ' + str(ex))
-            
+
         return jobs
 
     def is_admin(self):
-        url = self.config['ee2-url']
         api = EE2Api(url=self.config['ee2-url'], token=self.token, timeout=self.timeout)
         try:
             result = api.is_admin()
@@ -346,37 +351,42 @@ class EE2Model(object):
         # TODO: is this implemented yet?
 
     def get_job_log(self, job_id, offset, limit, search=None, level=None):
-        url = self.config['ee2-url']
-
-        rpc = GenericClient(url=url, module="execution_engine2", token=self.token, timeout=self.timeout)
+        api = EE2Api(url=self.config['ee2-url'], token=self.token, timeout=self.timeout)
         try:
-            result = rpc.call_func('get_job_logs', {
+            # Note plural form of get_job_log. The upstream apis (njs, ee2 copying it)
+            # mistakenly use the plural form ... it is a log of a job, not a logs of a job.
+            result = api.get_job_logs({
                 'job_id': job_id,
-                'skip_lines': offset
+                'offset': offset,
+                'limit': limit
             })
         except ServiceError as se:
-            # handle specific error mesages 
+            # handle specific error mesages
             if se.code == -32000:
-                # print('SERVICE ERROR 2', se.code, se.message, re.search('Cannot find job log with id:', se.message))
-                if re.search('Cannot find job log with id:', se.message):
-                    raise ServiceError(
-                        code=30,
-                        message='The requested job log could not be found',
-                        data={
-                            'job_id': job_id
-                        })
+                if re.search('Cannot find job log with id[s]?:', se.message):
+                    return {
+                        'log': [],
+                        'total_count': 0
+                    }
+                    # raise ServiceError(
+                    #     code=30,
+                    #     message='The requested job log could not be found',
+                    #     data={
+                    #         'job_id': job_id
+                    #     })
             raise se
+        else:
+            entries = [raw_log_line_to_entry(line, index, offset)
+                       for index, line in enumerate(result['lines'])]
 
-        entries = [raw_log_line_to_entry(line, index) for index, line in enumerate(result['lines'])]
+            if limit is not None:
+                entries = entries[slice(0, limit)]
 
-        if limit is not None:
-            entries = entries[slice(0, limit)]
-
-        # entries = list(map(raw_log_line_to_entry, result['lines']))
-        return {
-            'log': entries,
-            'total_count': len(result['lines'])
-        }
+            # entries = list(map(raw_log_line_to_entry, result['lines']))
+            return {
+                'log': entries,
+                'total_count': result['count']
+            }
 
     def cancel_job(self, job_id):
         api = EE2Api(url=self.config['ee2-url'], token=self.token, timeout=self.timeout)
@@ -385,19 +395,21 @@ class EE2Model(object):
                 'job_id': job_id,
                 'terminated_code': 0
             })
+            return None
         except ServiceError as se:
-            if re.search('A job with status .+ cannot be terminated. It is already cancelled.', se.message):
+            if re.search(('A job with status .+ cannot be terminated. '
+                          'It is already cancelled.'), se.message):
                 # Current behavior is indistinguishable from success.
-                return
+                return None
             elif re.search('Cannot find job with ids:', se.message):
                 raise ServiceError(code=10,
-                    message="The job specified for cancelation does not exist",
-                    data={
-                        'job_id': job_id
-                    })
+                                   message="The job specified for cancelation does not exist",
+                                   data={
+                                       'job_id': job_id
+                                   })
             else:
                 raise se
-       
+
     def ee2_query_jobs(self, offset, limit, time_span=None, filter=None, sort=None, admin=False):
         # TODO: timeout global or timeout per call?
         api = EE2Api(url=self.config['ee2-url'], token=self.token, timeout=self.timeout)
@@ -421,9 +433,10 @@ class EE2Model(object):
                 pass
             elif len(sort) > 1:
                 raise ServiceError(code=40000, message="Only one sort spec supported",
-                                    data={})
+                                   data={})
             elif sort[0].get('key') != 'created':
-                raise ServiceError(code=40000, message="The sort spec must be fo the 'created' key")
+                raise ServiceError(
+                    code=40000, message="The sort spec must be for the 'created' key")
 
             if sort[0].get('direction') == 'ascending':
                 ascending = True
@@ -434,18 +447,49 @@ class EE2Model(object):
         try:
             # TODO: when return total_count, use jobs, total_count = ...
             # TODO: use offset and limit (and batched fetch) when offset is available.
+            print('QUERY JOBS 1', params, json.dumps(params))
             if admin:
+                # print('   admin!')
                 result = api.check_jobs_date_range_for_all(params)
             else:
                 result = api.check_jobs_date_range_for_user(params)
-            # print('RESULT', result)
+
+            # print('QUERY JOBS 2', result)
             return result['jobs'], result['query_count']
         except ServiceError:
             raise
         except Exception as ex:
             raise ServiceError(code=40000, message='Unknown error', data={
-                'original_message': str(err)
+                'original_message': str(ex)
             })
+
+    def filter_transform(self, raw_filter):
+        field_name_transforms = {
+            'workspace_id': 'wsid',
+        }
+        # yeah, doing this with map is just ugly.
+        filter = dict()
+        print('filter??', raw_filter)
+        for field, value in raw_filter.items():
+            # transform the field name from ours to the idiosyncratic upstream names.
+            field_name = field_name_transforms.get(field, field)
+
+            # transform field values
+            if field_name == 'status':
+                status_transform = {
+                    'create': 'created',
+                    'queue': 'queued',
+                    'run': 'running',
+                    'error': 'error',
+                    'terminate': 'terminate'
+                }
+                value = list(map(lambda x: status_transform.get(x, x), value))
+
+            field_name = field_name + '__in'
+            filter.update({
+                field_name: value
+            })
+        return filter
 
     def query_jobs(self, params):
         # Sort is required (and validated before we get here) so safe to assume it exists.
@@ -456,18 +500,7 @@ class EE2Model(object):
         # Filter is optional.
         if 'filter' in params:
             # Some upstream field names are not api-friendly (imo)
-            field_name_transforms = {
-                'workspace_id': 'wsid',
-            }
-            # yeah, doing this with map is just ugly.
-            filter = {}
-            for field, value in params['filter'].items():
-                # transform the field name from ours to the idiosyncratic upstream names.
-                field_name = field_name_transforms.get(field, field)
-                # filter.append("{}={}".format(field_name, value))
-                filter.update({
-                   field_name: value
-                })
+            filter = self.filter_transform(params['filter'])
         else:
             # Note, we can use None for optional params.
             filter = None
@@ -480,7 +513,8 @@ class EE2Model(object):
             limit=params['limit'],
             filter=filter,
             sort=sort,
-            time_span=params.get('time_span', None)
+            time_span=params.get('time_span', None),
+            admin=params.get('admin', False)
         )
         # The total count is not returned by ee2 a this time;
         total_count = found_count
@@ -512,7 +546,7 @@ class EE2Model(object):
                 field_name = field_name_transforms.get(field, field)
                 # filter.append("{}={}".format(field_name, value))
                 filter.update({
-                   field_name: value
+                    field_name: value
                 })
         else:
             # Note, we can use None for optional params.
@@ -539,13 +573,12 @@ class EE2Model(object):
 
         return jobs, found_count, total_count
 
-    
-    def ee2_get_jobs(self, job_ids=None):
+    def ee2_get_jobs(self, params):
         api = EE2Api(url=self.config['ee2-url'], token=self.token, timeout=self.timeout)
 
         try:
             jobs = api.check_jobs({
-                'job_ids': job_ids
+                'job_ids': params['job_ids']
             })
             # print('JOBS JOBS JOBS', jobs)
             # TODO: when jobs returned as a array, remove this workaround.
@@ -589,6 +622,6 @@ class EE2Model(object):
         if len(params['job_ids']) == 0:
             return []
 
-        raw_jobs = self.ee2_get_jobs(job_ids=params['job_ids'])
+        raw_jobs = self.ee2_get_jobs(params)
 
         return self.raw_jobs_to_jobs(raw_jobs)

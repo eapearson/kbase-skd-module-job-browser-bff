@@ -14,7 +14,7 @@ ENV=ci
 NETWORK_NAME="kbase-dev"
 
 echo "Ensuring network $NETWORK_NAME exists"
-ensure_network_exists kbase-dev
+# ensure_network_exists kbase-dev
 
 echo "Starting dev image..."
 docker run -i -t \

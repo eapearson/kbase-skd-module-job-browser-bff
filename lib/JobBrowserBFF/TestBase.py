@@ -18,7 +18,7 @@ class TestBase(unittest.TestCase):
 
     @classmethod
     def loadConfig(cls):
-        # The standard deployment configuration 
+        # The standard deployment configuration
         cls.cfg = {}
         config = ConfigParser()
         config.read(cls.config_file)
@@ -76,9 +76,12 @@ class TestBase(unittest.TestCase):
         # it'll result in a NoneType error
         cls.serviceImpl = JobBrowserBFF(cls.cfg)
         cls.scratch = cls.cfg['scratch']
-       
+
     def getImpl(self):
         return self.__class__.serviceImpl
+
+    def get_config(self, key, default_value=None):
+        return self.cfg.get(key, default_value)
 
     def newAuth(self, token):
         # Getting username from Auth profile for token
@@ -100,7 +103,7 @@ class TestBase(unittest.TestCase):
                 {'service': 'JobBrowserBFF',
                     'method': 'please_never_use_it_in_production',
                     'method_params': []
-            }],
+                 }],
             'authenticated': 1})
         return ctx
 
@@ -126,7 +129,7 @@ class TestBase(unittest.TestCase):
             else:
                 return default_value
         return some_dict
-        
+
     @staticmethod
     def is_in_descending_order(items, keys):
         in_order = True
@@ -166,7 +169,6 @@ class TestBase(unittest.TestCase):
     def assert_in_descending_order(self, items, keys):
         result = self.is_in_descending_order(items, keys)
         self.assertTrue(result, 'Expected to be in descending order, is not')
-
 
     def assert_job_result_with_count(self, return_value):
         self.assertIsInstance(return_value, list)
@@ -224,9 +226,13 @@ class TestBase(unittest.TestCase):
             error_type = type(ex)
             if error_type == ServiceError:
                 print('DATA', ex.data)
-                self.assertTrue(False, 'Did not expect an exception : ServiceError: {} - {} '.format(ex.code, ex.message))
-            else: 
-                self.assertTrue(False, 'Did not expect an exception {}:{} '.format(ex.__class__.__name__, ex.message))
+                self.assertTrue(
+                    False,
+                    ('Did not expect an exception :'
+                     ' ServiceError: {} - {} '.format(ex.code, ex.message)))
+            else:
+                self.assertTrue(False, 'Did not expect an exception {}:{} '.format(
+                    ex.__class__.__name__, ex.message))
         else:
             self.assertTrue(False, 'Did not expect an exception (no message): {}'.format(type(ex)))
 
@@ -249,16 +255,20 @@ class TestBase(unittest.TestCase):
             'user_id': user_id,
             'provenance': [
                 {'service': 'JobBrowserBFF',
-                    'method': 'please_never_use_it_in_production',
-                    'method_params': []
-            }],
+                 'method': 'please_never_use_it_in_production',
+                 'method_params': []
+                 }],
             'authenticated': 1})
         return ctx
-     
+
+    def token_for(self, env, user_type):
+        token = self.test_config['test_token_{}_{}'.format(env, user_type)]
+        return token
+
     def impl_for(self, env, user_type):
         token = self.test_config['test_token_{}_{}'.format(env, user_type)]
         if env == 'mock':
             context = self.new_mock_context(token)
-        else: 
+        else:
             context = self.new_context(token)
         return self.new_implementation_instance(), context

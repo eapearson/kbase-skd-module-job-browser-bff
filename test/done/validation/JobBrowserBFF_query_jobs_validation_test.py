@@ -5,13 +5,14 @@ from JobBrowserBFF.Validation import Validation
 import unittest
 
 UPSTREAM_SERVICE = 'mock'
-ENV='mock'
-USER_CLASS='user'
-TIMEOUT = 10000
+ENV = 'mock'
+USER_CLASS = 'user'
+TIMEOUT_MS = 10000
 # 10/1/19
 TIMESTAMP_FROM = 0
 # 11/1/19
 TIMESTAMP_TO = 1575158400000
+
 
 class JobBrowserBFFTest(TestBase):
 
@@ -23,22 +24,7 @@ class JobBrowserBFFTest(TestBase):
             param = {
                 'limit': 1,
             }
-            param2 ={
-                'sort': [
-                    {
-                        'key': 'narrative',
-                        'direction': 'ascending'
-                    }
-                ],
-                'time_span': {
-                    'from': 0, 
-                    'to': 1567371030000 # 9/1/19
-                },
-                'client_groups': ['njs'],
-                'offset': 0,
-                'limit': 10
-            }
-            param3 =  {
+            param2 = {
                 'sort': [
                     {
                         'key': 'narrative',
@@ -47,7 +33,22 @@ class JobBrowserBFFTest(TestBase):
                 ],
                 'time_span': {
                     'from': 0,
-                    'to': 1567371030000 # 9/1/19
+                    'to': 1567371030000  # 9/1/19
+                },
+                'client_groups': ['njs'],
+                'offset': 0,
+                'limit': 10
+            }
+            param3 = {
+                'sort': [
+                    {
+                        'key': 'narrative',
+                        'direction': 'ascending'
+                    }
+                ],
+                'time_span': {
+                    'from': 0,
+                    'to': 1567371030000  # 9/1/19
                 },
                 'offset': 0,
                 # ok
@@ -95,7 +96,7 @@ class JobBrowserBFFTest(TestBase):
                 ],
                 'total_count': 1
             }
-            # , 
+            # ,
             result = validation.validate_result('query_jobs', result1)
             self.assertTrue(True)
         except Exception as ex:

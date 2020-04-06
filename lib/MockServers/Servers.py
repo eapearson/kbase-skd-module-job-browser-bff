@@ -1,3 +1,5 @@
+import time
+
 
 class JSONRPCBase(object):
     def is_method(self, method_name):
@@ -8,6 +10,7 @@ class JSONRPCBase(object):
 
     def call_method(self, method_name, params):
         return getattr(self, 'do_' + method_name)(params)
+
 
 class JSONRPC_Test(JSONRPCBase):
     def do_status(self, params):
@@ -33,8 +36,17 @@ class JSONRPC_Test(JSONRPCBase):
             'message': 'This is not a list...'
         }, None, None
 
+    def do_sleep_for(self, params):
+        start = time.time()
+        time.sleep(params[0]['sleep'])
+        elapsed = time.time() - start
+        return {
+            'slept_for': elapsed
+        }, None, None
+
     # TODO: trigger for all JSON RPC 2.0 errors, using the standard
     # structure (dict).
+
 
 class JSONRPC_ServiceWizard(JSONRPCBase):
     def __init__(self):
@@ -62,4 +74,3 @@ class JSONRPC_ServiceWizard(JSONRPCBase):
             }, None
 
         return [module], None, None
-

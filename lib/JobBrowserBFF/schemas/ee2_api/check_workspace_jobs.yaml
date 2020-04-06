@@ -1,0 +1,10 @@
+---
+"$schema": http://json-schema.org/draft-07/schema#
+"definitions": {}
+type: object
+additionalProperties: false
+properties:
+  job_states:
+    type: array
+    items:
+      "$ref": "base.json#definitions/job_state"

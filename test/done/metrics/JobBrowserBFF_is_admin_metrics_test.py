@@ -2,8 +2,9 @@ from JobBrowserBFF.TestBase import TestBase
 import unittest
 
 UPSTREAM_SERVICE = 'metrics'
-ENV='ci'
-USER_CLASS='user'
+ENV = 'ci'
+USER_CLASS = 'user'
+
 
 class JobBrowserBFFTest(TestBase):
     # Uncomment to skip this test
@@ -23,7 +24,7 @@ class JobBrowserBFFTest(TestBase):
             self.assertIsInstance(is_admin, bool)
             self.assertEqual(is_admin, True)
         except Exception as ex:
-           self.assert_no_exception(ex)
+            self.assert_no_exception(ex)
 
     # Uncomment to skip this test
     # @unittest.skip("skipped test_is_admin_happy")
@@ -42,11 +43,10 @@ class JobBrowserBFFTest(TestBase):
             self.assertIsInstance(is_admin, bool)
             self.assertEqual(is_admin, False)
         except Exception as ex:
-           self.assert_no_exception(ex)
+            self.assert_no_exception(ex)
 
     # TODO: various states of token (these are inherent to bad tokens, but might as well handle here)
     # TODO: no token
     # TODO: invalid token (structure)
     # TODO: token does not exist
     # TODO: token expired
-    

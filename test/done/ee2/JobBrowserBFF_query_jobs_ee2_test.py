@@ -1,11 +1,14 @@
 # -*- coding: utf-8 -*-
 from JobBrowserBFF.TestBase import TestBase
-from JobBrowserBFF.schemas.Schema import Schema
-from JobBrowserBFF.Validation import Validation
-import unittest
 
 UPSTREAM_SERVICE = 'ee2'
 TIMEOUT = 10000
+ENV = 'ci'
+USER_CLASS = 'user'
+
+TIME_FROM = 1585699200000  # 4/1/20
+TIME_TO = 1585872000000  # 4/4/20
+
 
 class JobBrowserBFFTest(TestBase):
     # Uncomment to skip this test
@@ -13,21 +16,21 @@ class JobBrowserBFFTest(TestBase):
     def test_query_jobs_happy(self):
         self.set_config('upstream-service', UPSTREAM_SERVICE)
         try:
-            impl, ctx = self.newImplCtx('test_token_admin')
-            ret = impl.query_jobs_admin(ctx, {
+            impl, context = self.impl_for(ENV, USER_CLASS)
+            ret = impl.query_jobs(context, {
                 'time_span': {
-                    'from': 1496275200000, # 6/1/17
-                    'to': 1527811200000 # 6/1/18
+                    'from': TIME_FROM,
+                    'to': TIME_TO
                 },
                 'offset': 0,
-                'limit': 10,
+                'limit': 5,
                 'timeout': TIMEOUT
             })
             jobs, found_count, total_count = self.assert_job_query_result_with_count(ret)
-            self.assertEqual(found_count, 184)
-            # TODO: change to actual total count when fixed upstream
-            # self.assertEqual(found_count, 2320)
-            self.assertEqual(len(jobs), 10)
+            self.assertEqual(found_count, 8)
+            # TODO: total_count is not implemented in ee2 yet.
+            # self.assertEqual(total_count, 19)
+            self.assertEqual(len(jobs), 5)
         except Exception as ex:
             self.assert_no_exception(ex)
 
@@ -36,8 +39,8 @@ class JobBrowserBFFTest(TestBase):
     def test_query_jobs_with_sort_happy(self):
         self.set_config('upstream-service', UPSTREAM_SERVICE)
         try:
-            impl, ctx = self.newImplCtx('test_token_admin')
-            ret = impl.query_jobs_admin(ctx, {
+            impl, context = self.impl_for(ENV, USER_CLASS)
+            ret = impl.query_jobs(context, {
                 'sort': [
                     {
                         'key': 'created',
@@ -45,29 +48,27 @@ class JobBrowserBFFTest(TestBase):
                     }
                 ],
                 'time_span': {
-                    'from': 1496275200000, # 6/1/17
-                    'to': 1527811200000 # 6/1/18
+                    'from': TIME_FROM,
+                    'to': TIME_TO
                 },
                 'offset': 0,
-                'limit': 10,
+                'limit': 5,
                 'timeout': TIMEOUT
             })
             jobs, found_count, total_count = self.assert_job_query_result_with_count(ret)
-            self.assertEqual(found_count, 184)
-            # TODO: change to actual total count when fixed upstream
-            # self.assertEqual(total_count, 2320)
-            self.assertEqual(len(jobs), 10)
+            # self.assertEqual(total_count, 19)
+            self.assertEqual(found_count, 8)
             self.is_in_ascending_order(jobs, ['state', 'create_at'])
         except Exception as ex:
-           self.assert_no_exception(ex)
+            self.assert_no_exception(ex)
 
     # Uncomment to skip this test
     # @unittest.skip("skipped test_query_jobs_with_sort_descending_happy")
     def test_query_jobs_with_sort_descending_happy(self):
         self.set_config('upstream-service', UPSTREAM_SERVICE)
         try:
-            impl, ctx = self.newImplCtx('test_token_admin')
-            ret = impl.query_jobs_admin(ctx, {
+            impl, context = self.impl_for(ENV, USER_CLASS)
+            ret = impl.query_jobs(context, {
                 'sort': [
                     {
                         'key': 'created',
@@ -75,20 +76,16 @@ class JobBrowserBFFTest(TestBase):
                     }
                 ],
                 'time_span': {
-                    'from': 1496275200000, # 6/1/17
-                    'to': 1527811200000 # 6/1/18
+                    'from': TIME_FROM,
+                    'to': TIME_TO
                 },
                 'offset': 0,
-                'limit': 10,
+                'limit': 5,
                 'timeout': TIMEOUT
             })
             jobs, found_count, total_count = self.assert_job_query_result_with_count(ret)
-            self.assertEqual(found_count, 184)
-            # TODO: change to actual total count when fixed upstream
-            # self.assertEqual(total_count, 2320)
-            self.assertEqual(len(jobs), 10)
+            # self.assertEqual(total_count, 19)
+            self.assertEqual(found_count, 8)
             self.is_in_descending_order(jobs, ['state', 'create_at'])
         except Exception as ex:
             self.assert_no_exception(ex)
-
-   

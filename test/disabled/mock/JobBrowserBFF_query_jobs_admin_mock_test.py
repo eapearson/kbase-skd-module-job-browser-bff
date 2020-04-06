@@ -5,14 +5,15 @@ from JobBrowserBFF.Validation import Validation
 import unittest
 
 UPSTREAM_SERVICE = 'mock'
-ENV='mock'
-USER_CLASS='admin'
-TIMEOUT = 10000
+ENV = 'mock'
+USER_CLASS = 'admin'
+TIMEOUT_MS = 10000
 # 10/1/19
 TIMESTAMP_FROM = 0
 # 11/1/19
 TIMESTAMP_TO = 1575158400000
 TOTAL_COUNT = 55104
+
 
 class JobBrowserBFFTest(TestBase):
     # Uncomment to skip this test
@@ -234,7 +235,7 @@ class JobBrowserBFFTest(TestBase):
                 'first': '54b02da8e4b06e6b5555476d',
                 'last': '54c5d7b5e4b0c6df765a91aa'
             }
-        },{
+        }, {
             'params': {
                 'sort': [
                     {
@@ -269,7 +270,7 @@ class JobBrowserBFFTest(TestBase):
                 jobs, found_count, total_count = self.assert_job_query_result_with_count(ret)
                 self.assertEqual(found_count, case['expected']['found_count'])
                 self.assertEqual(total_count, case['expected']['total_count'])
-                self.assertEqual(len(jobs), case['expected']['count'])  
+                self.assertEqual(len(jobs), case['expected']['count'])
                 self.assertEqual(jobs[0]['job_id'], case['expected']['first'])
                 self.assertEqual(jobs[9]['job_id'], case['expected']['last'])
                 if case['params']['sort'][0]['direction'] == 'ascending':

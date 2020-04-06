@@ -1,7 +1,10 @@
 from JobBrowserBFF.TestBase import TestBase
-import unittest
+# import unittest
 
 UPSTREAM_SERVICE = 'ee2'
+ENV = 'ci'
+USER_CLASS = 'admin'
+
 
 class JobBrowserBFFTest(TestBase):
     # Uncomment to skip this test
@@ -9,10 +12,9 @@ class JobBrowserBFFTest(TestBase):
     def test_is_admin_happy(self):
         try:
             self.set_config('upstream-service', UPSTREAM_SERVICE)
+            impl, context = self.impl_for(ENV, USER_CLASS)
 
-            token = self.test_config['test_token_admin']
-            context = self.newContext(token)
-            ret = self.newImplementationInstance().is_admin(context)
+            ret = impl.is_admin(context)
 
             self.assertIsInstance(ret, list)
             result = ret[0]
@@ -22,7 +24,7 @@ class JobBrowserBFFTest(TestBase):
             self.assertIsInstance(is_admin, bool)
             self.assertEqual(is_admin, True)
         except Exception as ex:
-           self.assert_no_exception(ex)
+            self.assert_no_exception(ex)
 
     # Uncomment to skip this test
     # @unittest.skip("skipped test_is_admin_happy")
@@ -30,9 +32,9 @@ class JobBrowserBFFTest(TestBase):
         try:
             self.set_config('upstream-service', UPSTREAM_SERVICE)
 
-            token = self.test_config['test_token_user']
-            context = self.newContext(token)
-            ret = self.newImplementationInstance().is_admin(context)
+            impl, context = self.impl_for(ENV, 'user')
+
+            ret = impl.is_admin(context)
 
             self.assertIsInstance(ret, list)
             result = ret[0]
@@ -42,4 +44,4 @@ class JobBrowserBFFTest(TestBase):
             self.assertIsInstance(is_admin, bool)
             self.assertEqual(is_admin, False)
         except Exception as ex:
-           self.assert_no_exception(ex)
+            self.assert_no_exception(ex)

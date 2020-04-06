@@ -8,7 +8,7 @@ RUN apk upgrade --update-cache --available && \
     apk add --update --no-cache apache-ant bash git linux-headers make openjdk8 python3 python3-dev py3-setuptools python2
 
 RUN mkdir -p /kb && \
-    git clone --depth=1 https://github.com/kbase/kb_sdk /kb/kb_sdk && \
+    git clone --depth=1 --branch=make-python-pep8-compliant https://github.com/eapearson/kb_sdk /kb/kb_sdk && \
     cd /kb/kb_sdk && \
     make
 
@@ -43,7 +43,8 @@ RUN pip3 install \
     uwsgi==2.0.18 \
     toml==0.10.0 \
     jsonschema==3.2.0 \
-    pymongo==3.9.0
+    pymongo==3.9.0 \
+    pyyaml==5.3.1
 
 COPY --from=builder /kb/module /kb/module
 

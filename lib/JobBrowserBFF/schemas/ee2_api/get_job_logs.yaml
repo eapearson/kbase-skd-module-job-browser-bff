@@ -1,0 +1,26 @@
+---
+"$schema": http://json-schema.org/draft-07/schema#
+definitions: {}
+type: "object"
+additionalProperties: false
+required: [lines, last_line_number, count]
+properties:
+  lines:
+    type: array
+    items:
+      type: "object"
+      additionalProperties: false
+      required: [line, linepos, is_error, ts]
+      properties:
+        line:
+          type: string
+        linepos:
+          type: integer
+        is_error:
+          type: integer
+        ts:
+          type: integer
+  last_line_number:
+    type: integer
+  count:
+    type: integer

@@ -6,6 +6,7 @@ from JobBrowserBFF.Utils import ms_to_iso, iso_to_ms, parse_app_id
 import requests
 import re
 
+
 def get_value(d, keys, default_value=None):
     for key in keys:
         if key in d:
@@ -13,6 +14,7 @@ def get_value(d, keys, default_value=None):
         else:
             return default_value
     return d
+
 
 def raw_job_to_app(raw_job):
     app_id = raw_job.get('app_id')
@@ -49,6 +51,7 @@ def raw_job_to_app(raw_job):
     else:
         app = None
     return app
+
 
 def raw_job_to_state(raw_job, client_group):
     raw_state = raw_job['state']
@@ -112,6 +115,7 @@ def raw_job_to_state(raw_job, client_group):
     else:
         raise ValueError('Unrecognized state: ' + raw_state)
 
+
 def raw_job_to_context(raw_job, workspaces_map):
     workspace_id = raw_job.get('wsid', None)
     if workspace_id is None:
@@ -172,6 +176,7 @@ def raw_job_to_context(raw_job, workspaces_map):
         }
     return context
 
+
 def raw_job_to_job(raw_job, apps_map, users_map, workspaces_map):
     # Get the additional user info out of the users map
     user_info = users_map.get(raw_job['user'], None)
@@ -187,7 +192,7 @@ def raw_job_to_job(raw_job, apps_map, users_map, workspaces_map):
     client_group = None
     if app is not None:
         app_info = apps_map.get(app['id'], None)
-        
+
         if app_info is None:
             app['title'] = app['id']
             app['client_groups'] = []
@@ -214,6 +219,7 @@ def raw_job_to_job(raw_job, apps_map, users_map, workspaces_map):
 
     return job
 
+
 def raw_log_line_to_entry(raw_log_line, entry_number, offset):
     if raw_log_line.get('is_error', False):
         level = 'error'
@@ -225,9 +231,11 @@ def raw_log_line_to_entry(raw_log_line, entry_number, offset):
         'level': level,
         'row': entry_number + offset
     }
-    
+
+
 class KBMetricsModel(object):
     NOT_FOUND_RE = re.compile('^There is no job .+ viewable by user .+$')
+
     def __init__(self, config, token, username, modules, timeout):
         self.config = config
         self.token = token
@@ -270,7 +278,7 @@ class KBMetricsModel(object):
         except Exception as err:
             raise ServiceError(code=40000, message='Unknown error', data={
                 'original_message': str(err)
-                })
+            })
 
     def is_admin(self):
         url = self.config['srv-wiz-url']
@@ -279,7 +287,7 @@ class KBMetricsModel(object):
                                    module='kb_Metrics',
                                    token=self.token,
                                    service_ver=service_ver,
-                                   #TODO: default timeout needs to be in config.
+                                   # TODO: default timeout needs to be in config.
                                    timeout=self.timeout)
         try:
             result = rpc.call_func('is_admin', {})
@@ -289,7 +297,7 @@ class KBMetricsModel(object):
         except Exception as ex:
             raise ServiceError(code=40000, message='Unknown error', data={
                 'original_message': str(err)
-                })
+            })
 
     def metrics_query_jobs(self, filter=None, search=None, offset=None, limit=None, time_span=None, timeout=None, sort=None, is_admin=False):
         service_ver = self.get_service_ver('kb_Metrics')
@@ -313,10 +321,12 @@ class KBMetricsModel(object):
                 params['epoch_range'] = [time_span['from'], time_span['to']]
 
             if sort:
-                params['sort'] = list(map(lambda x: {'field': x['key'], 'direction': x['direction']}, sort))
+                params['sort'] = list(
+                    map(lambda x: {'field': x['key'], 'direction': x['direction']}, sort))
 
             if search:
-                params['search'] = list(map(lambda x: {'term': x, 'type': 'regex'}, search['terms']))
+                params['search'] = list(
+                    map(lambda x: {'term': x, 'type': 'regex'}, search['terms']))
 
             if is_admin:
                 method = 'query_jobs_admin'
@@ -331,7 +341,7 @@ class KBMetricsModel(object):
         except Exception as ex:
             raise ServiceError(code=40000, message='Unknown error', data={
                 'original_message': str(ex)
-                })
+            })
 
     def query_jobs(self, params):
         is_admin = params.get('admin', False)
@@ -343,15 +353,15 @@ class KBMetricsModel(object):
                     data={})
 
         raw_jobs, found_count, total_count = self.metrics_query_jobs(
-                offset=params.get('offset', None),
-                limit=params.get('limit', None),
-                filter=params.get('filter', None),
-                time_span=params.get('time_span', None),
-                timeout=params.get('timeout', self.timeout),
-                sort=params.get('sort', None),
-                search=params.get('search', None),
-                is_admin=is_admin
-            )
+            offset=params.get('offset', None),
+            limit=params.get('limit', None),
+            filter=params.get('filter', None),
+            time_span=params.get('time_span', None),
+            timeout=params.get('timeout', self.timeout),
+            sort=params.get('sort', None),
+            search=params.get('search', None),
+            is_admin=is_admin
+        )
 
         # Where possible we do a batch request.
         usernames = set()
@@ -365,7 +375,7 @@ class KBMetricsModel(object):
                 app = raw_job_to_app(raw_job)
                 raw_job['app'] = app
                 if app is not None:
-                    apps_to_fetch[app['id']] =  app
+                    apps_to_fetch[app['id']] = app
             else:
                 # TODO: does this ever really happen?
                 raw_job['app'] = None
@@ -484,7 +494,7 @@ class KBMetricsModel(object):
     #     workspaces = services.get_workspaces(list(workspace_ids))
     #     for workspace in workspaces:
     #         workspace_map[workspace['id']] = workspace
-        
+
     #     # Now join them all together.
     #     jobs = []
     #     for raw_job in raw_jobs:
@@ -512,7 +522,8 @@ class KBMetricsModel(object):
 
         response = requests.get(endpoint, headers=header, timeout=self.timeout/1000)
         if response.status_code != 200:
-            raise ServiceError(code=40000, message='Error fetching users', data={'user_id': user_ids})
+            raise ServiceError(code=40000, message='Error fetching users',
+                               data={'user_id': user_ids})
         else:
             try:
                 result = response.json()
@@ -523,7 +534,8 @@ class KBMetricsModel(object):
                     }
                 return retval
             except Exception as err:
-                raise ServiceError(code=40000, message='Bad response', data={'user_id': user_ids, 'original_message': str(err)})
+                raise ServiceError(code=40000, message='Bad response', data={
+                                   'user_id': user_ids, 'original_message': str(err)})
 
     def get_client_groups(self):
         url = self.config['catalog-url']
@@ -536,7 +548,8 @@ class KBMetricsModel(object):
     def get_job_log(self, job_id, offset=None, limit=None, search=None, level=None):
         url = self.config['njsw-url']
 
-        rpc = GenericClient(url=url, module="NarrativeJobService", token=self.token, timeout=self.timeout)
+        rpc = GenericClient(url=url, module="NarrativeJobService",
+                            token=self.token, timeout=self.timeout)
 
         try:
             result = rpc.call_func('get_job_logs', {
@@ -551,7 +564,7 @@ class KBMetricsModel(object):
                     data={})
             else:
                 raise
-        except Exception as ex:
+        except Exception:
             # TODO: better munging of some other exception into service error. Maybe put this in biokbase.Errors.
             raise ServiceError(
                 code=1,
@@ -580,6 +593,7 @@ class KBMetricsModel(object):
             rpc.call_func('cancel_job', {
                 'job_id': job_id
             })
+            return None
         except ServiceError as se:
             if self.NOT_FOUND_RE.match(se.message):
                 raise ServiceError(
@@ -599,7 +613,7 @@ class KBMetricsModel(object):
                             'data': se.data
                         }
                     }
-                )    
+                )
         except Exception as ex:
             if hasattr(ex, 'message'):
                 message = ex.message
@@ -612,7 +626,7 @@ class KBMetricsModel(object):
                     'message': message
                 }
             )
-    
+
     def get_jobs(self, params):
         filter = {
             'job_id': params['job_ids']
@@ -633,8 +647,7 @@ class KBMetricsModel(object):
             raise ServiceError(
                 code=10,
                 message='One or more jobs not found',
-                # TODO: add missing jobs 
+                # TODO: add missing jobs
                 data={})
         else:
             return jobs
-        

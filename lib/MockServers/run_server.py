@@ -1,5 +1,4 @@
 import MockServers.Mocky as mocky
-import time
 import argparse
 
 if __name__ == '__main__':

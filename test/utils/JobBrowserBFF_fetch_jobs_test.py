@@ -5,9 +5,10 @@ from JobBrowserBFF.Validation import Validation
 import unittest
 import json
 
-ENV='ci'
+ENV = 'ci'
 UPSTREAM_SERVICE = 'metrics'
-TIMEOUT = 10000
+TIMEOUT_MS = 10000
+
 
 class JobBrowserBFFTest(TestBase):
     def test_query_jobs_happy(self):
@@ -20,12 +21,12 @@ class JobBrowserBFFTest(TestBase):
                 print('BATCH {}'.format(batch))
                 ret = impl.query_jobs_admin(context, {
                     'time_span': {
-                        'from': 0, # 1/1/70
-                        'to': 1572566400000 # 11/1/19
+                        'from': 0,  # 1/1/70
+                        'to': 1572566400000  # 11/1/19
                     },
                     'offset': batch * batch_size,
                     'limit': batch_size,
-                    'timeout': TIMEOUT
+                    'timeout': TIMEOUT_MS
                 })
                 jobs, found_count, total_count = self.assert_job_query_result_with_count(ret)
                 for job in jobs:

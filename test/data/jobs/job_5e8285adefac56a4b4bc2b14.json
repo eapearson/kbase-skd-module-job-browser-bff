@@ -1,0 +1,60 @@
+{
+    "user": "kbaseuitest",
+    "authstrat": "kbaseworkspace",
+    "wsid": 47458,
+    "status": "completed",
+    "updated": 1585612603013,
+    "queued": 1585612206651,
+    "running": 1585612292446,
+    "finished": 1585612603013,
+    "scheduler_type": "condor",
+    "scheduler_id": "14392",
+    "job_input": {
+        "wsid": 47458,
+        "method": "MEGAHIT.run_megahit",
+        "params": [
+            {
+                "workspace_name": "kbaseuitest:narrative_1581717956468",
+                "read_library_ref": "47458/2/4",
+                "output_contigset_name": "MEGAHIT.contigs",
+                "megahit_parameter_preset": null,
+                "min_count": null,
+                "k_min": null,
+                "k_max": null,
+                "k_step": null,
+                "k_list": [],
+                "min_contig_len": 500
+            }
+        ],
+        "service_ver": "2.2.2",
+        "app_id": "MEGAHIT/run_megahit",
+        "source_ws_objects": [
+            "47458/2/4"
+        ],
+        "parent_job_id": "None",
+        "requirements": {
+            "clientgroup": "njs",
+            "cpu": 4,
+            "memory": 23000,
+            "disk": 100
+        },
+        "narrative_cell_info": {
+            "run_id": "36b5c446-edb1-4c8a-b8d9-f89ff2b26388",
+            "token_id": "d09841dc-824e-4230-b60e-be3e781a9257",
+            "tag": "release",
+            "cell_id": "f10d66e3-8160-47a9-a5ef-2de68f10d247"
+        }
+    },
+    "job_output": {
+        "version": "1.1",
+        "result": [
+            {
+                "report_ref": "47458/5/1",
+                "report_name": "kb_megahit_report_a1fc939b-62e4-40ef-b75c-f00b5765d8ac"
+            }
+        ],
+        "id": "5e8285adefac56a4b4bc2b14"
+    },
+    "job_id": "5e8285adefac56a4b4bc2b14",
+    "created": 1585612205000
+}

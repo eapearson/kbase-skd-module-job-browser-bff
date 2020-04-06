@@ -1,0 +1,15 @@
+---
+"$schema": http://json-schema.org/draft-07/schema#
+definitions: {}
+type: object
+additionalProperties: false
+required: [job_id, finished, canceled]
+properties:
+  job_id:
+    type: string
+  finished:
+    type: boolean
+  canceled:
+    type: boolean
+  ujs_url:
+    type: string

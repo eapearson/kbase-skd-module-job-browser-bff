@@ -65,7 +65,7 @@ build-test-script:
 	@echo 'python3 -m MockServers.run_server --port 5001 --host "localhost" &' >> $(TEST_DIR)/$(TEST_SCRIPT_NAME)
 	@echo 'echo "...done"' >> $(TEST_DIR)/$(TEST_SCRIPT_NAME)
 	@echo 'echo "Running tests..."' >> $(TEST_DIR)/$(TEST_SCRIPT_NAME)
-	@echo 'python3 -m nose --with-coverage --cover-package=$(SERVICE_CAPS) --cover-html --cover-html-dir=/kb/module/work/test_coverage --nocapture  --nologcapture .' >> $(TEST_DIR)/$(TEST_SCRIPT_NAME)
+	@echo 'python3 -m nose --with-coverage --cover-package=$(SERVICE_CAPS) --cover-package=biokbase --cover-html --cover-html-dir=/kb/module/work/test_coverage --nocapture  --nologcapture .' >> $(TEST_DIR)/$(TEST_SCRIPT_NAME)
 	@chmod +x $(TEST_DIR)/$(TEST_SCRIPT_NAME)
 
 test:
