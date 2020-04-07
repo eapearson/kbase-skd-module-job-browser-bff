@@ -92,3 +92,7 @@ run-dev-mongo:
 run-local-tests:
 	@echo "> Running tests via sdk"
 	PATH="${PATH}":`pwd`/../kb_sdk/bin && kb-sdk test
+
+run-local-report:
+	@echo "> Running the already-built docker image"
+	@bash scripts/run-docker-image-dev-report.sh

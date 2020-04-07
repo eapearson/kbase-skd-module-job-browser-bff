@@ -18,6 +18,7 @@ RUN mkdir -p /kb/module/work/cache && \
     chmod -R a+rw /kb/module && \
     cd /kb/module && \
     PATH=$PATH:/kb/kb_sdk/bin && \
+    KB_SDK_COMPILE_REPORT_FILE=/kb/compile_report.json \
     make all
 
 # Final image
@@ -46,7 +47,8 @@ RUN pip3 install \
     pymongo==3.9.0 \
     pyyaml==5.3.1
 
-COPY --from=builder /kb/module /kb/module
+COPY --from=builder /kb /kb
+
 
 RUN addgroup --system kbmodule && \
     adduser --system --ingroup kbmodule kbmodule && \

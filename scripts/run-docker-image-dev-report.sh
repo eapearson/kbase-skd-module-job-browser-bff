@@ -40,4 +40,4 @@ docker run -i -t \
   -p 5000:5000 \
   --mount type=bind,src=${root}/deploy_local/work_dir,dst=${container_root}/work \
   --mount type=bind,src=${root}/${source_dir},dst=${container_root}/${source_dir} \
-  --rm test/job-browser-bff:dev 
+  --rm test/job-browser-bff:dev report
