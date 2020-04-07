@@ -1,13 +1,8 @@
-from biokbase.DynamicServiceClient import DynamicServiceClient
-from biokbase.GenericClient import GenericClient
 from biokbase.Errors import ServiceError
 from JobBrowserBFF.model.EE2Api import EE2Api
 from JobBrowserBFF.model.KBaseServices import KBaseServices
 from JobBrowserBFF.Utils import parse_app_id
-import requests
 import re
-import time
-from datetime import datetime
 import json
 
 
@@ -159,7 +154,6 @@ def raw_job_to_job(raw_job, apps_map, users_map, workspaces_map):
                 },
                 'app': app
             }
-            print('HERE!', job)
         elif job_type == 'export':
             job = {
                 'job_id': raw_job['job_id'],
@@ -427,8 +421,8 @@ class EE2Model(object):
         if sort is not None:
             # sort specs are not supported for ee2 (for now)
             # rather sorting is always by created timestamp
-            # defaulting to descending but reversable with the
-            # ascending parameter.
+            # defaulting to ascending but reversable with the
+            # ascending parameter set to 0.
             if len(sort) == 0:
                 pass
             elif len(sort) > 1:
@@ -439,22 +433,18 @@ class EE2Model(object):
                     code=40000, message="The sort spec must be for the 'created' key")
 
             if sort[0].get('direction') == 'ascending':
-                ascending = True
+                ascending = 1
             else:
-                ascending = False
+                ascending = 0
             params['ascending'] = ascending
 
         try:
             # TODO: when return total_count, use jobs, total_count = ...
             # TODO: use offset and limit (and batched fetch) when offset is available.
-            print('QUERY JOBS 1', params, json.dumps(params))
             if admin:
-                # print('   admin!')
                 result = api.check_jobs_date_range_for_all(params)
             else:
                 result = api.check_jobs_date_range_for_user(params)
-
-            # print('QUERY JOBS 2', result)
             return result['jobs'], result['query_count']
         except ServiceError:
             raise
@@ -469,7 +459,6 @@ class EE2Model(object):
         }
         # yeah, doing this with map is just ugly.
         filter = dict()
-        print('filter??', raw_filter)
         for field, value in raw_filter.items():
             # transform the field name from ours to the idiosyncratic upstream names.
             field_name = field_name_transforms.get(field, field)
@@ -480,8 +469,9 @@ class EE2Model(object):
                     'create': 'created',
                     'queue': 'queued',
                     'run': 'running',
+                    'complete': 'completed',
                     'error': 'error',
-                    'terminate': 'terminate'
+                    'terminate': 'terminated'
                 }
                 value = list(map(lambda x: status_transform.get(x, x), value))
 
