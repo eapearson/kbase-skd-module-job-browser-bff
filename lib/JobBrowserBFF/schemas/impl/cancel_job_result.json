@@ -1,5 +1,11 @@
 {
     "definitions": {},
     "$schema": "http://json-schema.org/draft-07/schema#",
-    "type": "null"
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+        "canceled": {
+            "type": "boolean"
+        }
+    }
 }

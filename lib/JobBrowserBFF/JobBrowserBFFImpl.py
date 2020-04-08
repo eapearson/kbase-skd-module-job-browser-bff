@@ -4,7 +4,6 @@ import logging
 from JobBrowserBFF.Validation import Validation
 from JobBrowserBFF.model.Model import Model
 from JobBrowserBFF.definitions.Definitions import Definitions
-import json
 # END_HEADER
 
 
@@ -25,7 +24,7 @@ class JobBrowserBFF:
     ######################################### noqa
     VERSION = "0.0.1"
     GIT_URL = ""
-    GIT_COMMIT_HASH = "868cf6f3455e12850b50c1d7207e43cff5c0b916"
+    GIT_COMMIT_HASH = "1a5e3e9e24bdd5f7eff24b961dc3c6a3850984d7"
 
     # BEGIN_CLASS_HEADER
     # END_CLASS_HEADER
@@ -49,6 +48,7 @@ class JobBrowserBFF:
         self.definitions = Definitions(load=True)
         # END_CONSTRUCTOR
         pass
+
 
     def get_jobs(self, ctx, params):
         """
@@ -117,6 +117,7 @@ class JobBrowserBFF:
         self.validation.validate_result('get_jobs', result)
         # END get_jobs
 
+        
         return [result]
 
     def query_jobs(self, ctx, params):
@@ -194,6 +195,7 @@ class JobBrowserBFF:
         self.validation.validate_result('query_jobs', result)
         # END query_jobs
 
+        
         return [result]
 
     def get_job_log(self, ctx, params):
@@ -227,6 +229,7 @@ class JobBrowserBFF:
         self.validation.validate_result('get_job_log', result)
         # END get_job_log
 
+        
         return [result]
 
     def cancel_job(self, ctx, params):
@@ -237,11 +240,13 @@ class JobBrowserBFF:
            Job not found: If the given job id was not found Note that
            attempting to cancel a job which is not cancelable will not throw
            an error. This behavior may change in the future. At present one
-           upstream service (njsw) ignore this condition, but another (ee2)
+           upstream service (njsw) ignores this condition, but another (ee2)
            returns an error. For ee2 that error is ignored.) -> structure:
-           parameter "job_id" of type "JobID" (Core types), parameter "code"
-           of type "JobTerminationCode"
-        :returns: instance of type "CancelJobResult" -> structure:
+           parameter "job_id" of type "JobID" (Core types), parameter "admin"
+           of type "bool" (Type synonym conveniences), parameter "timeout" of
+           Long
+        :returns: instance of type "CancelJobResult" -> structure: parameter
+           "canceled" of type "bool" (Type synonym conveniences)
         """
         # ctx is the context object
         # return variables are: result
@@ -251,11 +256,12 @@ class JobBrowserBFF:
         model = Model(config=self.config, context=ctx, timeout=params['timeout']).get_model(ctx)
 
         # Note no return value; or rather a bare null to emulate void.
-        result = model.cancel_job(params['job_id'])
+        result = model.cancel_job(params)
 
         self.validation.validate_result('cancel_job', result)
         # END cancel_job
 
+        
         return [result]
 
     def get_job_types(self, ctx):
@@ -275,6 +281,7 @@ class JobBrowserBFF:
         self.validation.validate_result('get_job_types', result)
         # END get_job_types
 
+        
         return [result]
 
     def get_job_states(self, ctx):
@@ -293,6 +300,7 @@ class JobBrowserBFF:
         self.validation.validate_result('get_job_states', result)
         # END get_job_states
 
+        
         return [result]
 
     def get_client_groups(self, ctx):
@@ -311,6 +319,7 @@ class JobBrowserBFF:
         self.validation.validate_result('get_client_groups', result)
         # END get_client_groups
 
+        
         return [result]
 
     def get_searchable_job_fields(self, ctx):
@@ -329,6 +338,7 @@ class JobBrowserBFF:
         self.validation.validate_result('get_searchable_job_fields', result)
         # END get_searchable_job_fields
 
+        
         return [result]
 
     def get_sort_specs(self, ctx):
@@ -347,6 +357,7 @@ class JobBrowserBFF:
         self.validation.validate_result('get_sort_specs', result)
         # END get_sort_specs
 
+        
         return [result]
 
     def get_log_levels(self, ctx):
@@ -365,6 +376,7 @@ class JobBrowserBFF:
         self.validation.validate_result('get_log_levels', result)
         # END get_log_levels
 
+        
         return [result]
 
     def is_admin(self, ctx):
@@ -383,6 +395,7 @@ class JobBrowserBFF:
         self.validation.validate_result('is_admin', result)
         # END is_admin
 
+        
         return [result]
 
     def status(self, ctx):

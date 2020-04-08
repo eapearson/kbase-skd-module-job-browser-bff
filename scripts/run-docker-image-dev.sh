@@ -31,7 +31,7 @@ ensure_deploy_local_exists
 
 echo "Starting dev image..."
 docker run -i -t \
-  --network=kbase-dev \
+  --network="${NETWORK_NAME}" \
   --name=JobBrowserBFF  \
   --dns=8.8.8.8 \
   -e "KBASE_ENDPOINT=https://${ENV}.kbase.us/services" \

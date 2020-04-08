@@ -18,6 +18,7 @@ class JobBrowserBFFTest(TestBase):
     # Uncomment to skip this test
     # Uncommented because it relies on a cancellable job, which needs to be manually
     # arranged.
+    # TODO: launch a job, then cancel
     @unittest.skip("skipped test_cancel_job_happy")
     def test_cancel_job_happy(self):
         self.set_config('upstream-service', UPSTREAM_SERVICE)
@@ -28,9 +29,9 @@ class JobBrowserBFFTest(TestBase):
                 'timeout': TIMEOUT
             })
             result = ret[0]
-            self.assertIsNone(result)
-            # ensure it is empty (a form of void)
-            self.assertFalse(result)
+            self.assertIsInstance(result, dict)
+            self.assertIn('canceled', result)
+            self.assertEqual(result['canceled'], False)
         except Exception as ex:
             self.assert_no_exception(ex)
 
@@ -48,9 +49,11 @@ class JobBrowserBFFTest(TestBase):
                 'timeout': TIMEOUT
             })
             result = ret[0]
-            self.assertIsNone(result)
-            # ensure it is empty (a form of void)
-            self.assertFalse(result)
+            self.assertIsInstance(result, dict)
+            self.assertIn('canceled', result)
+            # ee2 upstream does not distinguish between a job which is cancelable
+            # and successfully canceled, and a job which is not cancelable.
+            self.assertEqual(result['canceled'], True)
         except Exception as ex:
             self.assert_no_exception(ex)
 

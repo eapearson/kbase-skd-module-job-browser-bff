@@ -21,17 +21,17 @@ source_dir=lib
 container_root=/kb/module
 
 ENV=ci
-NETWORK_NAME="kbase-dev"
 
 echo "Ensuring network $NETWORK_NAME exists"
 # ensure_network_exists kbase-dev
+
 
 echo "Ensuring deploy_dir is set up"
 ensure_deploy_local_exists
 
 echo "Starting dev image..."
 docker run -i -t \
-  --network=kbase-dev \
+  --network="${NETWORK_NAME}" \
   --name=JobBrowserBFF  \
   --dns=8.8.8.8 \
   -e "KBASE_ENDPOINT=https://${ENV}.kbase.us/services" \

@@ -247,17 +247,20 @@ module JobBrowserBFF {
      
       Note that attempting to cancel a job which is not cancelable will not throw an error.
       This behavior may change in the future.
-      At present one upstream service (njsw) ignore this condition, but another (ee2) returns an error.
+      At present one upstream service (njsw) ignores this condition, but another (ee2) returns an error.
       For ee2 that error is ignored.
      
     */
 
      typedef structure {
          JobID job_id;
-         JobTerminationCode code;
+         bool admin;
+         int timeout;
      } CancelJobParams;
 
-     typedef structure {} CancelJobResult;
+     typedef structure {
+         bool canceled;
+     } CancelJobResult;
 
      funcdef cancel_job(CancelJobParams params) returns (CancelJobResult result) authentication required;
 

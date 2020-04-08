@@ -2,7 +2,6 @@ from biokbase.DynamicServiceClient import DynamicServiceClient
 from biokbase.GenericClient import GenericClient
 from biokbase.Errors import ServiceError
 from JobBrowserBFF.model.KBaseServices import KBaseServices
-from JobBrowserBFF.Utils import ms_to_iso, iso_to_ms, parse_app_id
 import requests
 import re
 
@@ -185,8 +184,6 @@ def raw_job_to_job(raw_job, apps_map, users_map, workspaces_map):
     else:
         realname = raw_job['user']
 
-    state = raw_job['state']
-
     # Get the additional app info out of the apps map
     app = raw_job.get('app', None)
     client_group = None
@@ -292,14 +289,15 @@ class KBMetricsModel(object):
         try:
             result = rpc.call_func('is_admin', {})
             return result['is_admin']
-        except ServiceError as se:
+        except ServiceError:
             raise
         except Exception as ex:
             raise ServiceError(code=40000, message='Unknown error', data={
-                'original_message': str(err)
+                'original_message': str(ex)
             })
 
-    def metrics_query_jobs(self, filter=None, search=None, offset=None, limit=None, time_span=None, timeout=None, sort=None, is_admin=False):
+    def metrics_query_jobs(self, filter=None, search=None, offset=None,
+                           limit=None, time_span=None, timeout=None, sort=None, is_admin=False):
         service_ver = self.get_service_ver('kb_Metrics')
         rpc = DynamicServiceClient(url=self.config['srv-wiz-url'],
                                    module='kb_Metrics',
@@ -409,101 +407,6 @@ class KBMetricsModel(object):
         # Now DONE!
         return jobs, found_count, total_count
 
-    # def metrics_query_jobs_admin(self, filter=None, search=None, offset=None, limit=None, time_span=None, timeout=None, sort=None):
-    #     service_ver = self.get_service_ver('kb_Metrics')
-    #     rpc = DynamicServiceClient(url=self.config['srv-wiz-url'],
-    #                                module='kb_Metrics',
-    #                                token=self.token,
-    #                                timeout=timeout,
-    #                                service_ver=service_ver)
-
-    #     try:
-    #         params = {
-    #             'offset': offset,
-    #             'limit': limit,
-    #             'timeout': timeout
-    #         }
-
-    #         if filter is not None:
-    #             params['filter'] = filter
-
-    #         if time_span:
-    #             params['epoch_range'] = [time_span['from'], time_span['to']]
-
-    #         if sort:
-    #             params['sort'] = list(map(lambda x: {'field': x['key'], 'direction': x['direction']}, sort))
-
-    #         if search:
-    #             params['search'] = list(map(lambda x: {'term': x, 'type': 'regex'}, search['terms']))
-
-    #         jobs = rpc.call_func('query_jobs_admin', params)
-
-    #         return jobs['job_states'], jobs['found_count'], jobs['total_count']
-    #     except ServiceError as se:
-    #         print('SERVICE ERROR', se.message)
-    #         raise
-    #     except Exception as ex:
-    #         raise ServiceError(code=40000, message='Unknown error', data={
-    #             'original_message': str(ex)
-    #             })
-
-    # def query_jobs_admin(self, params):
-    #     raw_jobs, found_count, total_count = self.metrics_query_jobs_admin(
-    #         offset=params.get('offset', None),
-    #         limit=params.get('limit', None),
-    #         filter=params.get('filter', None),
-    #         time_span=params.get('time_span', None),
-    #         timeout=params.get('timeout', self.timeout),
-    #         sort=params.get('sort', None),
-    #         search=params.get('search', None)
-    #     )
-
-    #     # Where possible we do a batch request.
-    #     usernames = set()
-    #     apps_to_fetch = dict()
-    #     workspace_ids = set()
-
-    #     for raw_job in raw_jobs:
-    #         usernames.add(raw_job['user'])
-
-    #         if 'app_id' in raw_job:
-    #             app = raw_job_to_app(raw_job)
-    #             raw_job['app'] = app
-    #             if app is not None:
-    #                 apps_to_fetch[app['id']] =  app
-    #         else:
-    #             # TODO: does this ever really happen?
-    #             raw_job['app'] = None
-
-    #         if 'wsid' in raw_job:
-    #             workspace_ids.add(raw_job['wsid'])
-
-    #     services = KBaseServices(config=self.config, token=self.token)
-
-    #     # Get a dict of unique users for this set of jobs
-    #     users_map = services.get_users(list(usernames))
-
-    #     # Get a dict of unique users for this set of jobs.
-    #     apps_map = dict()
-    #     apps = services.get_apps(list(apps_to_fetch.values()))
-    #     for app_id, app in apps.items():
-    #         if app is not None:
-    #             apps_map[app_id] = app
-
-    #     workspace_map = dict()
-    #     workspaces = services.get_workspaces(list(workspace_ids))
-    #     for workspace in workspaces:
-    #         workspace_map[workspace['id']] = workspace
-
-    #     # Now join them all together.
-    #     jobs = []
-    #     for raw_job in raw_jobs:
-    #         job = raw_job_to_job(raw_job, apps_map, users_map, workspace_map)
-    #         jobs.append(job)
-
-    #     # Now DONE!
-    #     return jobs, found_count, total_count
-
     def match_field(self, expr, obj, path):
         value = get_value(obj, path)
         if value is None:
@@ -565,7 +468,8 @@ class KBMetricsModel(object):
             else:
                 raise
         except Exception:
-            # TODO: better munging of some other exception into service error. Maybe put this in biokbase.Errors.
+            # TODO: better munging of some other exception into service error.
+            # Maybe put this in biokbase.Errors.
             raise ServiceError(
                 code=1,
                 message='Unknown error',
@@ -580,7 +484,7 @@ class KBMetricsModel(object):
             'total_count': len(result['lines'])
         }
 
-    def cancel_job(self, job_id):
+    def cancel_job(self, params):
         url = self.config['njsw-url']
 
         rpc = GenericClient(
@@ -591,7 +495,7 @@ class KBMetricsModel(object):
 
         try:
             rpc.call_func('cancel_job', {
-                'job_id': job_id
+                'job_id': params['job_id']
             })
             return None
         except ServiceError as se:
@@ -600,7 +504,7 @@ class KBMetricsModel(object):
                     code=10,
                     message='Job not found',
                     data={
-                        'job_id': job_id
+                        'job_id': params['job_id']
                     })
             else:
                 raise ServiceError(

@@ -19,6 +19,9 @@
             ],
             "pattern": "^(.*)$"
         },
+        "admin": {
+            "type": "boolean"
+        },
         "timeout": {
             "type": "integer",
             "minimum": 0

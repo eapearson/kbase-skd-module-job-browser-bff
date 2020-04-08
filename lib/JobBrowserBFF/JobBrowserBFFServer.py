@@ -133,12 +133,6 @@ class JSONRPCServiceCustom(JSONRPCService):
         debugging purposes.
         """
         rdata = jsondata
-        # we already deserialize the json string earlier in the server code, no
-        # need to do it again
-#        try:
-#            rdata = json.loads(jsondata)
-#        except ValueError:
-#            raise ParseError
 
         # set some default values for error handling
         request = self._get_default_vals()
@@ -670,7 +664,3 @@ if __name__ == "__main__":
             assert False, "unhandled option"
 
     start_server(host=host, port=port)
-#    print("Listening on port %s" % port)
-#    httpd = make_server( host, port, application)
-#
-#    httpd.serve_forever()

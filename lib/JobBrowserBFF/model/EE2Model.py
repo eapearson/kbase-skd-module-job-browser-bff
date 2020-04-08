@@ -3,7 +3,6 @@ from JobBrowserBFF.model.EE2Api import EE2Api
 from JobBrowserBFF.model.KBaseServices import KBaseServices
 from JobBrowserBFF.Utils import parse_app_id
 import re
-import json
 
 
 def raw_job_to_state(raw_job):
@@ -97,7 +96,7 @@ def raw_job_to_job(raw_job, apps_map, users_map, workspaces_map):
 
     # Get the additional app info out of the apps map
     app = raw_job.get('app', None)
-    client_group = None
+    # client_group = None
     if app is not None:
         app_info = apps_map.get(app['id'], None)
 
@@ -107,8 +106,8 @@ def raw_job_to_job(raw_job, apps_map, users_map, workspaces_map):
         else:
             app['title'] = app_info['name']
             app['client_groups'] = app_info['client_groups']
-            if len(app['client_groups']) > 0:
-                client_group = app['client_groups'][0]
+            # if len(app['client_groups']) > 0:
+            #     client_group = app['client_groups'][0]
 
     # Get the additional workspace info out of the workspaces map, and
     # also handle multiple types of workspace
@@ -382,24 +381,35 @@ class EE2Model(object):
                 'total_count': result['count']
             }
 
-    def cancel_job(self, job_id):
+    def cancel_job(self, params):
         api = EE2Api(url=self.config['ee2-url'], token=self.token, timeout=self.timeout)
+        admin = params.get('admin', False)
+        if admin:
+            as_admin = 1
+            terminated_code = params.get('code', 1)
+        else:
+            as_admin = 0
+            terminated_code = params.get('code', 0)
         try:
             api.cancel_job({
-                'job_id': job_id,
-                'terminated_code': 0
+                'job_id': params['job_id'],
+                'terminated_code': terminated_code,
+                'as_admin': as_admin
             })
-            return None
+            return {
+                'canceled': True
+            }
         except ServiceError as se:
             if re.search(('A job with status .+ cannot be terminated. '
                           'It is already cancelled.'), se.message):
-                # Current behavior is indistinguishable from success.
-                return None
+                return {
+                    'canceled': False
+                }
             elif re.search('Cannot find job with ids:', se.message):
                 raise ServiceError(code=10,
                                    message="The job specified for cancelation does not exist",
                                    data={
-                                       'job_id': job_id
+                                       'job_id': params['job_id']
                                    })
             else:
                 raise se
