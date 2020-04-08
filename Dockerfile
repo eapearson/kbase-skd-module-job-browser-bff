@@ -1,4 +1,4 @@
-FROM alpine:3.10 as builder
+FROM alpine:3.11 as builder
 MAINTAINER KBase Developer
 
 # The build stage needs just enough to run the KBase SDK tools.
@@ -23,7 +23,7 @@ RUN mkdir -p /kb/module/work/cache && \
 
 # Final image
 
-FROM alpine:3.10
+FROM alpine:3.11
 MAINTAINER KBase Developer
 
 # update and add system dependencies
@@ -32,19 +32,19 @@ RUN apk upgrade --update-cache --available && \
 
 # install python dependencies for the service runtime.
 RUN pip3 install \
-    cffi==1.13.2 \
-    coverage==4.5.4 \
-    jinja2==2.10.3 \
+    cffi==1.14.0 \
+    coverage==5.0.4 \
+    jinja2==2.11.1 \
     jsonrpcbase==0.2.0 \
     ndg-httpsclient==0.5.1 \
     nose==1.3.7 \
     python-dateutil==2.8.1 \
     pytz==2019.3 \
-    requests==2.22.0 \
+    requests==2.23.0 \
     uwsgi==2.0.18 \
     toml==0.10.0 \
     jsonschema==3.2.0 \
-    pymongo==3.9.0 \
+    pymongo==3.10.1 \
     pyyaml==5.3.1
 
 COPY --from=builder /kb /kb
