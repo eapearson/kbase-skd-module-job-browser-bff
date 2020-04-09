@@ -27,7 +27,10 @@
                         "type": "integer"
                     },
                     "logged_at": {
-                        "type": "integer",
+                        "type": [
+                            "integer",
+                            "null"
+                        ],
                         "title": "The Entry_number Schema"
                     },
                     "message": {
@@ -37,7 +40,10 @@
                     "level": {
                         "type": "string",
                         "title": "The Level Schema",
-                        "enum": ["normal", "error"]
+                        "enum": [
+                            "normal",
+                            "error"
+                        ]
                     }
                 }
             }

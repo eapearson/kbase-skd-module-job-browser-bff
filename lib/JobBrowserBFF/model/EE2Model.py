@@ -223,7 +223,7 @@ def raw_log_line_to_entry(raw_log_line, entry_number, offset):
     else:
         level = 'normal'
     return {
-        'logged_at': raw_log_line['ts'],
+        'logged_at': raw_log_line.get('ts'),
         'row': entry_number + offset,
         'message': raw_log_line['line'],
         'level': level
