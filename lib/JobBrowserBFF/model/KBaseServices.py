@@ -1,6 +1,7 @@
 import requests
 from biokbase.GenericClient import GenericClient
 
+
 class KBaseServices(object):
     def __init__(self, config=None, token=None, timeout=10000):
         self.token = token
@@ -19,7 +20,8 @@ class KBaseServices(object):
 
         response = requests.get(endpoint, headers=header, timeout=10)
         if response.status_code != 200:
-            raise ServiceError(code=40000, message='Error fetching users', data={'user_id': user_ids})
+            raise ServiceError(code=40000, message='Error fetching users',
+                               data={'user_id': user_ids})
         else:
             try:
                 result = response.json()
@@ -30,11 +32,13 @@ class KBaseServices(object):
                     }
                 return retval
             except Exception as err:
-                raise ServiceError(code=40000, message='Bad response', data={'user_id': user_ids, 'original_message': str(err)})
+                raise ServiceError(code=40000, message='Bad response', data={
+                                   'user_id': user_ids, 'original_message': str(err)})
 
     def get_app_catalog(self):
         url = self.config['nms-url']
-        rpc = GenericClient(url=url, module="NarrativeMethodStore", token=self.token, timeout=self.timeout)
+        rpc = GenericClient(url=url, module="NarrativeMethodStore",
+                            token=self.token, timeout=self.timeout)
         apps = dict()
         for tag in ['dev', 'beta', 'release']:
             apps[tag] = dict()
@@ -107,7 +111,8 @@ class KBaseServices(object):
                 })
                 continue
 
-            [id, name, owner, moddate, max_objid, user_permission, globalread, lockstat, metadata] = workspace_info
+            [id, name, owner, moddate, max_objid, user_permission,
+                globalread, lockstat, metadata] = workspace_info
 
             if metadata.get('narrative', None) is None:
                 is_narrative = False
@@ -125,7 +130,7 @@ class KBaseServices(object):
                 if metadata.get('is_temporary', None) == 'true':
                     is_temporary = True
                 else:
-                     is_temporary = False
+                    is_temporary = False
                 info['narrative'] = {
                     'title': metadata.get('narrative_nice_name', None),
                     'is_temporary': is_temporary
