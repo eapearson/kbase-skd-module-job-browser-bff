@@ -7,7 +7,8 @@
             "type": "object",
             "title": "A JSONRPC compatible error",
             "required": [
-                "code", "message"
+                "code",
+                "message"
             ],
             "additionalProperties": false,
             "properties": {
@@ -18,9 +19,11 @@
                     "type": "string"
                 },
                 "data": {
-                    "type": ["object", "null"],
-                    "properties": {
-                    }
+                    "type": [
+                        "object",
+                        "null"
+                    ],
+                    "properties": {}
                 }
             }
         },
@@ -28,7 +31,8 @@
             "type": "object",
             "title": "A JSONRPC error compatible with kbase legacy apps",
             "required": [
-                "code", "message"
+                "code",
+                "message"
             ],
             "additionalProperties": false,
             "properties": {
@@ -39,9 +43,12 @@
                     "type": "string"
                 },
                 "error": {
-                    "type": ["object", "string", "null"],
-                    "properties": {
-                    }
+                    "type": [
+                        "object",
+                        "string",
+                        "null"
+                    ],
+                    "properties": {}
                 }
             }
         },
@@ -49,21 +56,33 @@
             "type": "object",
             "title": "A job error",
             "required": [
-                "code", "message"
+                "code",
+                "message"
             ],
             "additionalProperties": false,
             "properties": {
                 "code": {
                     "type": "integer",
-                    "enum": [0, 1, 2, 3, 4, 5]
+                    "enum": [
+                        0,
+                        1,
+                        2,
+                        3,
+                        4,
+                        5
+                    ]
                 },
                 "message": {
                     "type": "string"
                 },
                 "service_error": {
                     "oneOf": [
-                        {"$ref": "#/definitions/jsonrpc_2_error"},
-                        {"$ref": "#/definitions/jsonrpc_11_error"}
+                        {
+                            "$ref": "#/definitions/jsonrpc_2_error"
+                        },
+                        {
+                            "$ref": "#/definitions/jsonrpc_11_error"
+                        }
                     ]
                 }
             }
@@ -78,7 +97,11 @@
             "properties": {
                 "code": {
                     "type": "integer",
-                    "enum": [0, 1, 2]
+                    "enum": [
+                        0,
+                        1,
+                        2
+                    ]
                 },
                 "message": {
                     "type": "string"
@@ -96,7 +119,7 @@
             "properties": {
                 "status": {
                     "type": "string",
-                    "const": "create"                
+                    "const": "create"
                 },
                 "create_at": {
                     "type": "integer"
@@ -124,7 +147,10 @@
                     "type": "integer"
                 },
                 "client_group": {
-                    "type": ["string", "null"]
+                    "type": [
+                        "string",
+                        "null"
+                    ]
                 }
             }
         },
@@ -153,7 +179,10 @@
                     "type": "integer"
                 },
                 "client_group": {
-                    "type": ["string", "null"]
+                    "type": [
+                        "string",
+                        "null"
+                    ]
                 }
             }
         },
@@ -186,7 +215,10 @@
                     "type": "integer"
                 },
                 "client_group": {
-                    "type": ["string", "null"]
+                    "type": [
+                        "string",
+                        "null"
+                    ]
                 }
             }
         },
@@ -221,7 +253,10 @@
                     "$ref": "#/definitions/error"
                 },
                 "client_group": {
-                    "type": ["string", "null"]
+                    "type": [
+                        "string",
+                        "null"
+                    ]
                 }
             }
         },
@@ -256,7 +291,10 @@
                     "$ref": "#/definitions/termination_reason"
                 },
                 "client_group": {
-                    "type": ["string", "null"]
+                    "type": [
+                        "string",
+                        "null"
+                    ]
                 }
             }
         },
@@ -282,13 +320,14 @@
                 {
                     "$ref": "#/definitions/job_state_terminate"
                 }
-            ] 
+            ]
         },
         "job_context_narrative": {
             "type": "object",
             "title": "The context",
             "required": [
-                "type", "workspace"
+                "type",
+                "workspace"
             ],
             "additionalProperties": false,
             "properties": {
@@ -322,12 +361,19 @@
                 "narrative": {
                     "type": "object",
                     "required": [
-                        "title"
+                        "title",
+                        "is_temporary"
                     ],
                     "additionalProperties": false,
                     "properties": {
                         "title": {
-                            "type": "string"
+                            "type": [
+                                "string",
+                                "null"
+                            ]
+                        },
+                        "is_temporary": {
+                            "type": "boolean"
                         }
                     }
                 }
@@ -337,7 +383,8 @@
             "type": "object",
             "title": "The workspace context",
             "required": [
-                "type", "workspace"
+                "type",
+                "workspace"
             ],
             "additionalProperties": false,
             "properties": {
@@ -348,7 +395,8 @@
                 "workspace": {
                     "type": "object",
                     "required": [
-                        "id", "is_accessible"
+                        "id",
+                        "is_accessible"
                     ],
                     "additionalProperties": false,
                     "properties": {
@@ -452,7 +500,10 @@
                 },
                 "app": {
                     "$id": "#/properties/jobs/items/properties/app",
-                    "type": ["object", "null"],
+                    "type": [
+                        "object",
+                        "null"
+                    ],
                     "title": "The App Schema",
                     "required": [
                         "id",
@@ -531,44 +582,57 @@
             "additionalProperties": false,
             "properties": {
                 "workspace_id": {
-                    "type": ["array"],
+                    "type": [
+                        "array"
+                    ],
                     "items": {
                         "type": "number"
                     }
                 },
                 "status": {
-                    "type": ["array"],
+                    "type": [
+                        "array"
+                    ],
                     "items": {
                         "type": "string"
                     }
                 },
                 "username": {
-                    "type": ["array"],
+                    "type": [
+                        "array"
+                    ],
                     "items": {
                         "type": "string"
                     }
                 },
                 "app_id": {
-                    "type": ["array"],
+                    "type": [
+                        "array"
+                    ],
                     "items": {
                         "type": "string"
                     }
                 },
-                
                 "job_id": {
-                    "type": ["array"],
+                    "type": [
+                        "array"
+                    ],
                     "items": {
                         "type": "string"
                     }
                 },
                 "error_code": {
-                    "type": ["array"],
+                    "type": [
+                        "array"
+                    ],
                     "items": {
                         "type": "number"
                     }
                 },
                 "terminated_code": {
-                    "type": ["array"],
+                    "type": [
+                        "array"
+                    ],
                     "items": {
                         "type": "number"
                     }

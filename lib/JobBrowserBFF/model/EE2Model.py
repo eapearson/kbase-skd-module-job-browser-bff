@@ -148,7 +148,8 @@ def raw_job_to_job(raw_job, apps_map, users_map, workspaces_map):
                         'is_deleted': workspace.get('is_deleted', None)
                     },
                     'narrative': {
-                        'title': workspace['narrative'].get('title', None)
+                        'title': workspace['narrative'].get('title', None),
+                        'is_temporary': workspace['narrative'].get('is_temporary')
                     }
                 },
                 'app': app
