@@ -29,7 +29,6 @@ class TokenCache(object):
         return False
 
     def get_user(self, token):
-        encoded_token = self.encode_token(token)
         with self._lock:
             token_info = self._cache.get(token)
         if not token_info:

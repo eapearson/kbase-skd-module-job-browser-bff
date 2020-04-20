@@ -106,8 +106,6 @@ class GenericClient(object):
                 try:
                     response_data = response.json()
                 except json.decoder.JSONDecodeError as err:
-                    # print('umm', response)
-                    # print(response.content)
                     raise ServiceError(
                         code=102,
                         message='Invalid response from upstream service - not json',

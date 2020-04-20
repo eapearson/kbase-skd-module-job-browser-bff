@@ -3,7 +3,6 @@ from JobBrowserBFF.model.EE2Api import EE2Api
 from JobBrowserBFF.model.KBaseServices import KBaseServices
 from JobBrowserBFF.Utils import parse_app_id
 import re
-import json
 
 
 def get_param(params, key):
@@ -130,7 +129,7 @@ def raw_job_to_job(raw_job, apps_map, users_map, workspaces_map):
             # if len(app['client_groups']) > 0:
             #     client_group = app['client_groups'][0]
 
-     # Get the additional workspace info out of the workspaces map, and
+    # Get the additional workspace info out of the workspaces map, and
     # also handle multiple types of workspace
     if 'job_input' in raw_job:
         job_input = raw_job['job_input']
@@ -620,12 +619,6 @@ class EE2Model(object):
             jobs = api.check_jobs({
                 'job_ids': params['job_ids']
             })
-            # print('JOBS JOBS JOBS', jobs)
-            # TODO: when jobs returned as a array, remove this workaround.
-            # jobs = []
-            # for job_id, job_info in job_map.items():
-            #     jobs.append(job_info)
-
             return jobs['job_states']
         except ServiceError as se:
             if se.code == -32000:
