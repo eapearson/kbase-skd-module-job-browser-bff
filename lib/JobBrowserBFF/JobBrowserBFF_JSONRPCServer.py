@@ -2,8 +2,6 @@
 # -*- coding: utf-8 -*-
 import datetime
 import json
-import os
-import random as _random
 import sys
 import traceback
 from getopt import getopt, GetoptError
@@ -11,7 +9,6 @@ from multiprocessing import Process
 from os import environ
 from wsgiref.simple_server import make_server
 
-import requests as _requests
 from jsonrpcbase import JSONRPCService, InvalidParamsError, KeywordError, \
     JSONRPCError, InvalidRequestError
 from jsonrpcbase import ServerError as JSONServerError
@@ -411,11 +408,15 @@ class Application(object):
                 'method': request['method']
             }]
         }
-        prov_action = {
-            'service': ctx['module'],
-            'method': ctx['method'],
-            'method_params': request['params']
-        }
+        # Provenance not used in jsonrpc calls as far as I can tell.
+        # Perhaps propagated to any local methods called? But I don't think any
+        # pure sdk dynamic services use local methods, so...
+        # TODO: ensure that prov_action cannot be used, before removing entirely.
+        # prov_action = {
+        #     'service': ctx['module'],
+        #     'method': ctx['method'],
+        #     'method_params': request['params']
+        # }
         try:
             token = environ.get('HTTP_AUTHORIZATION')
 
@@ -519,8 +520,6 @@ class Application(object):
                 response['error']['data'] = {
                     'message': response['error']['data']
                 }
-            # print('type?', isinstance(response['error']['data'], dict), type(response['error']['data']))
-            # print(response)
             response['error']['data']['trace'] = trace
 
         # Errors early in the processing phase before a valid request is

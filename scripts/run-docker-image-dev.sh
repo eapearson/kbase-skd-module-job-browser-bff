@@ -20,7 +20,7 @@ root=$(git rev-parse --show-toplevel)
 source_dir=lib
 container_root=/kb/module
 
-ENV=ci
+ENV="${ENV:-ci}"
 NETWORK_NAME="kbase-dev"
 
 echo "Ensuring network $NETWORK_NAME exists"

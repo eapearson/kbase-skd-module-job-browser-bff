@@ -5,9 +5,9 @@ A very basic KBase auth client for the Python server.
 
 @author: gaprice@lbl.gov
 '''
-import time 
-import requests 
-import threading 
+import time
+import requests
+import threading
 import hashlib
 
 
@@ -38,7 +38,7 @@ class TokenCache(object):
         username, cached_at = token_info
         if self.token_expired(cached_at):
             return None
-        
+
         return username
 
     def encode_token(self, token):
@@ -70,18 +70,19 @@ class KBaseAuth(object):
     A very basic KBase auth client for the Python server.
     '''
 
-    _LOGIN_URL = 'https://kbase.us/services/auth/api/legacy/KBase/Sessions/Login'
-
     def __init__(self, auth_url=None):
         '''
         Constructor
         '''
+        if auth_url is None:
+            raise ValueError('auth_url not provided to auth client')
+
         self._authurl = auth_url
         # TODO: is it really a good idea to have a default url? I think we
         #       should just fail if no url is provided; otherwise bad code,
         #       probably NOT in production, will call production.
-        if not self._authurl:
-            self._authurl = self._LOGIN_URL
+        # if not self._authurl:
+        #     self._authurl = self._LOGIN_URL
         self._cache = TokenCache()
 
     def get_user(self, token):
@@ -93,17 +94,18 @@ class KBaseAuth(object):
             return username
 
         d = {'token': token, 'fields': 'user_id'}
+
         ret = requests.post(self._authurl, data=d)
         if not ret.ok:
             try:
                 err = ret.json()
-            except Exception as e:
+            except Exception:
                 ret.raise_for_status()
             message = 'Error connecting to auth service: {} {}\n{}\n{}'.format(
-                    ret.status_code,
-                    ret.reason,
-                    err['error']['message'],
-                    self._authurl)
+                ret.status_code,
+                ret.reason,
+                err['error']['message'],
+                self._authurl)
             raise ValueError(message)
 
         username = ret.json()['user_id']
