@@ -25,6 +25,7 @@
                     "title": "Another job browser test"
                 }
             },
+            "queue": "njs",
             "app": {
                 "id": "ProkkaAnnotation/annotate_contigs",
                 "module_name": "ProkkaAnnotation",

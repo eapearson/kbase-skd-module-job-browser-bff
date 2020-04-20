@@ -24,8 +24,8 @@
             }
         },
         "admin": {
-            "type": "integer",
-            "default": 0
+            "type": "boolean",
+            "default": false
         },
         "timeout": {
             "type": "integer",

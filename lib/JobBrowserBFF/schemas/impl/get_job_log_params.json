@@ -72,6 +72,9 @@
         "timeout": {
             "type": "integer",
             "minimumExclusive": 0
+        },
+        "admin": {
+            "type": "boolean"
         }
     }
 }

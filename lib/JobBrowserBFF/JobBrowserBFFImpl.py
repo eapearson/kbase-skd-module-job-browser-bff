@@ -24,7 +24,7 @@ class JobBrowserBFF:
     ######################################### noqa
     VERSION = "0.0.1"
     GIT_URL = ""
-    GIT_COMMIT_HASH = "1a5e3e9e24bdd5f7eff24b961dc3c6a3850984d7"
+    GIT_COMMIT_HASH = "e2f696d69a9957e3a396baea38b3a22b0d64d72d"
 
     # BEGIN_CLASS_HEADER
     # END_CLASS_HEADER
@@ -48,7 +48,6 @@ class JobBrowserBFF:
         self.definitions = Definitions(load=True)
         # END_CONSTRUCTOR
         pass
-
 
     def get_jobs(self, ctx, params):
         """
@@ -117,7 +116,6 @@ class JobBrowserBFF:
         self.validation.validate_result('get_jobs', result)
         # END get_jobs
 
-        
         return [result]
 
     def query_jobs(self, ctx, params):
@@ -195,7 +193,6 @@ class JobBrowserBFF:
         self.validation.validate_result('query_jobs', result)
         # END query_jobs
 
-        
         return [result]
 
     def get_job_log(self, ctx, params):
@@ -205,7 +202,8 @@ class JobBrowserBFF:
            "search" of type "SearchSpec" -> structure: parameter "terms" of
            list of String, parameter "level" of list of type "LogLevel"
            (enum-like: default, error), parameter "offset" of Long, parameter
-           "limit" of Long
+           "limit" of Long, parameter "admin" of type "bool" (Type synonym
+           conveniences)
         :returns: instance of type "GetJobLogResult" -> structure: parameter
            "log" of list of type "LogEntry" -> structure: parameter
            "entry_number" of Long, parameter "created" of Long, parameter
@@ -219,17 +217,11 @@ class JobBrowserBFF:
 
         model = Model(config=self.config, context=ctx, timeout=params['timeout']).get_model(ctx)
 
-        result = model.get_job_log(
-            params['job_id'],
-            search=params.get('search', None),
-            level=params.get('level', None),
-            offset=params['offset'],
-            limit=params['limit'])
+        result = model.get_job_log(params)
 
         self.validation.validate_result('get_job_log', result)
         # END get_job_log
 
-        
         return [result]
 
     def cancel_job(self, ctx, params):
@@ -261,7 +253,6 @@ class JobBrowserBFF:
         self.validation.validate_result('cancel_job', result)
         # END cancel_job
 
-        
         return [result]
 
     def get_job_types(self, ctx):
@@ -281,7 +272,6 @@ class JobBrowserBFF:
         self.validation.validate_result('get_job_types', result)
         # END get_job_types
 
-        
         return [result]
 
     def get_job_states(self, ctx):
@@ -300,7 +290,6 @@ class JobBrowserBFF:
         self.validation.validate_result('get_job_states', result)
         # END get_job_states
 
-        
         return [result]
 
     def get_client_groups(self, ctx):
@@ -319,7 +308,6 @@ class JobBrowserBFF:
         self.validation.validate_result('get_client_groups', result)
         # END get_client_groups
 
-        
         return [result]
 
     def get_searchable_job_fields(self, ctx):
@@ -338,7 +326,6 @@ class JobBrowserBFF:
         self.validation.validate_result('get_searchable_job_fields', result)
         # END get_searchable_job_fields
 
-        
         return [result]
 
     def get_sort_specs(self, ctx):
@@ -357,7 +344,6 @@ class JobBrowserBFF:
         self.validation.validate_result('get_sort_specs', result)
         # END get_sort_specs
 
-        
         return [result]
 
     def get_log_levels(self, ctx):
@@ -376,7 +362,6 @@ class JobBrowserBFF:
         self.validation.validate_result('get_log_levels', result)
         # END get_log_levels
 
-        
         return [result]
 
     def is_admin(self, ctx):
@@ -395,7 +380,6 @@ class JobBrowserBFF:
         self.validation.validate_result('is_admin', result)
         # END is_admin
 
-        
         return [result]
 
     def status(self, ctx):

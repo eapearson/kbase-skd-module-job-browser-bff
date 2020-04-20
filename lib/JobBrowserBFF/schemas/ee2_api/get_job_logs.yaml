@@ -24,3 +24,5 @@ properties:
     type: integer
   count:
     type: integer
+  as_admin:
+    type: integer

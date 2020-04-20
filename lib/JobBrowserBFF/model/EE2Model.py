@@ -3,21 +3,33 @@ from JobBrowserBFF.model.EE2Api import EE2Api
 from JobBrowserBFF.model.KBaseServices import KBaseServices
 from JobBrowserBFF.Utils import parse_app_id
 import re
+import json
+
+
+def get_param(params, key):
+    if key not in params:
+        raise ValueError(f'required param {key} not provided')
+    return params.get(key)
 
 
 def raw_job_to_state(raw_job):
     raw_state = raw_job['status']
+
+    # which queue it is/was running on.
+    client_group = find_in(['job_input', 'requirements', 'clientgroup'], raw_job, 'njs')
+
     if raw_state == 'created':
         return {
             'status': 'create',
-            'create_at': raw_job['created']
+            'create_at': raw_job['created'],
+            'client_group': client_group
         }
     if raw_state == 'queued':
         return {
             'status': 'queue',
             'create_at': raw_job['created'],
             'queue_at': raw_job['queued'],
-            'client_group': None
+            'client_group': client_group
         }
     elif raw_state == 'running':
         return {
@@ -26,7 +38,7 @@ def raw_job_to_state(raw_job):
             # TODO: queued time does not exist yet!
             'queue_at': raw_job['created'],
             'run_at': raw_job['running'],
-            'client_group': None
+            'client_group': client_group
         }
     elif raw_state == 'completed':
         return {
@@ -38,7 +50,7 @@ def raw_job_to_state(raw_job):
             # TODO: finished is not being set in many cases!!
             # TODO: remove this workaround when that is fixed.
             'finish_at': raw_job.get('finished', raw_job.get('updated', None)),
-            'client_group': None
+            'client_group': client_group
         }
     elif raw_state == 'error':
         state = {
@@ -52,7 +64,7 @@ def raw_job_to_state(raw_job):
                 'code': 1,
                 'message': raw_job.get('errormsg', '')
             },
-            'client_group': None
+            'client_group': client_group
         }
 
         # TODO: when 'queued' is ready
@@ -75,7 +87,7 @@ def raw_job_to_state(raw_job):
             'reason': {
                 'code': 0
             },
-            'client_group': None
+            'client_group': client_group
         }
         # reason omitted because not supported by kb_Metrics
         if 'running' in raw_job:
@@ -84,6 +96,15 @@ def raw_job_to_state(raw_job):
         return state
     else:
         raise ValueError('Unrecognized state: ' + raw_state)
+
+
+def find_in(path, data, default_value=None):
+    for el in path:
+        if el in data:
+            data = data[el]
+        else:
+            return default_value
+    return data
 
 
 def raw_job_to_job(raw_job, apps_map, users_map, workspaces_map):
@@ -109,10 +130,12 @@ def raw_job_to_job(raw_job, apps_map, users_map, workspaces_map):
             # if len(app['client_groups']) > 0:
             #     client_group = app['client_groups'][0]
 
-    # Get the additional workspace info out of the workspaces map, and
+     # Get the additional workspace info out of the workspaces map, and
     # also handle multiple types of workspace
     if 'job_input' in raw_job:
         job_input = raw_job['job_input']
+
+        # Determine workspace type
         workspace_id = job_input.get('wsid', None)
         if workspace_id is None:
             workspace = None
@@ -344,7 +367,18 @@ class EE2Model(object):
             raise se
         # TODO: is this implemented yet?
 
-    def get_job_log(self, job_id, offset, limit, search=None, level=None):
+    def get_job_log(self, params):
+        job_id = get_param(params, 'job_id')
+        offset = get_param(params, 'offset')
+        limit = get_param(params, 'limit')
+        # search = params.get('search')
+        # level = params.get('level')
+        admin = params.get('admin', False)
+        if admin:
+            admin = 1
+        else:
+            admin = 0
+
         api = EE2Api(url=self.config['ee2-url'], token=self.token, timeout=self.timeout)
         try:
             # Note plural form of get_job_log. The upstream apis (njs, ee2 copying it)
@@ -352,8 +386,8 @@ class EE2Model(object):
             result = api.get_job_logs({
                 'job_id': job_id,
                 'offset': offset,
-                'limit': limit
-            })
+                'limit': limit,
+                'as_admin': admin})
         except ServiceError as se:
             # handle specific error mesages
             if se.code == -32000:
@@ -415,7 +449,8 @@ class EE2Model(object):
             else:
                 raise se
 
-    def ee2_query_jobs(self, offset, limit, time_span=None, filter=None, sort=None, admin=False):
+    def ee2_query_jobs(self, offset, limit, time_span=None, search=None,
+                       filter=None, sort=None, admin=False):
         # TODO: timeout global or timeout per call?
         api = EE2Api(url=self.config['ee2-url'], token=self.token, timeout=self.timeout)
 
@@ -450,8 +485,6 @@ class EE2Model(object):
             params['ascending'] = ascending
 
         try:
-            # TODO: when return total_count, use jobs, total_count = ...
-            # TODO: use offset and limit (and batched fetch) when offset is available.
             if admin:
                 result = api.check_jobs_date_range_for_all(params)
             else:
@@ -506,6 +539,11 @@ class EE2Model(object):
             # Note, we can use None for optional params.
             filter = None
 
+        if 'search' in params:
+            search = params['search']
+        else:
+            search = None
+
         # TODO: massage the sort?
         sort = params.get('sort', None)
 
@@ -513,6 +551,7 @@ class EE2Model(object):
             offset=params['offset'],
             limit=params['limit'],
             filter=filter,
+            search=search,
             sort=sort,
             time_span=params.get('time_span', None),
             admin=params.get('admin', False)

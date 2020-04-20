@@ -49,6 +49,7 @@ def get_config():
         retconfig[nameval[0]] = nameval[1]
     return retconfig
 
+
 config = get_config()
 
 from JobBrowserBFF.JobBrowserBFFImpl import JobBrowserBFF  # noqa @IgnorePep8
@@ -90,7 +91,7 @@ class JSONRPCServiceCustom(JSONRPCService):
         result = None
         try:
             if isinstance(params, list):
-                
+
                 # Does it have enough arguments?
                 if len(params) < self._man_args(method) - 1:
                     raise InvalidParamsError(data={'issue': 'not enough arguments'})
@@ -242,6 +243,7 @@ class MethodContext(dict):
         self._logger.log_message(level, message, self['client_ip'],
                                  self['user_id'], self['module'],
                                  self['method'], self['call_id'])
+
 
 class ServerError(Exception):
     '''
@@ -443,7 +445,7 @@ class Application(object):
                             err.data = \
                                 "Token validation failed: %s" % e
                             raise err
-                        
+
             if (environ.get('HTTP_X_FORWARDED_FOR')):
                 self.log(log.INFO, ctx, 'X-Forwarded-For: ' + environ.get('HTTP_X_FORWARDED_FOR'))
 
@@ -525,7 +527,7 @@ class Application(object):
         # available will not have a jsonrpc request available.
         if request is None:
             response['id'] = None
-        else: 
+        else:
             response['id'] = request['id']
 
         return json.dumps(response)
@@ -538,6 +540,7 @@ class Application(object):
         hh, mm = divmod((delta.days * 24 * 60 * 60 + delta.seconds + 30) // 60,
                         60)
         return "%s%+02d:%02d" % (dtnow.isoformat(), hh, mm)
+
 
 application = Application()
 

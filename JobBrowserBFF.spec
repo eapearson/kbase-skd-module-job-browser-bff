@@ -221,6 +221,7 @@ module JobBrowserBFF {
         list<LogLevel> level;
         int offset;
         int limit;
+        bool admin;
      } GetJobLogParams;
 
 
