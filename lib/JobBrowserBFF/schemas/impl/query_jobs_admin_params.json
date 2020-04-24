@@ -47,7 +47,9 @@
                     "key": {
                         "type": "string",
                         "title": "The Key Schema",
-                        "enum": ["created"],
+                        "enum": [
+                            "created"
+                        ],
                         "default": "",
                         "examples": [
                             "name"
@@ -57,7 +59,10 @@
                     "direction": {
                         "type": "string",
                         "title": "The Direction Schema",
-                        "enum": ["ascending", "descending"],
+                        "enum": [
+                            "ascending",
+                            "descending"
+                        ],
                         "default": "",
                         "examples": [
                             "ascending"
@@ -88,6 +93,9 @@
                     }
                 }
             }
+        },
+        "filter": {
+            "$ref": "base.json#definitions/job_filter"
         },
         "time_span": {
             "type": "object",

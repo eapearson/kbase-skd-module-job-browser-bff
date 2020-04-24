@@ -5,14 +5,17 @@ import unittest
 import os
 import json
 
+
 class JobBrowserBFFTest(unittest.TestCase):
     def load_data_file(self, method_name, outcome_type, data_type, file_name):
-        data_path = os.path.join(os.path.dirname(__file__), '..', 'data', 'methods', method_name, outcome_type, data_type, file_name)
+        data_path = os.path.join(os.path.dirname(__file__), '..', 'data',
+                                 'methods', method_name, outcome_type, data_type, file_name)
         with open(data_path) as fin:
             return json.load(fin)
 
     def get_data_files(self, method_name, outcome_type, data_type):
-        dir_path = os.path.join(os.path.dirname(__file__), '..', 'data', 'methods', method_name, outcome_type, data_type)
+        dir_path = os.path.join(os.path.dirname(__file__), '..', 'data',
+                                'methods', method_name, outcome_type, data_type)
         dirs = []
         for file_name in os.listdir(dir_path):
             dirs.append(file_name)
@@ -25,7 +28,7 @@ class JobBrowserBFFTest(unittest.TestCase):
             validation = Validation(load_schemas=True)
             method_names = [
                 'query_jobs', 'get_jobs', 'get_job_log',
-                'cancel_job', 'query_jobs_admin'
+                'cancel_job'
             ]
             for method_name in method_names:
                 sample_files = self.get_data_files(method_name, 'happy', 'params')
@@ -46,7 +49,7 @@ class JobBrowserBFFTest(unittest.TestCase):
                 'get_jobs', 'query_jobs', 'get_job_log',
                 'cancel_job', 'get_client_groups',
                 'get_job_states', 'get_job_types', 'get_log_levels',
-                'get_searchable_job_fields', 'query_jobs_admin'
+                'get_searchable_job_fields'
 
             ]
             for method_name in method_names:

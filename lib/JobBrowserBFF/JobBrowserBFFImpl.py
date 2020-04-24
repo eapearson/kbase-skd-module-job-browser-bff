@@ -24,7 +24,7 @@ class JobBrowserBFF:
     ######################################### noqa
     VERSION = "0.0.1"
     GIT_URL = ""
-    GIT_COMMIT_HASH = "e2f696d69a9957e3a396baea38b3a22b0d64d72d"
+    GIT_COMMIT_HASH = "e581fd931cd7a5f88595bf14f65ced38d4cd3d3c"
 
     # BEGIN_CLASS_HEADER
     # END_CLASS_HEADER
@@ -48,6 +48,7 @@ class JobBrowserBFF:
         self.definitions = Definitions(load=True)
         # END_CONSTRUCTOR
         pass
+
 
     def get_jobs(self, ctx, params):
         """
@@ -116,6 +117,7 @@ class JobBrowserBFF:
         self.validation.validate_result('get_jobs', result)
         # END get_jobs
 
+        
         return [result]
 
     def query_jobs(self, ctx, params):
@@ -193,6 +195,7 @@ class JobBrowserBFF:
         self.validation.validate_result('query_jobs', result)
         # END query_jobs
 
+        
         return [result]
 
     def get_job_log(self, ctx, params):
@@ -222,6 +225,7 @@ class JobBrowserBFF:
         self.validation.validate_result('get_job_log', result)
         # END get_job_log
 
+        
         return [result]
 
     def cancel_job(self, ctx, params):
@@ -253,6 +257,7 @@ class JobBrowserBFF:
         self.validation.validate_result('cancel_job', result)
         # END cancel_job
 
+        
         return [result]
 
     def get_job_types(self, ctx):
@@ -272,6 +277,7 @@ class JobBrowserBFF:
         self.validation.validate_result('get_job_types', result)
         # END get_job_types
 
+        
         return [result]
 
     def get_job_states(self, ctx):
@@ -290,6 +296,7 @@ class JobBrowserBFF:
         self.validation.validate_result('get_job_states', result)
         # END get_job_states
 
+        
         return [result]
 
     def get_client_groups(self, ctx):
@@ -308,6 +315,7 @@ class JobBrowserBFF:
         self.validation.validate_result('get_client_groups', result)
         # END get_client_groups
 
+        
         return [result]
 
     def get_searchable_job_fields(self, ctx):
@@ -326,6 +334,7 @@ class JobBrowserBFF:
         self.validation.validate_result('get_searchable_job_fields', result)
         # END get_searchable_job_fields
 
+        
         return [result]
 
     def get_sort_specs(self, ctx):
@@ -344,6 +353,7 @@ class JobBrowserBFF:
         self.validation.validate_result('get_sort_specs', result)
         # END get_sort_specs
 
+        
         return [result]
 
     def get_log_levels(self, ctx):
@@ -362,6 +372,7 @@ class JobBrowserBFF:
         self.validation.validate_result('get_log_levels', result)
         # END get_log_levels
 
+        
         return [result]
 
     def is_admin(self, ctx):
@@ -380,6 +391,7 @@ class JobBrowserBFF:
         self.validation.validate_result('is_admin', result)
         # END is_admin
 
+        
         return [result]
 
     def status(self, ctx):

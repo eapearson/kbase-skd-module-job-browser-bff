@@ -461,7 +461,83 @@ class EE2Model(object):
         }
 
         if filter is not None:
-            params['filter'] = filter
+            raw_query = []
+
+            status = filter.get('status', [])
+            if len(status) > 0:
+                status_transform = {
+                    'create': 'created',
+                    'queue': 'queued',
+                    'run': 'running',
+                    'complete': 'completed',
+                    'error': 'error',
+                    'terminate': 'terminated'
+                }
+                # value = list(map(lambda x: status_transform.get(x, x), value))
+                status = [status_transform.get(x, x) for x in status]
+                raw_query.append({
+                    'status': {
+                        '$in': status
+                    }
+                })
+
+            # parse and reformat the filters...
+            workspace_id = filter.get('workspace_id', [])
+            if len(workspace_id) > 0:
+                raw_query.append({
+                    'wsid': {
+                        '$in': workspace_id
+                    }
+                })
+
+            user = filter.get('user', [])
+            if len(user) > 0:
+                raw_query.append({
+                    'user': {
+                        '$in': user
+                    }
+                })
+
+            client_group = filter.get('client_group', [])
+            if len(client_group) > 0:
+                raw_query.append({
+                    'job_input.requirements.clientgroup': {
+                        '$in': client_group
+                    }
+                })
+
+            app_id = filter.get('app_id', [])
+            if len(app_id) > 0:
+                raw_query.append({
+                    'job_input.app_id': {
+                        '$in': app_id
+                    }
+                })
+
+            app_module = filter.get('app_module', [])
+            if len(app_module) > 0:
+                raw_query.append({
+                    '$or': [{'job_input.app_id': {'$regex': f'^{module_name}/', '$options': 'i'}}
+                            for module_name in app_module]
+                })
+
+            app_function = filter.get('app_function', [])
+            if len(app_function) > 0:
+                raw_query.append({
+                    '$or': [{'job_input.app_id': {'$regex': f'/{function_name}$', '$options': 'i'}}
+                            for function_name in app_function]
+                })
+
+            # wrap it in a raw query for mongoengine
+            # TODO: upstream ee2 service should not be exposed like this!
+            if len(raw_query) > 0:
+                filter_query = {
+                    '__raw__': {
+                        '$and': raw_query
+                    }
+                }
+
+                params['filter'] = filter_query
 
         if sort is not None:
             # sort specs are not supported for ee2 (for now)
@@ -496,62 +572,13 @@ class EE2Model(object):
                 'original_message': str(ex)
             })
 
-    def filter_transform(self, raw_filter):
-        field_name_transforms = {
-            'workspace_id': 'wsid',
-        }
-        # yeah, doing this with map is just ugly.
-        filter = dict()
-        for field, value in raw_filter.items():
-            # transform the field name from ours to the idiosyncratic upstream names.
-            field_name = field_name_transforms.get(field, field)
-
-            # transform field values
-            if field_name == 'status':
-                status_transform = {
-                    'create': 'created',
-                    'queue': 'queued',
-                    'run': 'running',
-                    'complete': 'completed',
-                    'error': 'error',
-                    'terminate': 'terminated'
-                }
-                value = list(map(lambda x: status_transform.get(x, x), value))
-
-            field_name = field_name + '__in'
-            filter.update({
-                field_name: value
-            })
-        return filter
-
     def query_jobs(self, params):
-        # Sort is required (and validated before we get here) so safe to assume it exists.
-        # but it isn't implemented yet on the upstream service?
-
-        # Search is optional.
-
-        # Filter is optional.
-        if 'filter' in params:
-            # Some upstream field names are not api-friendly (imo)
-            filter = self.filter_transform(params['filter'])
-        else:
-            # Note, we can use None for optional params.
-            filter = None
-
-        if 'search' in params:
-            search = params['search']
-        else:
-            search = None
-
-        # TODO: massage the sort?
-        sort = params.get('sort', None)
-
         raw_jobs, found_count = self.ee2_query_jobs(
             offset=params['offset'],
             limit=params['limit'],
-            filter=filter,
-            search=search,
-            sort=sort,
+            filter=params.get('filter'),
+            search=params.get('search'),
+            sort=params.get('sort'),
             time_span=params.get('time_span', None),
             admin=params.get('admin', False)
         )
@@ -564,52 +591,6 @@ class EE2Model(object):
         jobs = self.raw_jobs_to_jobs(raw_jobs)
 
         # Now DONE!
-        return jobs, found_count, total_count
-
-    def query_jobs_admin(self, params):
-        # Sort is required (and validated before we get here) so safe to assume it exists.
-        # but it isn't implemented yet on the upstream service?
-
-        # Search is optional.
-
-        # Filter is optional.
-        if 'filter' in params:
-            # Some upstream field names are not api-friendly (imo)
-            field_name_transforms = {
-                'workspace_id': 'wsid',
-            }
-            # yeah, doing this with map is just ugly.
-            filter = {}
-            for field, value in params['filter'].items():
-                # transform the field name from ours to the idiosyncratic upstream names.
-                field_name = field_name_transforms.get(field, field)
-                # filter.append("{}={}".format(field_name, value))
-                filter.update({
-                    field_name: value
-                })
-        else:
-            # Note, we can use None for optional params.
-            filter = None
-
-        # TODO: massage the sort?
-        sort = params.get('sort', None)
-
-        raw_jobs, found_count = self.ee2_query_jobs(
-            offset=params['offset'],
-            limit=params['limit'],
-            filter=filter,
-            sort=sort,
-            time_span=params.get('time_span', None),
-            admin=True
-        )
-
-        total_count = found_count
-
-        if len(raw_jobs) == 0:
-            return [], 0, total_count
-
-        jobs = self.raw_jobs_to_jobs(raw_jobs)
-
         return jobs, found_count, total_count
 
     def ee2_get_jobs(self, params):

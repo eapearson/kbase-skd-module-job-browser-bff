@@ -613,6 +613,30 @@
                         "type": "string"
                     }
                 },
+                "app_module": {
+                    "type": [
+                        "array"
+                    ],
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "app_function": {
+                    "type": [
+                        "array"
+                    ],
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "client_group": {
+                    "type": [
+                        "array"
+                    ],
+                    "items": {
+                        "type": "string"
+                    }
+                },
                 "job_id": {
                     "type": [
                         "array"
