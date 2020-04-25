@@ -3,6 +3,7 @@ from JobBrowserBFF.model.EE2Api import EE2Api
 from JobBrowserBFF.model.KBaseServices import KBaseServices
 from JobBrowserBFF.Utils import parse_app_id
 import re
+import json
 
 
 def get_param(params, key):
@@ -20,8 +21,7 @@ def raw_job_to_state(raw_job):
     if raw_state == 'created':
         return {
             'status': 'create',
-            'create_at': raw_job['created'],
-            'client_group': client_group
+            'create_at': raw_job['created']
         }
     if raw_state == 'queued':
         return {
@@ -560,6 +560,7 @@ class EE2Model(object):
             params['ascending'] = ascending
 
         try:
+            print('calling ee2', json.dumps(params))
             if admin:
                 result = api.check_jobs_date_range_for_all(params)
             else:
