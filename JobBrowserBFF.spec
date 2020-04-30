@@ -4,15 +4,21 @@ A KBase module: JobBrowserBFF
 
 module JobBrowserBFF {
     /* Type synonym conveniences */
-    typedef int bool;
-    typedef int epoch_time;
-    typedef string UserID;
 
-    /* Core types */
+    /* In kb_sdk boolean values are represented as integer 1 and 0 */
+    typedef int bool;
+
+    /* Time represented as epoch time in milliseconds */
+    typedef int epoch_time;
+
+    /* A KBase username */
+    typedef string username;
+
+    /* A job id is a uuid */
     typedef string JobID;
 
     typedef structure {
-        string UserID;
+        username username;
         string realname;
     } User;
 
@@ -69,6 +75,14 @@ module JobBrowserBFF {
       done, but at the moment there are:
       narrative, export, workspace, unknown
     */
+
+    /* Information about the workspace the job is associated with. Most, but not all, jobs
+       are associated with a workspace.
+
+       Note that only minimal information is exposed here, since this is all the the job
+       browser requires. The design philosopy of this module is minimal support of the 
+       associated ui component.
+    */
     typedef structure  {
         int id;
         bool is_accessible;
@@ -77,6 +91,13 @@ module JobBrowserBFF {
         bool is_deleted;
     } WorkspaceInfo;
 
+    /* Information about the narrative with which the job is associated, if the 
+       workspace it is associated with is also a Narrative.
+
+       Note that only minimal information is available at this time, since this is all
+       that is required of a job browser.
+       Future enhancments of a job browser may require additional fields here.
+    */
     typedef structure {
         string title;
         bool is_temporary;
@@ -85,6 +106,12 @@ module JobBrowserBFF {
     /* narrative, export, workspace, unknown */
     typedef string JobContextType;
     
+    /* The JobContext represents the context in which the Job was run. 
+
+    The `type` field 
+
+        Every job is run with some context. A
+    */
     typedef structure {
         JobContextType type; 
         WorkspaceInfo workspace;
