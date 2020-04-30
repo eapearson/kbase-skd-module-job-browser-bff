@@ -14,6 +14,8 @@ TEST_SCRIPT_NAME = run_tests.sh
 
 .PHONY: test
 
+# These tasks are should be run within the service docker container.
+
 default: compile
 
 all: compile build build-startup-script build-executable-script build-test-script
@@ -25,7 +27,6 @@ compile:
 		--out $(LIB_DIR) \
 		--pysrvname $(SERVICE_CAPS).$(SERVICE_CAPS)Server \
 		--pyimplname $(SERVICE_CAPS).$(SERVICE_CAPS)Impl;
-	@python3 scripts/fix-impl.py
 
 build:
 	@chmod +x $(SCRIPTS_DIR)/entrypoint.sh
@@ -77,22 +78,29 @@ test:
 clean:
 	@rm -rfv $(LBIN_DIR)
 
+# These tasks are designed to be run within the local development environment.
+# Local development is facilitated by building and running the service image locally.
+
 dev-image:
 	@echo "> Creating local image for development or testing"
-	@bash scripts/build-docker-image-dev.sh	
+	@bash local-scripts/build-docker-image-dev.sh	
 
 run-dev-image:
 	@echo "> Running the already-built docker image"
-	@bash scripts/run-docker-image-dev.sh
+	@bash local-scripts/run-docker-image-dev.sh
 
 run-dev-mongo:
 	@echo "> Running local mongo container for testing/development"
-	@bash scripts/start-mongo-for-tests.sh
+	@bash local-scripts/start-mongo-for-tests.sh
 
-run-local-tests:
+# Convenience for running tests (which are run inside the service container) when 
+# kb_sdk is located one directory above.
+run-tests:
 	@echo "> Running tests via sdk"
 	PATH="${PATH}":`pwd`/../kb_sdk/bin && kb-sdk test
 
+# For testing the generation of a compilation report.
+# This module uses a different Dockerfile that the kb_sdk generates.
 run-local-report:
 	@echo "> Running the already-built docker image"
-	@bash scripts/run-docker-image-dev-report.sh
+	@bash local-scripts/run-docker-image-dev-report.sh
