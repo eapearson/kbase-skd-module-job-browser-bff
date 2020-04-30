@@ -24,7 +24,7 @@ class JobBrowserBFF:
     ######################################### noqa
     VERSION = "0.0.1"
     GIT_URL = ""
-    GIT_COMMIT_HASH = "e581fd931cd7a5f88595bf14f65ced38d4cd3d3c"
+    GIT_COMMIT_HASH = "404e492b58bc6de227992c20d4eb074acf40dbb5"
 
     # BEGIN_CLASS_HEADER
     # END_CLASS_HEADER
@@ -117,7 +117,12 @@ class JobBrowserBFF:
         self.validation.validate_result('get_jobs', result)
         # END get_jobs
 
-        
+        # At some point might do deeper type checking...
+        if not isinstance(result, dict):
+            raise ValueError('Method get_jobs ' +
+                             'return value result ' +
+                             'is not type dict as required.')
+        # return the results
         return [result]
 
     def query_jobs(self, ctx, params):
@@ -195,7 +200,12 @@ class JobBrowserBFF:
         self.validation.validate_result('query_jobs', result)
         # END query_jobs
 
-        
+        # At some point might do deeper type checking...
+        if not isinstance(result, dict):
+            raise ValueError('Method query_jobs ' +
+                             'return value result ' +
+                             'is not type dict as required.')
+        # return the results
         return [result]
 
     def get_job_log(self, ctx, params):
@@ -225,7 +235,12 @@ class JobBrowserBFF:
         self.validation.validate_result('get_job_log', result)
         # END get_job_log
 
-        
+        # At some point might do deeper type checking...
+        if not isinstance(result, dict):
+            raise ValueError('Method get_job_log ' +
+                             'return value result ' +
+                             'is not type dict as required.')
+        # return the results
         return [result]
 
     def cancel_job(self, ctx, params):
@@ -257,7 +272,12 @@ class JobBrowserBFF:
         self.validation.validate_result('cancel_job', result)
         # END cancel_job
 
-        
+        # At some point might do deeper type checking...
+        if not isinstance(result, dict):
+            raise ValueError('Method cancel_job ' +
+                             'return value result ' +
+                             'is not type dict as required.')
+        # return the results
         return [result]
 
     def get_job_types(self, ctx):
@@ -277,7 +297,12 @@ class JobBrowserBFF:
         self.validation.validate_result('get_job_types', result)
         # END get_job_types
 
-        
+        # At some point might do deeper type checking...
+        if not isinstance(result, dict):
+            raise ValueError('Method get_job_types ' +
+                             'return value result ' +
+                             'is not type dict as required.')
+        # return the results
         return [result]
 
     def get_job_states(self, ctx):
@@ -296,7 +321,12 @@ class JobBrowserBFF:
         self.validation.validate_result('get_job_states', result)
         # END get_job_states
 
-        
+        # At some point might do deeper type checking...
+        if not isinstance(result, dict):
+            raise ValueError('Method get_job_states ' +
+                             'return value result ' +
+                             'is not type dict as required.')
+        # return the results
         return [result]
 
     def get_client_groups(self, ctx):
@@ -315,7 +345,12 @@ class JobBrowserBFF:
         self.validation.validate_result('get_client_groups', result)
         # END get_client_groups
 
-        
+        # At some point might do deeper type checking...
+        if not isinstance(result, dict):
+            raise ValueError('Method get_client_groups ' +
+                             'return value result ' +
+                             'is not type dict as required.')
+        # return the results
         return [result]
 
     def get_searchable_job_fields(self, ctx):
@@ -334,7 +369,12 @@ class JobBrowserBFF:
         self.validation.validate_result('get_searchable_job_fields', result)
         # END get_searchable_job_fields
 
-        
+        # At some point might do deeper type checking...
+        if not isinstance(result, dict):
+            raise ValueError('Method get_searchable_job_fields ' +
+                             'return value result ' +
+                             'is not type dict as required.')
+        # return the results
         return [result]
 
     def get_sort_specs(self, ctx):
@@ -353,7 +393,12 @@ class JobBrowserBFF:
         self.validation.validate_result('get_sort_specs', result)
         # END get_sort_specs
 
-        
+        # At some point might do deeper type checking...
+        if not isinstance(result, dict):
+            raise ValueError('Method get_sort_specs ' +
+                             'return value result ' +
+                             'is not type dict as required.')
+        # return the results
         return [result]
 
     def get_log_levels(self, ctx):
@@ -372,7 +417,12 @@ class JobBrowserBFF:
         self.validation.validate_result('get_log_levels', result)
         # END get_log_levels
 
-        
+        # At some point might do deeper type checking...
+        if not isinstance(result, dict):
+            raise ValueError('Method get_log_levels ' +
+                             'return value result ' +
+                             'is not type dict as required.')
+        # return the results
         return [result]
 
     def is_admin(self, ctx):
@@ -391,7 +441,12 @@ class JobBrowserBFF:
         self.validation.validate_result('is_admin', result)
         # END is_admin
 
-        
+        # At some point might do deeper type checking...
+        if not isinstance(result, dict):
+            raise ValueError('Method is_admin ' +
+                             'return value result ' +
+                             'is not type dict as required.')
+        # return the results
         return [result]
 
     def status(self, ctx):

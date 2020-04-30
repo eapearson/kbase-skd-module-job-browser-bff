@@ -225,7 +225,6 @@ class TestBase(unittest.TestCase):
         if hasattr(ex, 'message'):
             error_type = type(ex)
             if error_type == ServiceError:
-                print('DATA', ex.data)
                 self.assertTrue(
                     False,
                     ('Did not expect an exception :'
@@ -266,6 +265,21 @@ class TestBase(unittest.TestCase):
         return token
 
     def impl_for(self, env, user_type):
+        """Create an instance of the implentation class and an associated context
+
+        A convenience method for creating an implementation class instance and context
+        based on the kbase deployment environment tag (env) and user type (user_type).
+
+        The env tag may be ci, next, prod, narrative-dev, and is used to select the 
+        test token from the test config file (test_local/test.cfg).
+
+        The user_type is either "admin" or "user"; since many methods take the admin flag, 
+        and admin usage requires an admin token (an admin for the ee2 service).
+
+        Note that the environment "mock" is not a KBase environment, rather it indicates 
+        that the special mock testing config should be used. The mock environment
+        provides all required backend services that this service depends upon.
+        """
         token = self.test_config['test_token_{}_{}'.format(env, user_type)]
         if env == 'mock':
             context = self.new_mock_context(token)

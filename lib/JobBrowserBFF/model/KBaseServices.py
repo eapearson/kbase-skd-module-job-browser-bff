@@ -1,5 +1,6 @@
 import requests
 from biokbase.GenericClient import GenericClient
+from biokbase.Errors import ServiceError
 
 
 class KBaseServices(object):
@@ -72,10 +73,17 @@ class KBaseServices(object):
                 app = catalog.get(tag).get(app_id)
 
             if app is None:
-                print('WARNING app not found', app_id)
+                # TODO: use a global logger hooked into the kbase logger which is
+                # currently setup and owned by the server.
+                # It seems too much to thread the logger through all the method calls
+                # to get here.
+                print('WARNING: app not found', app_id)
                 continue
-            apps[app_id] = app
-            apps[app_id]['client_groups'] = app_client_groups_map.get(app_id, ['njs'])
+            apps[app_id] = {
+                'info': app,
+                'client_groups': app_client_groups_map.get(app_id, ['njs'])
+            }
+            # apps[app_id]['client_groups'] = app_client_groups_map.get(app_id, ['njs'])
 
         return apps
 

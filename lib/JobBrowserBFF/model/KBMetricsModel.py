@@ -118,7 +118,6 @@ def raw_job_to_state(raw_job, client_group):
 def raw_job_to_context(raw_job, workspaces_map):
     workspace_id = raw_job.get('wsid', None)
     if workspace_id is None:
-        # print('NO WORKSPACE', raw_job)
         if raw_job.get('app') and 'export' in raw_job['app']['function_name']:
             # elif app is not None and 'export' in app['function_name']:
             job_type = 'export'
@@ -334,7 +333,6 @@ class KBMetricsModel(object):
 
             return jobs['job_states'], jobs['found_count'], jobs['total_count']
         except ServiceError as se:
-            print('SERVICE ERROR', se.message)
             raise
         except Exception as ex:
             raise ServiceError(code=40000, message='Unknown error', data={

@@ -509,6 +509,7 @@
                         "id",
                         "module_name",
                         "function_name",
+                        "type",
                         "title",
                         "client_groups"
                     ],
@@ -516,6 +517,13 @@
                         "id": {
                             "type": "string",
                             "title": "The App ID"
+                        },
+                        "type": {
+                            "type": "string",
+                            "enum": [
+                                "narrative",
+                                "unknown"
+                            ]
                         },
                         "module_name": {
                             "$id": "#/properties/jobs/items/properties/app/properties/module_name",

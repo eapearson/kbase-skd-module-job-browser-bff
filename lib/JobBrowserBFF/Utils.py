@@ -4,6 +4,7 @@ import json
 from biokbase.Errors import ServiceError
 from datetime import datetime
 
+
 def load_definition(base_file_name, format='toml'):
     try:
         file_name = base_file_name + '.' + format
@@ -16,22 +17,35 @@ def load_definition(base_file_name, format='toml'):
                 d = json.load(definitions_file)
                 return d
         else:
-            raise ServiceError(code=40000, message='Unrecognized definitions form "' + format + '"', data={'format': format})
+            raise ServiceError(code=40000, message='Unrecognized definitions form "' +
+                               format + '"', data={'format': format})
     except Exception as e:
-        raise ServiceError(code=40000, message="Error loading definition", data={'file': file_name})
- 
+        raise ServiceError(code=40000, message=f"Error loading definition {str(e)}", data={
+                           'file': file_name})
+
+
 def ms_to_iso(ms_time):
     return datetime.fromtimestamp(ms_time / 1000).isoformat(timespec="seconds") + 'Z'
 
+
 def iso_to_ms(iso):
     return round(datetime.fromisoformat(iso).timestamp() * 1000)
-    
-def parse_app_id(app_id):
+
+
+def parse_app_id(app_id, module):
     if app_id is not None:
-        app_id_parts = app_id.split('/')
+
+        if '/' in app_id:
+            # This is the normal case - narrative methods
+            app_id_parts = app_id.split('/')
+            app_type = 'narrative'
+        else:
+            # Here we use the method for non-narrative methods.
+            app_id_parts = module.split('.')
+            app_type = 'other'
+
         if len(app_id_parts) != 2:
-            # main category of oddly formed app ids simple doesn't have the
-            # correct number of elements.
+            # Strange but true.
             if len(app_id_parts) == 3:
                 if len(app_id_parts[2]) == 0:
                     # Some have a / at the end
@@ -40,7 +54,8 @@ def parse_app_id(app_id):
                     app = {
                         'id': id,
                         'module_name': module_name,
-                        'function_name': function_name
+                        'function_name': function_name,
+                        'type': app_type
                     }
                 else:
                     app = None
@@ -50,9 +65,10 @@ def parse_app_id(app_id):
             # normal case
             module_name, function_name = app_id_parts
             app = {
-                'id': app_id,
+                'id': '/'.join(app_id_parts),
                 'module_name': module_name,
-                'function_name': function_name
+                'function_name': function_name,
+                'type': app_type
             }
     else:
         app = None

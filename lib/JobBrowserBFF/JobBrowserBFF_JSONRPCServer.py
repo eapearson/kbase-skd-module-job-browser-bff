@@ -198,7 +198,6 @@ class JSONRPCServiceCustom(JSONRPCService):
 
 
 class MethodContext(dict):
-
     def __init__(self, logger):
         self['client_ip'] = None
         self['user_id'] = None

@@ -11,6 +11,23 @@ def get_param(params, key):
         raise ValueError(f'required param {key} not provided')
     return params.get(key)
 
+# def get_path(the_dict, key_path, default_value=None):
+#     if len(key_path) == 0:
+#         return default_value
+#     value = the_dict
+#     for key in key_path:
+
+#         if key == '*':
+#             # this means the current value should be an array
+#             # and the next
+
+#         value = value.get(key)
+#         if value is None:
+#             return default_value
+#         if not isinstance(value, dict):
+#             return default_value
+#     return value
+
 
 def raw_job_to_state(raw_job):
     raw_state = raw_job['status']
@@ -116,18 +133,22 @@ def raw_job_to_job(raw_job, apps_map, users_map, workspaces_map):
 
     # Get the additional app info out of the apps map
     app = raw_job.get('app', None)
-    # client_group = None
     if app is not None:
-        app_info = apps_map.get(app['id'], None)
-
-        if app_info is None:
+        catalog_app = apps_map.get(app['id'], None)
+        if catalog_app is None:
             app['title'] = app['id']
             app['client_groups'] = []
+            app['type'] = 'unknown'
         else:
-            app['title'] = app_info['name']
-            app['client_groups'] = app_info['client_groups']
-            # if len(app['client_groups']) > 0:
-            #     client_group = app['client_groups'][0]
+            app_info = catalog_app.get('info')
+            if app_info is None:
+                app['title'] = app['id']
+                app['client_groups'] = []
+                app['type'] = 'unknown'
+            else:
+                app['title'] = app_info['name']
+                app['client_groups'] = catalog_app['client_groups']
+                app['type'] = 'narrative'
 
     # Get the additional workspace info out of the workspaces map, and
     # also handle multiple types of workspace
@@ -136,18 +157,18 @@ def raw_job_to_job(raw_job, apps_map, users_map, workspaces_map):
 
         # Determine workspace type
         workspace_id = job_input.get('wsid', None)
+
         if workspace_id is None:
             workspace = None
-            job_type = 'unknown'
+            if app is not None and 'export' in app['function_name']:
+                job_type = 'export'
+            else:
+                job_type = 'unknown'
         else:
             workspace = workspaces_map.get(workspace_id, None)
-            if workspace is None:
-                job_type = 'unknown'
-            elif workspace['is_accessible']:
+            if workspace is not None and workspace['is_accessible']:
                 if workspace.get('narrative'):
                     job_type = 'narrative'
-                elif app is not None and 'export' in app['function_name']:
-                    job_type = 'export'
                 else:
                     job_type = 'workspace'
             else:
@@ -315,11 +336,12 @@ class EE2Model(object):
             if 'job_input' in raw_job:
                 job_input = raw_job['job_input']
                 if 'app_id' in job_input:
-                    app = parse_app_id(job_input['app_id'])
+                    app = parse_app_id(job_input.get('app_id'), job_input['method'])
                     # note we save the parsed app id as 'app'
                     raw_job['app'] = app
                     if app is not None:
-                        apps_to_fetch[app['id']] = app
+                        if app['type'] == 'narrative':
+                            apps_to_fetch[app['id']] = app
                 else:
                     raw_job['app'] = None
 
@@ -335,8 +357,8 @@ class EE2Model(object):
         apps_map = dict()
         apps = services.get_apps(list(apps_to_fetch.values()))
         for app_id, app in apps.items():
-            if app is not None:
-                apps_map[app_id] = app
+            # if app.get is not None:
+            apps_map[app_id] = app
 
         workspace_map = dict()
         workspaces = services.get_workspaces(list(workspace_ids))
@@ -346,11 +368,8 @@ class EE2Model(object):
         # Now join them all together.
         jobs = []
         for raw_job in raw_jobs:
-            try:
-                job = raw_job_to_job(raw_job, apps_map, users_map, workspace_map)
-                jobs.append(job)
-            except Exception as ex:
-                print('Error converting job: ' + str(ex))
+            job = raw_job_to_job(raw_job, apps_map, users_map, workspace_map)
+            jobs.append(job)
 
         return jobs
 
@@ -560,7 +579,6 @@ class EE2Model(object):
             params['ascending'] = ascending
 
         try:
-            print('calling ee2', json.dumps(params))
             if admin:
                 result = api.check_jobs_date_range_for_all(params)
             else:
