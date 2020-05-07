@@ -1,0 +1,1 @@
+python3 ./scripts/fix-impl.py ./lib/JobBrowserBFF/JobBrowserBFFImpl.py
