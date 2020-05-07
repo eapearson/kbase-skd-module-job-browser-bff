@@ -51,8 +51,7 @@ def raw_job_to_state(raw_job):
         return {
             'status': 'run',
             'create_at': raw_job['created'],
-            # TODO: queued time does not exist yet!
-            'queue_at': raw_job['created'],
+            'queue_at': raw_job['queued'],
             'run_at': raw_job['running'],
             'client_group': client_group
         }
@@ -60,8 +59,7 @@ def raw_job_to_state(raw_job):
         return {
             'status': 'complete',
             'create_at': raw_job['created'],
-            # TODO: queued time does not exist yet!
-            'queue_at': raw_job['created'],
+            'queue_at': raw_job['queued'],
             'run_at': raw_job['running'],
             # TODO: finished is not being set in many cases!!
             # TODO: remove this workaround when that is fixed.
@@ -72,10 +70,6 @@ def raw_job_to_state(raw_job):
         state = {
             'status': 'error',
             'create_at': raw_job['created'],
-            # TODO: queued time does not exist yet!
-            # 'queue_at': iso_to_ms(raw_job['created']),
-            # TODO: remove the usage of 'updated' when this is fixed.
-            'finish_at': raw_job.get('finished', raw_job.get('updated', None)),
             'error': {
                 'code': 1,
                 'message': raw_job.get('errormsg', '')
@@ -83,31 +77,34 @@ def raw_job_to_state(raw_job):
             'client_group': client_group
         }
 
-        # TODO: when 'queued' is ready
         if 'queued' in raw_job:
             state['queue_at'] = raw_job['queued']
 
         if 'running' in raw_job:
-            # remove when queued is ready.
-            state['queue_at'] = raw_job['created']
             state['run_at'] = raw_job['running']
+
+        if 'finished' in raw_job:
+            state['finish_at'] = raw_job['finished']
+
         return state
     elif raw_state == 'terminated':
         state = {
             'status': 'terminate',
             'create_at': raw_job['created'],
-            # TODO: queued time does not exist yet!
-            'queue_at': raw_job['created'],
-            # TODO: finished time is mysteriously missing!
-            'finish_at': raw_job['updated'],
             'reason': {
                 'code': 0
             },
             'client_group': client_group
         }
-        # reason omitted because not supported by kb_Metrics
+
+        if 'queued' in raw_job:
+            state['queue_at'] = raw_job['queued']
+
         if 'running' in raw_job:
             state['run_at'] = raw_job['running']
+
+        if 'finished' in raw_job:
+            state['finish_at'] = raw_job['finished']
 
         return state
     else:
