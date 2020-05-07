@@ -24,7 +24,7 @@ class JobBrowserBFF:
     ######################################### noqa
     VERSION = "0.0.1"
     GIT_URL = ""
-    GIT_COMMIT_HASH = "404e492b58bc6de227992c20d4eb074acf40dbb5"
+    GIT_COMMIT_HASH = "c0c362a5e2f84fa9a69608e834e5f7fa858b2283"
 
     # BEGIN_CLASS_HEADER
     # END_CLASS_HEADER
@@ -64,21 +64,26 @@ class JobBrowserBFF:
            boolean indicating whether the request is for a admin usage or not
            Returns: - jobs - list of JobStatus Throws: - 10 - Job not found:
            If the any of the given job ids are not found) -> structure:
-           parameter "job_ids" of list of type "JobID" (Core types),
-           parameter "admin" of type "bool" (Type synonym conveniences)
+           parameter "job_ids" of list of type "JobID" (A job id is a uuid),
+           parameter "admin" of type "bool" (In kb_sdk boolean values are
+           represented as integer 1 and 0)
         :returns: instance of type "GetJobsResult" -> structure: parameter
            "jobs" of list of type "JobInfo" -> structure: parameter "job_id"
-           of type "JobID" (Core types), parameter "owner" of type "User" ->
-           structure: parameter "UserID" of String, parameter "realname" of
-           String, parameter "state" of type "JobState" (Superset of all
-           fields used to represent job state See the TS typing and
-           json-schema) -> structure: parameter "status" of type "JobStatus"
-           (create | queue | run | complete | error | terminate), parameter
-           "create_at" of type "epoch_time", parameter "queue_at" of type
-           "epoch_time", parameter "run_at" of type "epoch_time", parameter
-           "finish_at" of type "epoch_time", parameter "client_group" of type
-           "ClientGroup" (njs, bigmem, bigmemlong, kb_import, ...), parameter
-           "error" of type "JobError" -> structure: parameter "code" of type
+           of type "JobID" (A job id is a uuid), parameter "owner" of type
+           "User" -> structure: parameter "username" of type "username" (A
+           KBase username), parameter "realname" of String, parameter "state"
+           of type "JobState" (Superset of all fields used to represent job
+           state See the TS typing and json-schema) -> structure: parameter
+           "status" of type "JobStatus" (create | queue | run | complete |
+           error | terminate), parameter "create_at" of type "epoch_time"
+           (Time represented as epoch time in milliseconds), parameter
+           "queue_at" of type "epoch_time" (Time represented as epoch time in
+           milliseconds), parameter "run_at" of type "epoch_time" (Time
+           represented as epoch time in milliseconds), parameter "finish_at"
+           of type "epoch_time" (Time represented as epoch time in
+           milliseconds), parameter "client_group" of type "ClientGroup"
+           (njs, bigmem, bigmemlong, kb_import, ...), parameter "error" of
+           type "JobError" -> structure: parameter "code" of type
            "JobErrorCode", parameter "message" of String, parameter
            "service_error" of type "JSONRPC11Error" -> structure: parameter
            "code" of Long, parameter "message" of String, parameter "error"
@@ -88,18 +93,28 @@ class JobBrowserBFF:
            "app" of type "AppInfo" -> structure: parameter "module_name" of
            String, parameter "function_name" of String, parameter "title" of
            String, parameter "client_groups" of list of String, parameter
-           "context" of type "JobContext" -> structure: parameter "type" of
-           type "JobContextType" (narrative, export, workspace, unknown),
-           parameter "workspace" of type "WorkspaceInfo" (represents the
-           context in which the job was spawned. should collapse to
-           narrative, perhaps, when all is said and done, but at the moment
-           there are: narrative, export, workspace, unknown) -> structure:
-           parameter "id" of Long, parameter "is_accessible" of type "bool"
-           (Type synonym conveniences), parameter "name" of String, parameter
-           "is_deleted" of type "bool" (Type synonym conveniences), parameter
-           "narrative" of type "NarrativeInfo" -> structure: parameter
-           "title" of String, parameter "is_temporary" of type "bool" (Type
-           synonym conveniences)
+           "context" of type "JobContext" (The JobContext represents the
+           context in which the Job was run. The `type` field Every job is
+           run with some context. A) -> structure: parameter "type" of type
+           "JobContextType" (narrative, export, workspace, unknown),
+           parameter "workspace" of type "WorkspaceInfo" (Information about
+           the workspace the job is associated with. Most, but not all, jobs
+           are associated with a workspace. Note that only minimal
+           information is exposed here, since this is all the the job browser
+           requires. The design philosopy of this module is minimal support
+           of the associated ui component.) -> structure: parameter "id" of
+           Long, parameter "is_accessible" of type "bool" (In kb_sdk boolean
+           values are represented as integer 1 and 0), parameter "name" of
+           String, parameter "is_deleted" of type "bool" (In kb_sdk boolean
+           values are represented as integer 1 and 0), parameter "narrative"
+           of type "NarrativeInfo" (Information about the narrative with
+           which the job is associated, if the workspace it is associated
+           with is also a Narrative. Note that only minimal information is
+           available at this time, since this is all that is required of a
+           job browser. Future enhancments of a job browser may require
+           additional fields here.) -> structure: parameter "title" of
+           String, parameter "is_temporary" of type "bool" (In kb_sdk boolean
+           values are represented as integer 1 and 0)
         """
         # ctx is the context object
         # return variables are: result
@@ -115,22 +130,15 @@ class JobBrowserBFF:
         }
 
         self.validation.validate_result('get_jobs', result)
+        return result
         # END get_jobs
-
-        # At some point might do deeper type checking...
-        if not isinstance(result, dict):
-            raise ValueError('Method get_jobs ' +
-                             'return value result ' +
-                             'is not type dict as required.')
-        # return the results
-        return [result]
 
     def query_jobs(self, ctx, params):
         """
         :param params: instance of type "QueryJobsParams" (TODO: expand to
            match the filtering, sorting, searching of kb_metrics) ->
-           structure: parameter "jobs" of list of type "JobID" (Core types),
-           parameter "sort" of list of type "SortSpec" -> structure:
+           structure: parameter "jobs" of list of type "JobID" (A job id is a
+           uuid), parameter "sort" of list of type "SortSpec" -> structure:
            parameter "key" of type "SortKey" (behaves as an enum: narrative,
            app, submitted, status), parameter "direction" of type
            "SortDirection" (behaves as an enum: ascending, descending),
@@ -142,24 +150,30 @@ class JobBrowserBFF:
            of list of String, parameter "error_code" of list of Long,
            parameter "terminated_code" of list of Long, parameter "time_span"
            of type "TimeSpanSpec" -> structure: parameter "from" of type
-           "epoch_time", parameter "to" of type "epoch_time", parameter
-           "client_groups" of list of type "ClientGroup" (njs, bigmem,
-           bigmemlong, kb_import, ...), parameter "offset" of Long, parameter
-           "limit" of Long, parameter "admin" of type "bool" (Type synonym
-           conveniences)
+           "epoch_time" (Time represented as epoch time in milliseconds),
+           parameter "to" of type "epoch_time" (Time represented as epoch
+           time in milliseconds), parameter "client_groups" of list of type
+           "ClientGroup" (njs, bigmem, bigmemlong, kb_import, ...), parameter
+           "offset" of Long, parameter "limit" of Long, parameter "admin" of
+           type "bool" (In kb_sdk boolean values are represented as integer 1
+           and 0)
         :returns: instance of type "QueryJobsResult" -> structure: parameter
            "jobs" of list of type "JobInfo" -> structure: parameter "job_id"
-           of type "JobID" (Core types), parameter "owner" of type "User" ->
-           structure: parameter "UserID" of String, parameter "realname" of
-           String, parameter "state" of type "JobState" (Superset of all
-           fields used to represent job state See the TS typing and
-           json-schema) -> structure: parameter "status" of type "JobStatus"
-           (create | queue | run | complete | error | terminate), parameter
-           "create_at" of type "epoch_time", parameter "queue_at" of type
-           "epoch_time", parameter "run_at" of type "epoch_time", parameter
-           "finish_at" of type "epoch_time", parameter "client_group" of type
-           "ClientGroup" (njs, bigmem, bigmemlong, kb_import, ...), parameter
-           "error" of type "JobError" -> structure: parameter "code" of type
+           of type "JobID" (A job id is a uuid), parameter "owner" of type
+           "User" -> structure: parameter "username" of type "username" (A
+           KBase username), parameter "realname" of String, parameter "state"
+           of type "JobState" (Superset of all fields used to represent job
+           state See the TS typing and json-schema) -> structure: parameter
+           "status" of type "JobStatus" (create | queue | run | complete |
+           error | terminate), parameter "create_at" of type "epoch_time"
+           (Time represented as epoch time in milliseconds), parameter
+           "queue_at" of type "epoch_time" (Time represented as epoch time in
+           milliseconds), parameter "run_at" of type "epoch_time" (Time
+           represented as epoch time in milliseconds), parameter "finish_at"
+           of type "epoch_time" (Time represented as epoch time in
+           milliseconds), parameter "client_group" of type "ClientGroup"
+           (njs, bigmem, bigmemlong, kb_import, ...), parameter "error" of
+           type "JobError" -> structure: parameter "code" of type
            "JobErrorCode", parameter "message" of String, parameter
            "service_error" of type "JSONRPC11Error" -> structure: parameter
            "code" of Long, parameter "message" of String, parameter "error"
@@ -169,24 +183,36 @@ class JobBrowserBFF:
            "app" of type "AppInfo" -> structure: parameter "module_name" of
            String, parameter "function_name" of String, parameter "title" of
            String, parameter "client_groups" of list of String, parameter
-           "context" of type "JobContext" -> structure: parameter "type" of
-           type "JobContextType" (narrative, export, workspace, unknown),
-           parameter "workspace" of type "WorkspaceInfo" (represents the
-           context in which the job was spawned. should collapse to
-           narrative, perhaps, when all is said and done, but at the moment
-           there are: narrative, export, workspace, unknown) -> structure:
-           parameter "id" of Long, parameter "is_accessible" of type "bool"
-           (Type synonym conveniences), parameter "name" of String, parameter
-           "is_deleted" of type "bool" (Type synonym conveniences), parameter
-           "narrative" of type "NarrativeInfo" -> structure: parameter
-           "title" of String, parameter "is_temporary" of type "bool" (Type
-           synonym conveniences), parameter "found_count" of Long, parameter
-           "total_count" of Long
+           "context" of type "JobContext" (The JobContext represents the
+           context in which the Job was run. The `type` field Every job is
+           run with some context. A) -> structure: parameter "type" of type
+           "JobContextType" (narrative, export, workspace, unknown),
+           parameter "workspace" of type "WorkspaceInfo" (Information about
+           the workspace the job is associated with. Most, but not all, jobs
+           are associated with a workspace. Note that only minimal
+           information is exposed here, since this is all the the job browser
+           requires. The design philosopy of this module is minimal support
+           of the associated ui component.) -> structure: parameter "id" of
+           Long, parameter "is_accessible" of type "bool" (In kb_sdk boolean
+           values are represented as integer 1 and 0), parameter "name" of
+           String, parameter "is_deleted" of type "bool" (In kb_sdk boolean
+           values are represented as integer 1 and 0), parameter "narrative"
+           of type "NarrativeInfo" (Information about the narrative with
+           which the job is associated, if the workspace it is associated
+           with is also a Narrative. Note that only minimal information is
+           available at this time, since this is all that is required of a
+           job browser. Future enhancments of a job browser may require
+           additional fields here.) -> structure: parameter "title" of
+           String, parameter "is_temporary" of type "bool" (In kb_sdk boolean
+           values are represented as integer 1 and 0), parameter
+           "found_count" of Long, parameter "total_count" of Long
         """
         # ctx is the context object
         # return variables are: result
         # BEGIN query_jobs
+        print('VALIDATING')
         self.validation.validate_params('query_jobs', params)
+        print('...validated')
 
         model = Model(self.config, ctx).get_model(ctx)
         jobs, found_count, total_count = model.query_jobs(params)
@@ -198,25 +224,18 @@ class JobBrowserBFF:
         }
 
         self.validation.validate_result('query_jobs', result)
+        return result
         # END query_jobs
-
-        # At some point might do deeper type checking...
-        if not isinstance(result, dict):
-            raise ValueError('Method query_jobs ' +
-                             'return value result ' +
-                             'is not type dict as required.')
-        # return the results
-        return [result]
 
     def get_job_log(self, ctx, params):
         """
         :param params: instance of type "GetJobLogParams" -> structure:
-           parameter "job_id" of type "JobID" (Core types), parameter
+           parameter "job_id" of type "JobID" (A job id is a uuid), parameter
            "search" of type "SearchSpec" -> structure: parameter "terms" of
            list of String, parameter "level" of list of type "LogLevel"
            (enum-like: default, error), parameter "offset" of Long, parameter
-           "limit" of Long, parameter "admin" of type "bool" (Type synonym
-           conveniences)
+           "limit" of Long, parameter "admin" of type "bool" (In kb_sdk
+           boolean values are represented as integer 1 and 0)
         :returns: instance of type "GetJobLogResult" -> structure: parameter
            "log" of list of type "LogEntry" -> structure: parameter
            "entry_number" of Long, parameter "created" of Long, parameter
@@ -233,15 +252,8 @@ class JobBrowserBFF:
         result = model.get_job_log(params)
 
         self.validation.validate_result('get_job_log', result)
+        return result
         # END get_job_log
-
-        # At some point might do deeper type checking...
-        if not isinstance(result, dict):
-            raise ValueError('Method get_job_log ' +
-                             'return value result ' +
-                             'is not type dict as required.')
-        # return the results
-        return [result]
 
     def cancel_job(self, ctx, params):
         """
@@ -253,11 +265,12 @@ class JobBrowserBFF:
            an error. This behavior may change in the future. At present one
            upstream service (njsw) ignores this condition, but another (ee2)
            returns an error. For ee2 that error is ignored.) -> structure:
-           parameter "job_id" of type "JobID" (Core types), parameter "admin"
-           of type "bool" (Type synonym conveniences), parameter "timeout" of
-           Long
+           parameter "job_id" of type "JobID" (A job id is a uuid), parameter
+           "admin" of type "bool" (In kb_sdk boolean values are represented
+           as integer 1 and 0), parameter "timeout" of Long
         :returns: instance of type "CancelJobResult" -> structure: parameter
-           "canceled" of type "bool" (Type synonym conveniences)
+           "canceled" of type "bool" (In kb_sdk boolean values are
+           represented as integer 1 and 0)
         """
         # ctx is the context object
         # return variables are: result
@@ -270,15 +283,8 @@ class JobBrowserBFF:
         result = model.cancel_job(params)
 
         self.validation.validate_result('cancel_job', result)
+        return result
         # END cancel_job
-
-        # At some point might do deeper type checking...
-        if not isinstance(result, dict):
-            raise ValueError('Method cancel_job ' +
-                             'return value result ' +
-                             'is not type dict as required.')
-        # return the results
-        return [result]
 
     def get_job_types(self, ctx):
         """
@@ -295,15 +301,8 @@ class JobBrowserBFF:
         d = self.definitions.get('job_types')
         result = {'job_types': d}
         self.validation.validate_result('get_job_types', result)
+        return result
         # END get_job_types
-
-        # At some point might do deeper type checking...
-        if not isinstance(result, dict):
-            raise ValueError('Method get_job_types ' +
-                             'return value result ' +
-                             'is not type dict as required.')
-        # return the results
-        return [result]
 
     def get_job_states(self, ctx):
         """
@@ -319,15 +318,8 @@ class JobBrowserBFF:
         d = self.definitions.get('job_states')
         result = {'job_states': d}
         self.validation.validate_result('get_job_states', result)
+        return result
         # END get_job_states
-
-        # At some point might do deeper type checking...
-        if not isinstance(result, dict):
-            raise ValueError('Method get_job_states ' +
-                             'return value result ' +
-                             'is not type dict as required.')
-        # return the results
-        return [result]
 
     def get_client_groups(self, ctx):
         """
@@ -343,15 +335,8 @@ class JobBrowserBFF:
         d = self.definitions.get('client_groups')
         result = {'client_groups': d}
         self.validation.validate_result('get_client_groups', result)
+        return result
         # END get_client_groups
-
-        # At some point might do deeper type checking...
-        if not isinstance(result, dict):
-            raise ValueError('Method get_client_groups ' +
-                             'return value result ' +
-                             'is not type dict as required.')
-        # return the results
-        return [result]
 
     def get_searchable_job_fields(self, ctx):
         """
@@ -367,15 +352,8 @@ class JobBrowserBFF:
         d = self.definitions.get('searchable_job_fields')
         result = {'searchable_job_fields': d}
         self.validation.validate_result('get_searchable_job_fields', result)
+        return result
         # END get_searchable_job_fields
-
-        # At some point might do deeper type checking...
-        if not isinstance(result, dict):
-            raise ValueError('Method get_searchable_job_fields ' +
-                             'return value result ' +
-                             'is not type dict as required.')
-        # return the results
-        return [result]
 
     def get_sort_specs(self, ctx):
         """
@@ -391,15 +369,8 @@ class JobBrowserBFF:
         d = self.definitions.get('sort_specs')
         result = {'sort_specs': d}
         self.validation.validate_result('get_sort_specs', result)
+        return result
         # END get_sort_specs
-
-        # At some point might do deeper type checking...
-        if not isinstance(result, dict):
-            raise ValueError('Method get_sort_specs ' +
-                             'return value result ' +
-                             'is not type dict as required.')
-        # return the results
-        return [result]
 
     def get_log_levels(self, ctx):
         """
@@ -415,21 +386,14 @@ class JobBrowserBFF:
         d = self.definitions.get('log_levels')
         result = {'log_levels': d}
         self.validation.validate_result('get_log_levels', result)
+        return result
         # END get_log_levels
-
-        # At some point might do deeper type checking...
-        if not isinstance(result, dict):
-            raise ValueError('Method get_log_levels ' +
-                             'return value result ' +
-                             'is not type dict as required.')
-        # return the results
-        return [result]
 
     def is_admin(self, ctx):
         """
         :returns: instance of type "IsAdminResult" (********* * is_admin
-           *********) -> structure: parameter "is_admin" of type "bool" (Type
-           synonym conveniences)
+           *********) -> structure: parameter "is_admin" of type "bool" (In
+           kb_sdk boolean values are represented as integer 1 and 0)
         """
         # ctx is the context object
         # return variables are: result
@@ -439,15 +403,8 @@ class JobBrowserBFF:
         is_admin = model.is_admin()
         result = {'is_admin': is_admin}
         self.validation.validate_result('is_admin', result)
+        return result
         # END is_admin
-
-        # At some point might do deeper type checking...
-        if not isinstance(result, dict):
-            raise ValueError('Method is_admin ' +
-                             'return value result ' +
-                             'is not type dict as required.')
-        # return the results
-        return [result]
 
     def status(self, ctx):
         # BEGIN_STATUS
@@ -456,5 +413,6 @@ class JobBrowserBFF:
                      'version': self.VERSION,
                      'git_url': self.GIT_URL,
                      'git_commit_hash': self.GIT_COMMIT_HASH}
+        return returnVal
         # END_STATUS
-        return [returnVal]
+

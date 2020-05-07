@@ -9,9 +9,9 @@ from multiprocessing import Process
 from os import environ
 from wsgiref.simple_server import make_server
 
-from jsonrpcbase import JSONRPCService, InvalidParamsError, KeywordError, \
+from JobBrowserBFF.jsonrpcbase import JSONRPCService, InvalidParamsError, KeywordError, \
     JSONRPCError, InvalidRequestError
-from jsonrpcbase import ServerError as JSONServerError
+from JobBrowserBFF.jsonrpcbase import ServerError as JSONServerError
 
 from biokbase import log
 from JobBrowserBFF.authclient import KBaseAuth as _KBaseAuth
@@ -75,6 +75,7 @@ class JSONRPCServiceCustom(JSONRPCService):
         Arguments:
         jsondata -- remote method call in jsonrpc format
         """
+        print('CALL', jsondata)
         result = self.call_py(ctx, jsondata)
         if result is not None:
             return json.dumps(result, cls=JSONObjectEncoder)
@@ -84,11 +85,11 @@ class JSONRPCServiceCustom(JSONRPCService):
     def _call_method(self, ctx, request):
         """Calls given method with given params and returns it value."""
         method = self.method_data[request['method']]['method']
-        params = request['params']
+        params = request.get('params', None)
         result = None
+        print('HERE')
         try:
             if isinstance(params, list):
-
                 # Does it have enough arguments?
                 if len(params) < self._man_args(method) - 1:
                     raise InvalidParamsError(data={'issue': 'not enough arguments'})
@@ -105,7 +106,7 @@ class JSONRPCServiceCustom(JSONRPCService):
                 if request['jsonrpc'] < 20:
                     raise KeywordError
 
-                result = method(ctx, **params)
+                result = method(ctx, params)
             else:  # No params
                 result = method(ctx)
         except JSONRPCError:
@@ -307,52 +308,40 @@ class Application(object):
         self.rpc_service = JSONRPCServiceCustom()
         self.method_authentication = dict()
         self.rpc_service.add(impl_JobBrowserBFF.get_jobs,
-                             name='JobBrowserBFF.get_jobs',
-                             types=[dict])
+                             name='JobBrowserBFF.get_jobs')
         self.method_authentication['JobBrowserBFF.get_jobs'] = 'required'  # noqa
         self.rpc_service.add(impl_JobBrowserBFF.query_jobs,
-                             name='JobBrowserBFF.query_jobs',
-                             types=[dict])
+                             name='JobBrowserBFF.query_jobs')
         self.method_authentication['JobBrowserBFF.query_jobs'] = 'required'  # noqa
         self.rpc_service.add(impl_JobBrowserBFF.get_job_log,
-                             name='JobBrowserBFF.get_job_log',
-                             types=[dict])
+                             name='JobBrowserBFF.get_job_log')
         self.method_authentication['JobBrowserBFF.get_job_log'] = 'required'  # noqa
         self.rpc_service.add(impl_JobBrowserBFF.cancel_job,
-                             name='JobBrowserBFF.cancel_job',
-                             types=[dict])
+                             name='JobBrowserBFF.cancel_job')
         self.method_authentication['JobBrowserBFF.cancel_job'] = 'required'  # noqa
         self.rpc_service.add(impl_JobBrowserBFF.get_job_types,
-                             name='JobBrowserBFF.get_job_types',
-                             types=[])
+                             name='JobBrowserBFF.get_job_types')
         self.method_authentication['JobBrowserBFF.get_job_types'] = 'required'  # noqa
         self.rpc_service.add(impl_JobBrowserBFF.get_job_states,
-                             name='JobBrowserBFF.get_job_states',
-                             types=[])
+                             name='JobBrowserBFF.get_job_states')
         self.method_authentication['JobBrowserBFF.get_job_states'] = 'required'  # noqa
         self.rpc_service.add(impl_JobBrowserBFF.get_client_groups,
-                             name='JobBrowserBFF.get_client_groups',
-                             types=[])
+                             name='JobBrowserBFF.get_client_groups')
         self.method_authentication['JobBrowserBFF.get_client_groups'] = 'required'  # noqa
         self.rpc_service.add(impl_JobBrowserBFF.get_searchable_job_fields,
-                             name='JobBrowserBFF.get_searchable_job_fields',
-                             types=[])
+                             name='JobBrowserBFF.get_searchable_job_fields')
         self.method_authentication['JobBrowserBFF.get_searchable_job_fields'] = 'required'  # noqa
         self.rpc_service.add(impl_JobBrowserBFF.get_sort_specs,
-                             name='JobBrowserBFF.get_sort_specs',
-                             types=[])
+                             name='JobBrowserBFF.get_sort_specs')
         self.method_authentication['JobBrowserBFF.get_sort_specs'] = 'required'  # noqa
         self.rpc_service.add(impl_JobBrowserBFF.get_log_levels,
-                             name='JobBrowserBFF.get_log_levels',
-                             types=[])
+                             name='JobBrowserBFF.get_log_levels')
         self.method_authentication['JobBrowserBFF.get_log_levels'] = 'required'  # noqa
         self.rpc_service.add(impl_JobBrowserBFF.is_admin,
-                             name='JobBrowserBFF.is_admin',
-                             types=[])
+                             name='JobBrowserBFF.is_admin')
         self.method_authentication['JobBrowserBFF.is_admin'] = 'required'  # noqa
         self.rpc_service.add(impl_JobBrowserBFF.status,
-                             name='JobBrowserBFF.status',
-                             types=[dict])
+                             name='JobBrowserBFF.status')
         authurl = config.get(AUTH) if config else None
         self.auth_client = _KBaseAuth(authurl)
 
