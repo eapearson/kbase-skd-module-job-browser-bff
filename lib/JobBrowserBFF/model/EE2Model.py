@@ -3,7 +3,6 @@ from JobBrowserBFF.model.EE2Api import EE2Api
 from JobBrowserBFF.model.KBaseServices import KBaseServices
 from JobBrowserBFF.Utils import parse_app_id
 import re
-import json
 
 
 def get_param(params, key):
@@ -85,6 +84,8 @@ def raw_job_to_state(raw_job):
 
         if 'finished' in raw_job:
             state['finish_at'] = raw_job['finished']
+        else:
+            raise ValueError('"finished" timestamp required for "error" job')
 
         return state
     elif raw_state == 'terminated':
@@ -105,6 +106,9 @@ def raw_job_to_state(raw_job):
 
         if 'finished' in raw_job:
             state['finish_at'] = raw_job['finished']
+        else:
+            raise ValueError(
+                '"finished" timestamp required for "terminated" job')
 
         return state
     else:
@@ -378,6 +382,16 @@ class EE2Model(object):
                 return True
             else:
                 return False
+        except ServiceError as se:
+            raise se
+
+    def get_client_groups(self):
+        api = EE2Api(url=self.config['ee2-url'], token=self.token, timeout=self.timeout)
+        try:
+            result = api.get_client_groups()
+            return {
+                'client_groups': result
+            }
         except ServiceError as se:
             raise se
         # TODO: is this implemented yet?

@@ -24,7 +24,7 @@ class JobBrowserBFF:
     ######################################### noqa
     VERSION = "0.0.1"
     GIT_URL = ""
-    GIT_COMMIT_HASH = "c0c362a5e2f84fa9a69608e834e5f7fa858b2283"
+    GIT_COMMIT_HASH = "0de05d2b9029adbdcdb546279cb82c09e16daa7f"
 
     # BEGIN_CLASS_HEADER
     # END_CLASS_HEADER
@@ -325,15 +325,14 @@ class JobBrowserBFF:
         """
         :returns: instance of type "GetClientGroupsResult" (********* *
            get_client_groups *********) -> structure: parameter
-           "searchable_job_fields" of list of type "DomainDefinition" ->
-           structure: parameter "code" of String, parameter "description" of
-           String, parameter "notes" of String
+           "client_groups" of list of type "ClientGroup" (njs, bigmem,
+           bigmemlong, kb_import, ...)
         """
         # ctx is the context object
         # return variables are: result
         # BEGIN get_client_groups
-        d = self.definitions.get('client_groups')
-        result = {'client_groups': d}
+        model = Model(self.config, ctx).get_model(ctx)
+        result = model.get_client_groups()
         self.validation.validate_result('get_client_groups', result)
         return result
         # END get_client_groups

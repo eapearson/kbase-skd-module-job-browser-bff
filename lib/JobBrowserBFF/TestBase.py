@@ -1,8 +1,6 @@
 # -*- coding: utf-8 -*-
 import os
-import time
 import unittest
-import json
 from configparser import ConfigParser
 import traceback
 import io
@@ -10,8 +8,6 @@ from JobBrowserBFF.JobBrowserBFFImpl import JobBrowserBFF
 from JobBrowserBFF.JobBrowserBFF_JSONRPCServer import MethodContext
 from JobBrowserBFF.authclient import KBaseAuth as _KBaseAuth
 from biokbase.Errors import ServiceError
-
-from installed_clients.WorkspaceClient import Workspace
 
 
 class TestBase(unittest.TestCase):

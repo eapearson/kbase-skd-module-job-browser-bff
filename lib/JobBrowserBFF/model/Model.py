@@ -1,4 +1,3 @@
-from JobBrowserBFF.model.KBMetricsModel import KBMetricsModel
 from JobBrowserBFF.model.EE2Model import EE2Model
 from JobBrowserBFF.model.MockModel import MockModel
 
@@ -10,18 +9,7 @@ class Model(object):
         self.timeout = timeout or config['default-timeout']
 
     def get_model(self, context):
-        if self.config.get('upstream-service', None) == 'metrics':
-            return KBMetricsModel(
-                config=self.config,
-                token=self.context['token'],
-                timeout=self.timeout,
-                modules={
-                    'kb_Metrics': {
-                        'tag': 'dev'
-                    }
-                },
-                username=self.context['user_id'])
-        elif self.config.get('upstream-service', None) == 'ee2':
+        if self.config.get('upstream-service', None) == 'ee2':
             return EE2Model(
                 config=self.config,
                 token=self.context['token'],

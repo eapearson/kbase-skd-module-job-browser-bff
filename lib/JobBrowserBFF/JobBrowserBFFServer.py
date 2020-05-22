@@ -475,6 +475,12 @@ class Application(object):
                     rpc_result = self.process_error(err, ctx, req,
                                                     traceback.format_exc())
 
+        # print('Request method was %s\n' % environ['REQUEST_METHOD'])
+        # print('Environment dictionary is:\n%s\n' % pprint.pformat(environ))
+        # print('Request body was: %s' % request_body)
+        # print('Result from the method call is:\n%s\n' % \
+        #    pprint.pformat(rpc_result))
+
         if rpc_result:
             response_body = rpc_result
         else:

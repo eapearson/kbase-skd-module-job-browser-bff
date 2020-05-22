@@ -115,6 +115,19 @@ class EE2Api(object):
                     'original_message': str(err)
                 })
 
+    def get_client_groups(self):
+        try:
+            return self.rpc.call_func('get_client_groups')
+        except ServiceError:
+            raise
+        except Exception as err:
+            raise ServiceError(
+                code=1,
+                message='Unknown error',
+                data={
+                    'original_message': str(err)
+                })
+
     def get_job_logs(self, params):
         try:
             return self.rpc.call_func('get_job_logs', params)

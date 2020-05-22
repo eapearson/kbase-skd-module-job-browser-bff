@@ -315,7 +315,7 @@ module JobBrowserBFF {
      * get_client_groups
      **********/
      typedef structure {
-        list<DomainDefinition> searchable_job_fields;
+        list<ClientGroup> client_groups;
     } GetClientGroupsResult;
 
      funcdef get_client_groups() returns (GetClientGroupsResult result) authentication required;

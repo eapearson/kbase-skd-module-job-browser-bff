@@ -13,34 +13,7 @@
             "title": "The Client_groups Schema",
             "items": {
                 "$id": "#/properties/client_groups/items",
-                "type": "object",
-                "title": "The Items Schema",
-                "required": [
-                    "code",
-                    "description"
-                ],
-                "properties": {
-                    "code": {
-                        "$id": "#/properties/client_groups/items/properties/code",
-                        "type": "string",
-                        "title": "The Code Schema",
-                        "default": "",
-                        "examples": [
-                            "njs"
-                        ],
-                        "pattern": "^(.*)$"
-                    },
-                    "description": {
-                        "$id": "#/properties/client_groups/items/properties/description",
-                        "type": "string",
-                        "title": "The Description Schema",
-                        "default": "",
-                        "examples": [
-                            "Narrative Job Service"
-                        ],
-                        "pattern": "^(.*)$"
-                    }
-                }
+                "type": "string"
             }
         }
     }

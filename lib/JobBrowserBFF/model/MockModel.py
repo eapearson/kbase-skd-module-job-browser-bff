@@ -1,12 +1,7 @@
-from biokbase.DynamicServiceClient import DynamicServiceClient
 from biokbase.GenericClient import GenericClient
 from biokbase.Errors import ServiceError
 from JobBrowserBFF.model.KBaseServices import KBaseServices
-from JobBrowserBFF.Utils import ms_to_iso, iso_to_ms, parse_app_id
 import requests
-import re
-import glob
-import os
 import json
 import pymongo
 import urllib.parse
@@ -48,7 +43,6 @@ class MockModel(object):
     # TODO: need to be able to stuff tokens into the mock db, since we may need
     # to use real tokens in order to do stuff like call to the CI workspace
     def is_admin(self):
-        token = self.token
         if self.token == 'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA':
             return True
         elif self.token == 'BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB':

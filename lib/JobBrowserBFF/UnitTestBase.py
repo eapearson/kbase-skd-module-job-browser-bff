@@ -1,23 +1,18 @@
 # -*- coding: utf-8 -*-
 import os
-import time
 import unittest
-import json
 from configparser import ConfigParser
-import traceback
 import io
 from JobBrowserBFF.JobBrowserBFFImpl import JobBrowserBFF
 from JobBrowserBFF.JobBrowserBFF_JSONRPCServer import MethodContext
 from JobBrowserBFF.authclient import KBaseAuth as _KBaseAuth
-
-from installed_clients.WorkspaceClient import Workspace
 
 
 class UnitTestBase(unittest.TestCase):
 
     @classmethod
     def loadConfig(cls):
-        # The standard deployment configuration 
+        # The standard deployment configuration
         cls.cfg = {}
         config = ConfigParser()
         config.read(cls.config_file)
@@ -75,7 +70,7 @@ class UnitTestBase(unittest.TestCase):
         # it'll result in a NoneType error
         cls.serviceImpl = JobBrowserBFF(cls.cfg)
         cls.scratch = cls.cfg['scratch']
-       
+
     def getImpl(self):
         return self.__class__.serviceImpl
 

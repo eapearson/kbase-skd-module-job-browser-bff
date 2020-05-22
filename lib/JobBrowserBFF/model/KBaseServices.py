@@ -97,7 +97,8 @@ class KBaseServices(object):
         workspaces_map = dict()
         for info in workspaces:
             workspaces_map[info[0]] = info
-            # [id, name, owner, moddate, max_objid, user_permission, globalread, lockstat, metadata] = info
+            # [id, name, owner, moddate, max_objid, user_permission,
+            # globalread, lockstat, metadata] = info
             # workspaces_map[str(id)] = {
             #     'id': id,
             #     'name': name,
