@@ -3,19 +3,22 @@ from JobBrowserBFF.TestBase import TestBase
 from biokbase.Errors import ServiceError
 import unittest
 
-UPSTREAM_SERVICE = 'metrics'
+UPSTREAM_SERVICE = 'ee2'
+JOB_ID_HAPPY = '5e8285adefac56a4b4bc2b14'
+JOB_ID_NOT_CANCELABLE = '5e8285adefac56a4b4bc2b14'
+JOB_ID_NOT_FOUND = '5e8285adefac56a4b4bc2b13'
+TIMEOUT = 10000
 ENV = 'ci'
 USER_CLASS = 'user'
-JOB_ID_HAPPY = '5b7b8287e4b0d417818a2f97'
-JOB_ID_NOT_CANCELABLE = '5b7b8287e4b0d417818a2f97'
-JOB_ID_NOT_FOUND = '5b7b8287e4b0d417818a2f96'
-TIMEOUT_MS = 10000
 
 
 class JobBrowserBFFTest(TestBase):
     # This test is tricky at present, because one has to have an active job to cancel!
     # That is, until we get some sort of mocking here.
     # Uncomment to skip this test
+    # Uncommented because it relies on a cancellable job, which needs to be manually
+    # arranged.
+    # TODO: launch a job, then cancel
     @unittest.skip("skipped test_cancel_job_happy")
     def test_cancel_job_happy(self):
         self.set_config('upstream-service', UPSTREAM_SERVICE)
@@ -23,12 +26,12 @@ class JobBrowserBFFTest(TestBase):
             impl, context = self.impl_for(ENV, USER_CLASS)
             ret = impl.cancel_job(context, {
                 'job_id': JOB_ID_HAPPY,
-                'timeout': TIMEOUT_MS
+                'timeout': TIMEOUT
             })
             result = ret[0]
             self.assertIsInstance(result, dict)
-            # ensure it is empty (a form of void)
-            self.assertFalse(result)
+            self.assertIn('canceled', result)
+            self.assertEqual(result['canceled'], False)
         except Exception as ex:
             self.assert_no_exception(ex)
 
@@ -41,14 +44,15 @@ class JobBrowserBFFTest(TestBase):
         self.set_config('upstream-service', UPSTREAM_SERVICE)
         try:
             impl, context = self.impl_for(ENV, USER_CLASS)
-            ret = impl.cancel_job(context, {
+            result = impl.cancel_job(context, {
                 'job_id': JOB_ID_NOT_CANCELABLE,
-                'timeout': TIMEOUT_MS
+                'timeout': TIMEOUT
             })
-            result = ret[0]
             self.assertIsInstance(result, dict)
-            # ensure it is empty (a form of void)
-            self.assertFalse(result)
+            self.assertIn('canceled', result)
+            # ee2 upstream does not distinguish between a job which is cancelable
+            # and successfully canceled, and a job which is not cancelable.
+            self.assertEqual(result['canceled'], True)
         except Exception as ex:
             self.assert_no_exception(ex)
 
@@ -63,7 +67,7 @@ class JobBrowserBFFTest(TestBase):
             impl, context = self.impl_for(ENV, USER_CLASS)
             impl.cancel_job(context, {
                 'job_id': JOB_ID_NOT_FOUND,
-                'timeout': TIMEOUT_MS
+                'timeout': TIMEOUT
             })
         except ServiceError as se:
             # This is "job not found", the error which should be returned

@@ -337,7 +337,7 @@ class EE2Model(object):
             if 'job_input' in raw_job:
                 job_input = raw_job['job_input']
                 if 'app_id' in job_input:
-                    app = parse_app_id(job_input.get('app_id'), job_input['method'])
+                    app = parse_app_id(job_input.get('app_id'), job_input.get('method'))
                     # note we save the parsed app id as 'app'
                     raw_job['app'] = app
                     if app is not None:
@@ -376,25 +376,18 @@ class EE2Model(object):
 
     def is_admin(self):
         api = EE2Api(url=self.config['ee2-url'], token=self.token, timeout=self.timeout)
-        try:
-            result = api.is_admin()
-            if result == 1:
-                return True
-            else:
-                return False
-        except ServiceError as se:
-            raise se
+        result = api.is_admin()
+        if result == 1:
+            return True
+        else:
+            return False
 
     def get_client_groups(self):
         api = EE2Api(url=self.config['ee2-url'], token=self.token, timeout=self.timeout)
-        try:
-            result = api.get_client_groups()
-            return {
-                'client_groups': result
-            }
-        except ServiceError as se:
-            raise se
-        # TODO: is this implemented yet?
+        result = api.get_client_groups()
+        return {
+            'client_groups': result
+        }
 
     def get_job_log(self, params):
         job_id = get_param(params, 'job_id')

@@ -16,7 +16,12 @@ class SchemaError(Exception):
 
 class Schema(object):
     def __init__(self, schema_dir=DEFAULT_SCHEMA_DIR, load_schemas=False):
-        self.schema_dir = os.path.abspath(os.path.dirname(__file__) + '/' + schema_dir)
+        try:
+            self.schema_dir = os.path.abspath(os.path.dirname(__file__) + '/' + schema_dir)
+        except Exception as e:
+            print('SCHEMA ERROR')
+            print(e)
+            raise e
 
         self.resolver = RefResolver('file://{}/'.format(self.schema_dir), None)
 

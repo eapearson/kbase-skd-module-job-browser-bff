@@ -18,9 +18,7 @@ JOB_ID_WITH_LOGS = JOB_ID_BATCH_CHILD
 
 class JobBrowserBFFTest(TestBase):
 
-    def assert_job_log_result(self, ret):
-        self.assertIsInstance(ret, list)
-        result = ret[0]
+    def assert_job_log_result(self, result):
         self.assertIsInstance(result, dict)
         self.assertIn('log', result)
         job_log = result.get('log')

@@ -49,7 +49,6 @@ class JobBrowserBFF:
         # END_CONSTRUCTOR
         pass
 
-
     def get_jobs(self, ctx, params):
         """
         :param params: instance of type "GetJobsParams" (get_jobs Given a set
@@ -210,19 +209,14 @@ class JobBrowserBFF:
         # ctx is the context object
         # return variables are: result
         # BEGIN query_jobs
-        print('VALIDATING')
         self.validation.validate_params('query_jobs', params)
-        print('...validated')
-
         model = Model(self.config, ctx).get_model(ctx)
         jobs, found_count, total_count = model.query_jobs(params)
-
         result = {
             'jobs': jobs,
             'found_count': found_count,
             'total_count': total_count
         }
-
         self.validation.validate_result('query_jobs', result)
         return result
         # END query_jobs
@@ -276,12 +270,8 @@ class JobBrowserBFF:
         # return variables are: result
         # BEGIN cancel_job
         self.validation.validate_params('cancel_job', params)
-
         model = Model(config=self.config, context=ctx, timeout=params['timeout']).get_model(ctx)
-
-        # Note no return value; or rather a bare null to emulate void.
         result = model.cancel_job(params)
-
         self.validation.validate_result('cancel_job', result)
         return result
         # END cancel_job
@@ -414,4 +404,3 @@ class JobBrowserBFF:
                      'git_commit_hash': self.GIT_COMMIT_HASH}
         return returnVal
         # END_STATUS
-

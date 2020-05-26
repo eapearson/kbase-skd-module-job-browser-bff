@@ -25,6 +25,9 @@
         "timeout": {
             "type": "integer",
             "minimum": 0
+        },
+        "code": {
+            "$ref": "base.json#termination_reason"
         }
     }
 }

@@ -14,10 +14,8 @@ class JobBrowserBFFTest(TestBase):
             self.set_config('upstream-service', UPSTREAM_SERVICE)
             impl, context = self.impl_for(ENV, USER_CLASS)
 
-            ret = impl.is_admin(context)
+            result = impl.is_admin(context)
 
-            self.assertIsInstance(ret, list)
-            result = ret[0]
             self.assertIsInstance(result, dict)
             self.assertIn('is_admin', result)
             is_admin = result.get('is_admin')
@@ -34,10 +32,8 @@ class JobBrowserBFFTest(TestBase):
 
             impl, context = self.impl_for(ENV, 'user')
 
-            ret = impl.is_admin(context)
+            result = impl.is_admin(context)
 
-            self.assertIsInstance(ret, list)
-            result = ret[0]
             self.assertIsInstance(result, dict)
             self.assertIn('is_admin', result)
             is_admin = result.get('is_admin')

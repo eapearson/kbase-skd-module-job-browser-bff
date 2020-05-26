@@ -266,12 +266,25 @@ module JobBrowserBFF {
 
       Params:
       - job_id: The id for the job to cancel
+      - timeout: A request timeout, in milliseconds, applied to all upstream 
+            network api requests.
+      - code: Optional termination reason code; defaults to 1 for admin, 
+            0 otherwise. Valid codes are:
+            0 - user cancellation
+            1 - admin cancellation
+            2 - terminated by some automatic process
+
+      - admin: Optional flag indicating whether the request should provide
+      admin powers; defaulcts to false. Note that the authorization for
+      this method call must have admin privs.
      
       Returns:
       - nothing.
      
       Throws:
       - 10 - Job not found: If the given job id was not found 
+      - 20 - Job could not be canceled because it is not active 
+      - 21 - Job could not be canceled due to insufficient privileges
      
       Note that attempting to cancel a job which is not cancelable will not throw an error.
       This behavior may change in the future.
@@ -284,6 +297,7 @@ module JobBrowserBFF {
          JobID job_id;
          bool admin;
          int timeout;
+         JobTerminationCode code;
      } CancelJobParams;
 
      typedef structure {

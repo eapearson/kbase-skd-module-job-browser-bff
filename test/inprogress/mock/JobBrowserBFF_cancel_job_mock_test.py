@@ -4,13 +4,15 @@ from biokbase.Errors import ServiceError
 import unittest
 
 UPSTREAM_SERVICE = 'mock'
-ENV='mock'
-USER_CLASS='user'
+ENV = 'mock'
+USER_CLASS = 'user'
 JOB_ID_HAPPY = '5b7b8287e4b0d417818a2f97'
-JOB_ID_NOT_CANCELABLE ='59820c93e4b06f68bf751eeb' # complete, not cancelable
-JOB_ID_NOT_FOUND = '5cf1522aaa5a4d298c5dc2fe' # does not exist at all
-JOB_ID_OTHER_USER_NOT_OWNER = '57f2dccfe4b0b05cf8996c43' # owned by eaptest34 user other than 'user' and 'admin'
+JOB_ID_NOT_CANCELABLE = '59820c93e4b06f68bf751eeb'  # complete, not cancelable
+JOB_ID_NOT_FOUND = '5cf1522aaa5a4d298c5dc2fe'  # does not exist at all
+# owned by eaptest34 user other than 'user' and 'admin'
+JOB_ID_OTHER_USER_NOT_OWNER = '57f2dccfe4b0b05cf8996c43'
 TIMEOUT = 10000
+
 
 class JobBrowserBFFTest(TestBase):
     # This test is tricky at present, because one has to have an active job to cancel!
@@ -73,13 +75,17 @@ class JobBrowserBFFTest(TestBase):
         except ServiceError as se:
             # This is "job not found", the error which should be returned
             # in this case.
-            self.assertEqual(se.code, 10, 'Service Error should return code "10" - for Job not found; got {} - {}'.format(se.code, se.message))
+            self.assertEqual(
+                se.code, 10,
+                f'''Service Error should return code "10" - for Job not found; \
+                got {se.code} - {se.message}\
+                ''')
         except Exception as ex:
             self.assert_no_exception(ex)
-       
 
     # Uncomment to skip this test
     # @unittest.skip("skipped test_cancel_job_not_found_sad")
+
     def test_cancel_access_denied_sad(self):
         # I know, it is supposed to work to use assertRaises with a context object,
         # but it isn't working. Maybe the unittest version is too old, or we need to
@@ -94,7 +100,10 @@ class JobBrowserBFFTest(TestBase):
         except ServiceError as se:
             # This is "job not found", the error which should be returned
             # in this case.
-            self.assertEqual(se.code, 40, 'Service Error should return code "10" - for Job not found; got {} - {}'.format(se.code, se.message))
+            self.assertEqual(
+                se.code, 40,
+                f'''Service Error should return code "10" - for Job not found;\
+                 got {se.code} - {se.message}\
+                ''')
         except Exception as ex:
             self.assert_no_exception(ex)
-       

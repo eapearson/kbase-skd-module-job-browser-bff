@@ -1,0 +1,21 @@
+[run]
+source = lib
+branch = True
+omit =
+    lib/JobBrowserBFF/JobBrowserBFF_JSONRPCServer.py
+    lib/JobBrowserBFF/JobBrowserBFFServer.py
+    lib/JobBrowserBFF/model/MockModel.py
+    lib/JobBrowserBFF/jsonrpcbase.py
+    test/* 
+    */__init__.py
+    lib/biokbase/log.py
+    lib/JobBrowserBFF/authclient.py
+
+[html]
+directory = work/test_coverage
+
+[xml]
+output = work/test_coverage_xml
+
+[json]
+output = work/test_coverage_json

@@ -64,12 +64,14 @@ build-test-script:
 	@echo 'rm -rf $(WORK_DIR)/*' >> $(TEST_DIR)/$(TEST_SCRIPT_NAME)
 	@echo 'echo "...done removing temp files."' >> $(TEST_DIR)/$(TEST_SCRIPT_NAME)
 	@echo 'export PYTHONPATH=$$script_dir/../$(LIB_DIR):$$PATH:$$PYTHONPATH' >> $(TEST_DIR)/$(TEST_SCRIPT_NAME)
-	@echo 'cd $$script_dir/../$(TEST_DIR)/enabled' >> $(TEST_DIR)/$(TEST_SCRIPT_NAME)
+	# @echo 'cd $$script_dir/../$(TEST_DIR)/enabled' >> $(TEST_DIR)/$(TEST_SCRIPT_NAME)
 	@echo 'echo "Starting mock servers..."' >> $(TEST_DIR)/$(TEST_SCRIPT_NAME)
 	@echo 'python3 -m MockServers.run_server --port 5001 --host "localhost" &' >> $(TEST_DIR)/$(TEST_SCRIPT_NAME)
 	@echo 'echo "...done"' >> $(TEST_DIR)/$(TEST_SCRIPT_NAME)
 	@echo 'echo "Running tests..."' >> $(TEST_DIR)/$(TEST_SCRIPT_NAME)
-	@echo 'python3 -m nose --with-coverage --cover-package=$(SERVICE_CAPS) --cover-package=biokbase --cover-html --cover-html-dir=/kb/module/work/test_coverage --nocapture  --nologcapture .' >> $(TEST_DIR)/$(TEST_SCRIPT_NAME)
+	@echo 'nose2 -s test/enabled -t lib --with-coverage --coverage-report term --coverage-report html' >> $(TEST_DIR)/$(TEST_SCRIPT_NAME)
+	# @echo 'nose2 -s test/enabled -t lib' >> $(TEST_DIR)/$(TEST_SCRIPT_NAME)
+	#	@echo 'python3 -m nose --with-coverage --cover-package=$(SERVICE_CAPS) --cover-package=biokbase --cover-html --cover-html-dir=/kb/module/work/test_coverage --nocapture  --nologcapture .' >> $(TEST_DIR)/$(TEST_SCRIPT_NAME)
 	@chmod +x $(TEST_DIR)/$(TEST_SCRIPT_NAME)
 
 test:
@@ -91,6 +93,10 @@ dev-image:
 run-dev-image:
 	@echo "> Running the already-built docker image"
 	@bash local-scripts/run-docker-image-dev.sh
+
+run-dev-image-test:
+	@echo "> Running the already-built docker image for testing"
+	@bash local-scripts/run-docker-image-dev-test.sh
 
 run-dev-mongo:
 	@echo "> Running local mongo container for testing/development"
