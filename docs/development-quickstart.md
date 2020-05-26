@@ -45,20 +45,26 @@ SDK modules tend to operate off of a single master branch. You may have occasion
 
 - make sure you are in a terminal and in the `project` directory
 - clone your fork of the repo:  
+
     ```bash
     git clone https://github.com/mmouse/kbase-sdk-module-job-browser-bff
     ```
+
     > An alterative, and the method I use for my forks, is to use an ssh url which will use an ssl certificate registered in your github account, and avoid the need to log in to github to push up commits:
-    ```
+
+    ```bash
     git clone ssh://git@github.com/mmouse/kbase-sdk-module-job-browser-bff
     ```
+
 - you'll notice that there is now a directory within `projects` named `kbase-sdk-module-job-browser-bff`.
-- set up the upstream url 
-    - It is useful, but not necessary to also set up a connection to the upstream repo. If you are working on the repo concurrently with another developer, it is highly advisable to do this; if you are working alone, it is not necessary.
-    - `cd kbase-sdk-module-job-browser-bff`
-    - `git remote add upstream https://github.com/kbaseapps/kbase-sdk-module-job-browser-bff`
-    - `git remote set-url --push upstream nopush`
-      - This prevents accidental pushes to the upstream repo.
+- set up the upstream url
+
+  - It is useful, but not necessary to also set up a connection to the upstream repo. If you are working on the repo concurrently with another developer, it is highly advisable to do this; if you are working alone, it is not necessary.
+  - `cd kbase-sdk-module-job-browser-bff`
+  - `git remote add upstream https://github.com/kbaseapps/kbase-sdk-module-job-browser-bff`
+  - `git remote set-url --push upstream nopush`
+  
+    - This prevents accidental pushes to the upstream repo.
 
 ### Clone and build KBase's SDK
 

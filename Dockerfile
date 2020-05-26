@@ -31,18 +31,20 @@ RUN apk upgrade --update-cache --available && \
     apk add --update --no-cache bash g++ git libffi-dev linux-headers make openssl-dev python3 python3-dev py3-setuptools
 
 # install python dependencies for the service runtime.
-RUN pip3 install \
+RUN pip3 install --upgrade pip && \
+    pip3 install \
     cffi==1.14.0 \
-    coverage==5.0.4 \
-    jinja2==2.11.1 \
+    coverage==5.1.0 \
+    jinja2==2.11.2 \
     jsonrpcbase==0.2.0 \
     ndg-httpsclient==0.5.1 \
-    nose==1.3.7 \
+    nose2==0.9.2 \
+    nose2-cov==1.0a4 \
     python-dateutil==2.8.1 \
-    pytz==2019.3 \
+    pytz==2020.1 \
     requests==2.23.0 \
     uwsgi==2.0.18 \
-    toml==0.10.0 \
+    toml==0.10.1 \
     jsonschema==3.2.0 \
     pymongo==3.10.1 \
     pyyaml==5.3.1

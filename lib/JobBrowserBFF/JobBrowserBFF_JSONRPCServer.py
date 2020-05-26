@@ -25,8 +25,6 @@ DEPLOY = 'KB_DEPLOYMENT_CONFIG'
 SERVICE = 'KB_SERVICE_NAME'
 AUTH = 'auth-service-url'
 
-# Note that the error fields do not match the 2.0 JSONRPC spec
-
 
 def get_config_file():
     return environ.get(DEPLOY, None)
@@ -75,7 +73,6 @@ class JSONRPCServiceCustom(JSONRPCService):
         Arguments:
         jsondata -- remote method call in jsonrpc format
         """
-        print('CALL', jsondata)
         result = self.call_py(ctx, jsondata)
         if result is not None:
             return json.dumps(result, cls=JSONObjectEncoder)
@@ -87,7 +84,6 @@ class JSONRPCServiceCustom(JSONRPCService):
         method = self.method_data[request['method']]['method']
         params = request.get('params', None)
         result = None
-        print('HERE')
         try:
             if isinstance(params, list):
                 # Does it have enough arguments?

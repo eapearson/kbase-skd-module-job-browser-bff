@@ -166,10 +166,7 @@ class TestBase(unittest.TestCase):
         result = self.is_in_descending_order(items, keys)
         self.assertTrue(result, 'Expected to be in descending order, is not')
 
-    def assert_job_result_with_count(self, return_value):
-        self.assertIsInstance(return_value, list)
-        self.assertGreaterEqual(len(return_value), 1)
-        result = return_value[0]
+    def assert_job_result_with_count(self, result):
         self.assertIsInstance(result, dict)
         self.assertIsInstance(result, dict)
         self.assertIn('jobs', result)
@@ -179,10 +176,7 @@ class TestBase(unittest.TestCase):
         total_count = result['total_count']
         return jobs, total_count
 
-    def assert_job_query_result_with_count(self, return_value):
-        self.assertIsInstance(return_value, list)
-        self.assertGreaterEqual(len(return_value), 1)
-        result = return_value[0]
+    def assert_job_query_result_with_count(self, result):
         self.assertIsInstance(result, dict)
         self.assertIsInstance(result, dict)
         self.assertIn('jobs', result)
@@ -194,10 +188,7 @@ class TestBase(unittest.TestCase):
         total_count = result['total_count']
         return jobs, found_count, total_count
 
-    def assert_job_result(self, return_value):
-        self.assertIsInstance(return_value, list)
-        self.assertGreaterEqual(len(return_value), 1)
-        result = return_value[0]
+    def assert_job_result(self, result):
         self.assertIsInstance(result, dict)
         self.assertIsInstance(result, dict)
         self.assertIn('jobs', result)
@@ -223,13 +214,15 @@ class TestBase(unittest.TestCase):
             if error_type == ServiceError:
                 self.assertTrue(
                     False,
-                    ('Did not expect an exception :'
+                    ('Did not expect a ServiceError exception :'
                      ' ServiceError: {} - {} '.format(ex.code, ex.message)))
             else:
                 self.assertTrue(False, 'Did not expect an exception {}:{} '.format(
                     ex.__class__.__name__, ex.message))
         else:
-            self.assertTrue(False, 'Did not expect an exception (no message): {}'.format(type(ex)))
+            # self.assertTrue(False, 'Did not expect an exception (no message): {}'.format(type(ex)))
+            self.assertTrue(False, 'Did not expect an exception {}:{} '.format(
+                ex.__class__.__name__, str(ex)))
 
     # Just temporary, to bootstrap this thing.
     def new_mock_context(self, token):
@@ -266,13 +259,13 @@ class TestBase(unittest.TestCase):
         A convenience method for creating an implementation class instance and context
         based on the kbase deployment environment tag (env) and user type (user_type).
 
-        The env tag may be ci, next, prod, narrative-dev, and is used to select the 
+        The env tag may be ci, next, prod, narrative-dev, and is used to select the
         test token from the test config file (test_local/test.cfg).
 
-        The user_type is either "admin" or "user"; since many methods take the admin flag, 
+        The user_type is either "admin" or "user"; since many methods take the admin flag,
         and admin usage requires an admin token (an admin for the ee2 service).
 
-        Note that the environment "mock" is not a KBase environment, rather it indicates 
+        Note that the environment "mock" is not a KBase environment, rather it indicates
         that the special mock testing config should be used. The mock environment
         provides all required backend services that this service depends upon.
         """

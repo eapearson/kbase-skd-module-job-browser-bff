@@ -389,7 +389,16 @@ class MockModel(object):
             'total_count': total_count
         }
 
-    def cancel_job(self, job_id):
+    def cancel_job(self, params):
+        admin = params.get('admin', False)
+        if admin:
+            as_admin = 1
+            terminated_code = params.get('code', 1)
+        else:
+            as_admin = 0
+            terminated_code = params.get('code', 0)
+
+        job_id = params['job_id']
         job = self.get_job(job_id)
 
         if job['state']['status'] not in ['create', 'queue', 'run']:

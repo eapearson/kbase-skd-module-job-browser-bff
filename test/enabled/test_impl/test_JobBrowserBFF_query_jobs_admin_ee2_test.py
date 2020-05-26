@@ -25,7 +25,7 @@ class JobBrowserBFFTest(TestBase):
                 'offset': 0,
                 'limit': 5,
                 'timeout': TIMEOUT,
-                'admin': 1
+                'admin': True
             })
             jobs, found_count, total_count = self.assert_job_query_result_with_count(ret)
             self.assertEqual(found_count, 36)
@@ -55,7 +55,7 @@ class JobBrowserBFFTest(TestBase):
                 'offset': 0,
                 'limit': 5,
                 'timeout': TIMEOUT,
-                'admin': 1
+                'admin': True
             })
             jobs, found_count, total_count = self.assert_job_query_result_with_count(ret)
             # self.assertEqual(total_count, 19)
@@ -84,7 +84,7 @@ class JobBrowserBFFTest(TestBase):
                 'offset': 0,
                 'limit': 5,
                 'timeout': TIMEOUT,
-                'admin': 1
+                'admin': True
             })
             jobs, found_count, total_count = self.assert_job_query_result_with_count(ret)
             # self.assertEqual(total_count, 19)

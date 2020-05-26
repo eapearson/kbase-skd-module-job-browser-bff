@@ -2,6 +2,7 @@ import os
 import subprocess
 import glob
 
+
 def import_log():
     data_dir = "/Users/erikpearson/work/kbase/sprints/2019/q3/s4/kbase-sdk-module-job-browser-bff/lib/JobBrowserBFF/model/mockData/logs"
     # filename = "job_log_56a0f9d8e4b00c7404a23aee.json"
@@ -23,5 +24,6 @@ def import_log():
 
     if result.returncode:
         print('OOPS', result.stdout, result.stderr)
-    
+
+
 import_log()

@@ -136,7 +136,7 @@ docker run -it \
   -e "AUTH_SERVICE_URL=https://${ENV}.kbase.us/services/auth/api/legacy/KBase/Sessions/Login" \
   -e "AUTH_SERVICE_URL_ALLOW_INSECURE=true" \
   -p 5000:5000 \
-  --mount type=bind,src=${root}/deploy_local/work_dir,dst=${container_root}/work \
+  --mount type=bind,src=${root}/test_local,dst=${container_root}/work \
   --mount type=bind,src=${root}/${source_dir},dst=${container_root}/${source_dir} \
   --mount type=bind,src=${root}/${test_dir},dst=${container_root}/${test_dir} \
   --rm test/job-browser-bff:dev 

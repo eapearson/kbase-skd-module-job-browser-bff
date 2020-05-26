@@ -1,20 +1,20 @@
 # -*- coding: utf-8 -*-
 from JobBrowserBFF.Validation import Validation
-from JobBrowserBFF.UnitTestBase import UnitTestBase
+from JobBrowserBFF.TestBase import TestBase
 import unittest
 import os
 import json
 
 
-class JobBrowserBFFTest(unittest.TestCase):
+class ValidationTests(TestBase):
     def load_data_file(self, method_name, outcome_type, data_type, file_name):
-        data_path = os.path.join(os.path.dirname(__file__), '..', 'data',
+        data_path = os.path.join(os.path.dirname(__file__), '..', '..', 'data',
                                  'methods', method_name, outcome_type, data_type, file_name)
         with open(data_path) as fin:
             return json.load(fin)
 
     def get_data_files(self, method_name, outcome_type, data_type):
-        dir_path = os.path.join(os.path.dirname(__file__), '..', 'data',
+        dir_path = os.path.join(os.path.dirname(__file__), '..', '..', 'data',
                                 'methods', method_name, outcome_type, data_type)
         dirs = []
         for file_name in os.listdir(dir_path):
@@ -50,7 +50,6 @@ class JobBrowserBFFTest(unittest.TestCase):
                 'cancel_job', 'get_client_groups',
                 'get_job_states', 'get_job_types', 'get_log_levels',
                 'get_searchable_job_fields'
-
             ]
             for method_name in method_names:
                 sample_files = self.get_data_files(method_name, 'happy', 'result')
