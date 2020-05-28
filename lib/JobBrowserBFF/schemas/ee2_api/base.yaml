@@ -3,236 +3,177 @@
 type: object
 title: The Base Schema
 definitions:
-    termination_code:
+  termination_code:
+    type: integer
+    minimum: 0
+    maximum: 2
+  error_code:
+    type: integer
+    minimum: 0
+    maximum: 5
+  json_rpc_11_error:
+    type: object
+    additionalProperties: false
+    properties:
+      code:
         type: integer
-        minimum: 0
-        maximum: 2
-    error_code:
+      message:
+        oneOf:
+          - type: string
+          - type: "null"
+      name:
+        type: string
+      error:
+        type: string
+  any_json:
+    oneOf:
+      - type: object
+        additionalProperties:
+          $ref: "#definitions/any_json"
+      - type: array
+        items:
+          $ref: "#definitions/any_json"
+      - type: string
+      - type: number
+      - type: "null"
+      - type: boolean
+  params:
+    type: array
+    items:
+      $ref: "#definitions/any_json"
+  job_state:
+    type: object
+    title: results for check_job
+    required:
+      - user
+      - authstrat
+      - status
+      - created
+    additionalProperties: false
+    properties:
+      # junk
+      _id:
+        type: string
+      msg:
+        type: string
+      condor_job_ads:
+        type: object
+        additionalProperties: true
+        properties: {}
+      # real
+      job_id:
+        type: string
+      user:
+        type: string
+      authstrat:
+        type: string
+      wsid:
         type: integer
-        minimum: 0
-        maximum: 5
-    json_rpc_11_error:
+      status:
+        type: string
+      created:
+        type: integer
+      updated:
+        type: integer
+      queued:
+        type: integer
+      running:
+        type: integer
+      finished:
+        type: integer
+      error:
+        oneOf:
+          - $ref: "#definitions/json_rpc_11_error"
+          - type: string
+      error_code:
+        type: integer
+      errormsg:
+        type: string
+      terminated_code:
+        type: integer
+      scheduler_type:
+        type: string
+      scheduler_id:
+        type: string
+      job_input:
         type: object
         additionalProperties: false
         properties:
-            code:
+          wsid:
+            type: integer
+          method:
+            type: string
+          params:
+            $ref: "#definitions/params"
+          service_ver:
+            type: string
+          app_id:
+            type: string
+          source_ws_objects:
+            type: array
+            items:
+              type: string
+          parent_job_id:
+            type: string
+          requirements:
+            type: object
+            additionalProperties: false
+            properties:
+              clientgroup:
+                type: string
+              cpu:
                 type: integer
-            message:
+              memory:
+                type: integer
+              disk:
+                type: integer
+          requested_release:
+            type: string
+          narrative_cell_info:
+            type: object
+            additionalProperties: false
+            properties:
+              run_id:
                 type: string
-            name:
+              token_id:
                 type: string
-            error:
+              tag:
                 type: string
-    job_state:
+              cell_id:
+                type: string
+      job_output:
         type: object
-        title: results for check_job
-        required:
-            - user
-            - authstrat
-            - status
-            - created
         additionalProperties: false
         properties:
-            job_id:
-                type: string
-            user:
-                type: string
-            authstrat:
-                type: string
-            wsid:
-                type: integer
-            status:
-                type: string
-            created:
-                type: integer
-            updated:
-                type: integer
-            queued:
-                type: integer
-            running:
-                type: integer
-            finished:
-                type: integer
-            error:
-                $ref: "#definitions/json_rpc_11_error"
-            error_code:
-                type: integer
-            errormsg:
-                type: string
-            terminated_code:
-                type: integer
-            scheduler_type:
-                type: string
-            scheduler_id:
-                type: string
-            job_input:
-                type: object
-                additionalProperties: false
-                properties:
-                    wsid:
-                        type: integer
-                    method:
-                        type: string
-                    params:
-                        type: array
-                        items:
-                            type: object
-                            additionalProperties: true
-                            properties: {}
-                    service_ver:
-                        type: string
-                    app_id:
-                        type: string
-                    source_ws_objects:
-                        type: array
-                        items:
-                            type: string
-                    parent_job_id:
-                        type: string
-                    requirements:
-                        type: object
-                        additionalProperties: false
-                        properties:
-                            clientgroup:
-                                type: string
-                            cpu:
-                                type: integer
-                            memory:
-                                type: integer
-                            disk:
-                                type: integer
-                    narrative_cell_info:
-                        type: object
-                        additionalProperties: false
-                        properties:
-                            run_id:
-                                type: string
-                            token_id:
-                                type: string
-                            tag:
-                                type: string
-                            cell_id:
-                                type: string
-            job_output:
-                type: object
-                additionalProperties: false
-                properties:
-                    version:
-                        type: string
-                    result:
-                        type: array
-                        items:
-                            type: object
-                            additionalProperties: true
-                            properties: {}
-                    id:
-                        type: string
-    job_statex:
-        type: object
-        title: results for check_job
-        required:
-            - user
-            - authstrat
-            - status
-            - created
-        additionalProperties: false
-        properties:
-            _id:
-                type: string
-            job_id:
-                type: string
-            user:
-                type: string
-            authstrat:
-                type: string
-            wsid:
-                type: integer
-            status:
-                type: string
-            created:
-                type: integer
-            updated:
-                type: integer
-            queued:
-                type: integer
-            running:
-                type: integer
-            finished:
-                type: integer
-            error:
-                $ref: "#definitions/json_rpc_11_error"
-            error_code:
-                $ref: "#definitions/error_code"
-            errormsg:
-                type: string
-            # TODO: remove 'msg' property when upstream service fixed.
-            msg:
-                type: string
-            terminated_code:
-                $ref: "#definitions/termination_code"
-            scheduler_type:
-                type: string
-            scheduler_id:
-                type: string
-            job_input:
-                type: object
-                additionalProperties: false
-                properties:
-                    wsid:
-                        type: integer
-                    method:
-                        type: string
-                    params:
-                        type: array
-                        items:
-                            type: object
-                            additionalProperties: true
-                            properties: {}
-                    service_ver:
-                        type: string
-                    app_id:
-                        type: string
-                    source_ws_objects:
-                        type: array
-                        items:
-                            type: string
-                    parent_job_id:
-                        type: string
-                    requirements:
-                        type: object
-                        additionalProperties: false
-                        properties:
-                            clientgroup:
-                                type: string
-                            cpu:
-                                type: integer
-                            memory:
-                                type: integer
-                            disk:
-                                type: integer
-                    narrative_cell_info:
-                        type: object
-                        additionalProperties: false
-                        properties:
-                            run_id:
-                                type: string
-                            token_id:
-                                type: string
-                            tag:
-                                type: string
-                            cell_id:
-                                type: string
-            job_output:
-                type: object
-                additionalProperties: false
-                properties:
-                    version:
-                        type: string
-                    result:
-                        type: array
-                        items:
-                            type: object
-                            additionalProperties: true
-                            properties: {}
-                    id:
-                        type: string
+          version:
+            type: string
+          error:
+            type: object
+            properties:
+              additionalProperties: false
+              properties:
+                message: string
+          result:
+            # probably should just be any_json!
+            oneOf:
+              - type: array
+                items:
+                  $ref: "#definitions/any_json"
+              - type: object
+                additionalProperties:
+                  $ref: "#definitions/any_json"
+              - type: string
+          # wonder how many use these...
+          context:
+            $ref: "#definitions/any_json"
+          method:
+            type: string
+          params:
+            $ref: "#definitions/params"
+
+          id:
+            type: string
+          is_cancelled:
+            type: number
+          is_canceled:
+            type: number

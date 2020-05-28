@@ -21,7 +21,14 @@
                     "type": "integer"
                 },
                 "message": {
-                    "type": "string"
+                    "oneOf": [
+                        {
+                            "type": "string"
+                        },
+                        {
+                            "type": "null"
+                        }
+                    ]
                 },
                 "name": {
                     "type": "string"
@@ -29,6 +36,68 @@
                 "error": {
                     "type": "string"
                 }
+            }
+        },
+        "job_output_item": {
+            "oneOf": [
+                {
+                    "type": "object",
+                    "additionalProperties": {
+                        "$ref": "#definitions/job_output_item"
+                    }
+                },
+                {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#definitions/job_output_item"
+                    }
+                },
+                {
+                    "type": "string"
+                },
+                {
+                    "type": "number"
+                },
+                {
+                    "type": "null"
+                },
+                {
+                    "type": "boolean"
+                }
+            ]
+        },
+        "any_json": {
+            "oneOf": [
+                {
+                    "type": "object",
+                    "additionalProperties": {
+                        "$ref": "#definitions/job_output_item"
+                    }
+                },
+                {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#definitions/job_output_item"
+                    }
+                },
+                {
+                    "type": "string"
+                },
+                {
+                    "type": "number"
+                },
+                {
+                    "type": "null"
+                },
+                {
+                    "type": "boolean"
+                }
+            ]
+        },
+        "params": {
+            "type": "array",
+            "items": {
+                "$ref": "#definitions/any_json"
             }
         },
         "job_state": {
@@ -42,205 +111,65 @@
             ],
             "additionalProperties": false,
             "properties": {
-                "job_id": {
-                    "type": "string"
-                },
-                "user": {
-                    "type": "string"
-                },
-                "authstrat": {
-                    "type": "string"
-                },
-                "wsid": {
-                    "type": "integer"
-                },
-                "status": {
-                    "type": "string"
-                },
-                "created": {
-                    "type": "integer"
-                },
-                "updated": {
-                    "type": "integer"
-                },
-                "queued": {
-                    "type": "integer"
-                },
-                "running": {
-                    "type": "integer"
-                },
-                "finished": {
-                    "type": "integer"
-                },
-                "error": {
-                    "$ref": "#definitions/json_rpc_11_error"
-                },
-                "error_code": {
-                    "type": "integer"
-                },
-                "errormsg": {
-                    "type": "string"
-                },
-                "terminated_code": {
-                    "type": "integer"
-                },
-                "scheduler_type": {
-                    "type": "string"
-                },
-                "scheduler_id": {
-                    "type": "string"
-                },
-                "job_input": {
-                    "type": "object",
-                    "additionalProperties": false,
-                    "properties": {
-                        "wsid": {
-                            "type": "integer"
-                        },
-                        "method": {
-                            "type": "string"
-                        },
-                        "params": {
-                            "type": "array",
-                            "items": {
-                                "type": "object",
-                                "additionalProperties": true,
-                                "properties": {}
-                            }
-                        },
-                        "service_ver": {
-                            "type": "string"
-                        },
-                        "app_id": {
-                            "type": "string"
-                        },
-                        "source_ws_objects": {
-                            "type": "array",
-                            "items": {
-                                "type": "string"
-                            }
-                        },
-                        "parent_job_id": {
-                            "type": "string"
-                        },
-                        "requirements": {
-                            "type": "object",
-                            "additionalProperties": false,
-                            "properties": {
-                                "clientgroup": {
-                                    "type": "string"
-                                },
-                                "cpu": {
-                                    "type": "integer"
-                                },
-                                "memory": {
-                                    "type": "integer"
-                                },
-                                "disk": {
-                                    "type": "integer"
-                                }
-                            }
-                        },
-                        "narrative_cell_info": {
-                            "type": "object",
-                            "additionalProperties": false,
-                            "properties": {
-                                "run_id": {
-                                    "type": "string"
-                                },
-                                "token_id": {
-                                    "type": "string"
-                                },
-                                "tag": {
-                                    "type": "string"
-                                },
-                                "cell_id": {
-                                    "type": "string"
-                                }
-                            }
-                        }
-                    }
-                },
-                "job_output": {
-                    "type": "object",
-                    "additionalProperties": false,
-                    "properties": {
-                        "version": {
-                            "type": "string"
-                        },
-                        "result": {
-                            "type": "array",
-                            "items": {
-                                "type": "object",
-                                "additionalProperties": true,
-                                "properties": {}
-                            }
-                        },
-                        "id": {
-                            "type": "string"
-                        }
-                    }
-                }
-            }
-        },
-        "job_statex": {
-            "type": "object",
-            "title": "results for check_job",
-            "required": [
-                "user",
-                "authstrat",
-                "status",
-                "created"
-            ],
-            "additionalProperties": false,
-            "properties": {
                 "_id": {
-                    "type": "string"
-                },
-                "job_id": {
-                    "type": "string"
-                },
-                "user": {
-                    "type": "string"
-                },
-                "authstrat": {
-                    "type": "string"
-                },
-                "wsid": {
-                    "type": "integer"
-                },
-                "status": {
-                    "type": "string"
-                },
-                "created": {
-                    "type": "integer"
-                },
-                "updated": {
-                    "type": "integer"
-                },
-                "queued": {
-                    "type": "integer"
-                },
-                "running": {
-                    "type": "integer"
-                },
-                "finished": {
-                    "type": "integer"
-                },
-                "error": {
-                    "$ref": "#definitions/json_rpc_11_error"
-                },
-                "error_code": {
-                    "$ref": "#definitions/error_code"
-                },
-                "errormsg": {
                     "type": "string"
                 },
                 "msg": {
                     "type": "string"
                 },
+                "condor_job_ads": {
+                    "type": "object",
+                    "additionalProperties": true,
+                    "properties": {}
+                },
+                "job_id": {
+                    "type": "string"
+                },
+                "user": {
+                    "type": "string"
+                },
+                "authstrat": {
+                    "type": "string"
+                },
+                "wsid": {
+                    "type": "integer"
+                },
+                "status": {
+                    "type": "string"
+                },
+                "created": {
+                    "type": "integer"
+                },
+                "updated": {
+                    "type": "integer"
+                },
+                "queued": {
+                    "type": "integer"
+                },
+                "running": {
+                    "type": "integer"
+                },
+                "finished": {
+                    "type": "integer"
+                },
+                "error": {
+                    "oneOf": [
+                        {
+                            "$ref": "#definitions/json_rpc_11_error"
+                        },
+                        {
+                            "type": "string"
+                        }
+                    ]
+                },
+                "error_code": {
+                    "type": "integer"
+                },
+                "errormsg": {
+                    "type": "string"
+                },
                 "terminated_code": {
-                    "$ref": "#definitions/termination_code"
+                    "type": "integer"
                 },
                 "scheduler_type": {
                     "type": "string"
@@ -259,12 +188,7 @@
                             "type": "string"
                         },
                         "params": {
-                            "type": "array",
-                            "items": {
-                                "type": "object",
-                                "additionalProperties": true,
-                                "properties": {}
-                            }
+                            "$ref": "#definitions/params"
                         },
                         "service_ver": {
                             "type": "string"
@@ -299,6 +223,9 @@
                                 }
                             }
                         },
+                        "requested_release": {
+                            "type": "string"
+                        },
                         "narrative_cell_info": {
                             "type": "object",
                             "additionalProperties": false,
@@ -326,16 +253,51 @@
                         "version": {
                             "type": "string"
                         },
-                        "result": {
-                            "type": "array",
-                            "items": {
-                                "type": "object",
-                                "additionalProperties": true,
-                                "properties": {}
+                        "error": {
+                            "type": "object",
+                            "properties": {
+                                "additionalProperties": false,
+                                "properties": {
+                                    "message": "string"
+                                }
                             }
+                        },
+                        "result": {
+                            "oneOf": [
+                                {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#definitions/job_output_item"
+                                    }
+                                },
+                                {
+                                    "type": "object",
+                                    "additionalProperties": {
+                                        "$ref": "#definitions/job_output_item"
+                                    }
+                                },
+                                {
+                                    "type": "string"
+                                }
+                            ]
+                        },
+                        "context": {
+                            "$ref": "#definitions/any_json"
+                        },
+                        "method": {
+                            "type": "string"
+                        },
+                        "params": {
+                            "$ref": "#definitions/params"
                         },
                         "id": {
                             "type": "string"
+                        },
+                        "is_cancelled": {
+                            "type": "number"
+                        },
+                        "is_canceled": {
+                            "type": "number"
                         }
                     }
                 }
