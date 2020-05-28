@@ -33,6 +33,7 @@ RUN apk upgrade --update-cache --available && \
 # install python dependencies for the service runtime.
 RUN pip3 install --upgrade pip && \
     pip3 install \
+    cachetools=4.1.0 \
     cffi==1.14.0 \
     coverage==5.1.0 \
     jinja2==2.11.2 \

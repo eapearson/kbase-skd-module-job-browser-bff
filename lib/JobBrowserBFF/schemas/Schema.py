@@ -48,10 +48,12 @@ class Schema(object):
                 raise ValueError('Schemas not found at path ${file_path}')
         return schemas
 
-    def validate(self, schema_key, data):
-        schema = self.schemas.get(schema_key, None)
-        if schema is None:
-            raise ValueError('Schema "' + schema_key + '" does not exist')
+    def validate(self, schema, data):
+        if isinstance(schema, str):
+            schema_key = schema
+            schema = self.schemas.get(schema_key, None)
+            if schema is None:
+                raise ValueError('Schema "' + schema_key + '" does not exist')
         try:
             validate(instance=data, schema=schema, resolver=self.resolver)
         except ValidationError as ex:

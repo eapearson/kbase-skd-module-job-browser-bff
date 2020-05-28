@@ -259,6 +259,7 @@ def raw_job_to_job(raw_job, apps_map, users_map, workspaces_map):
                 'type': 'unknown'
             }
         }
+
     return job
 
 
@@ -322,7 +323,9 @@ class EE2Model(object):
     #     2 - terminated by some automatic process
     #
 
-    def raw_jobs_to_jobs(self, raw_jobs):
+    def raw_jobs_to_jobs(self, raw_jobs, services=None):
+        if services is None:
+            services = KBaseServices(config=self.config, token=self.token)
         if len(raw_jobs) == 0:
             return []
 
@@ -348,8 +351,6 @@ class EE2Model(object):
 
                 if 'wsid' in raw_job:
                     workspace_ids.add(raw_job['wsid'])
-
-        services = KBaseServices(config=self.config, token=self.token)
 
         # Get a dict of unique users for this set of jobs
         users_map = services.get_users(list(usernames))

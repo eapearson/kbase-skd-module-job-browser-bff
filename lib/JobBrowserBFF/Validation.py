@@ -28,6 +28,12 @@ class Validation(object):
                 'schema_value': ex.value
             })
 
+    def validate(self, schema_key, data):
+        try:
+            self.schema.validate(schema_key, data)
+        except SchemaError as ex:
+            raise ex
+
     def validate_config(self, data):
         schema_key = 'config'
         try:
