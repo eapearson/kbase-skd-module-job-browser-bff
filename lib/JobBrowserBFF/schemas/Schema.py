@@ -17,6 +17,8 @@ class SchemaError(Exception):
 class Schema(object):
     def __init__(self, schema_dir=DEFAULT_SCHEMA_DIR, load_schemas=False):
         try:
+            if schema_dir is None:
+                schema_dir = DEFAULT_SCHEMA_DIR
             self.schema_dir = os.path.abspath(os.path.dirname(__file__) + '/' + schema_dir)
         except Exception as e:
             print('SCHEMA ERROR')

@@ -5,8 +5,8 @@ root=$(git rev-parse --show-toplevel)
 script_dir=${root}/scripts
 lib_dir=${root}/lib
 
+#   --network=kbase-dev \
 docker run -i -t \
-  --network=kbase-dev \
   --name=JobBrowserBFF  \
   --dns=8.8.8.8 \
   -p 5000:5000 \

@@ -1,8 +1,11 @@
 {
-    "log": [{
-        "entry_number": 1,
-        "entry": "my log entry",
-        "level": "error"
-    }],
+    "log": [
+        {
+            "row": 1,
+            "logged_at": 0,
+            "message": "my log entry",
+            "level": "error"
+        }
+    ],
     "total_count": 100
 }
