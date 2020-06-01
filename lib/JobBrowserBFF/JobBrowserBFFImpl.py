@@ -1,9 +1,14 @@
 # -*- coding: utf-8 -*-
 # BEGIN_HEADER
+import apsw
 import logging
 from JobBrowserBFF.Validation import Validation
 from JobBrowserBFF.model.Model import Model
 from JobBrowserBFF.definitions.Definitions import Definitions
+from JobBrowserBFF.cache.AppCache import AppCache
+from JobBrowserBFF.cache.UserProfileCache import UserProfileCache
+
+from pathlib import Path
 # END_HEADER
 
 
@@ -37,6 +42,8 @@ class JobBrowserBFF:
 
         # fix up the config because, as an INI file, everything is a string...
         config['default-timeout'] = int(config['default-timeout'])
+        config['cache-refresh-interval'] = int(config['cache-refresh-interval'])
+        config['cache-refresh-initial-delay'] = int(config['cache-refresh-initial-delay'])
 
         self.validation.validate_config(config)
         self.config = config
@@ -46,6 +53,34 @@ class JobBrowserBFF:
                             level=logging.INFO)
 
         self.definitions = Definitions(load=True)
+
+        def setwal(db):
+            db.cursor().execute("pragma journal_mode=wal")
+            # custom auto checkpoint interval (use zero to disable)
+            db.wal_autocheckpoint(0)
+
+        apsw.connection_hooks.append(setwal)
+
+        # Set up cache directory
+        Path(config['cache-directory']).mkdir(parents=True, exist_ok=True)
+
+        # The app cache can be populated upon load.
+        # TODO: need a process to refresh the cache periodically
+        app_cache_path = config['cache-directory'] + '/app.db'
+        app_cache = AppCache(
+            path=app_cache_path,
+            narrative_method_store_url=config['nms-url'],
+            upstream_timeout=60
+        )
+        app_cache.initialize()
+
+        user_profile_cache_path = config['cache-directory'] + '/user_profile.db'
+        user_profile_cache = UserProfileCache(
+            path=user_profile_cache_path,
+            user_profile_url=config['user-profile-url'],
+            upstream_timeout=60
+        )
+        user_profile_cache.initialize()
         # END_CONSTRUCTOR
         pass
 
@@ -122,13 +157,15 @@ class JobBrowserBFF:
 
         model = Model(config=self.config, context=ctx, timeout=params['timeout']).get_model(ctx)
 
-        jobs = model.get_jobs(params)
+        jobs, stats = model.get_jobs(params)
 
         result = {
-            'jobs': jobs
+            'jobs': jobs,
+            'stats': stats
         }
 
         self.validation.validate_result('get_jobs', result)
+
         return result
         # END get_jobs
 
@@ -211,11 +248,12 @@ class JobBrowserBFF:
         # BEGIN query_jobs
         self.validation.validate_params('query_jobs', params)
         model = Model(self.config, ctx).get_model(ctx)
-        jobs, found_count, total_count = model.query_jobs(params)
+        jobs, found_count, total_count, stats = model.query_jobs(params)
         result = {
             'jobs': jobs,
             'found_count': found_count,
-            'total_count': total_count
+            'total_count': total_count,
+            'stats': stats
         }
         self.validation.validate_result('query_jobs', result)
         return result

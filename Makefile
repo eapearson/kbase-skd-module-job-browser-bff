@@ -51,7 +51,8 @@ build-startup-script:
 	@echo 'export KB_DEPLOYMENT_CONFIG=$$script_dir/../deploy.cfg' >> $(SCRIPTS_DIR)/$(STARTUP_SCRIPT_NAME)
 	@echo 'export PYTHONPATH=$$script_dir/../$(LIB_DIR):$$PATH:$$PYTHONPATH' >> $(SCRIPTS_DIR)/$(STARTUP_SCRIPT_NAME)
 	# NB: Using the fixed _Server not the sdk generated one.
-	@echo 'uwsgi --master --processes 5 --threads 5 --http :5000 --uid kbmodule --wsgi-file $$script_dir/../$(LIB_DIR)/$(SERVICE_CAPS)/$(SERVICE_CAPS)_JSONRPCServer.py' >> $(SCRIPTS_DIR)/$(STARTUP_SCRIPT_NAME)
+	# @echo 'uwsgi --master --plugins python,http --processes 5 --threads 5 --http :5000 --uid kbmodule --mule=$$script_dir/../$(LIB_DIR)/$(SERVICE_CAPS)/mules/app_cache.py  --wsgi-file $$script_dir/../$(LIB_DIR)/$(SERVICE_CAPS)/$(SERVICE_CAPS)_JSONRPCServer.py' >> $(SCRIPTS_DIR)/$(STARTUP_SCRIPT_NAME)
+	@echo 'uwsgi --ini uwsgi.ini --wsgi-file $$script_dir/../$(LIB_DIR)/$(SERVICE_CAPS)/$(SERVICE_CAPS)_JSONRPCServer.py' >> $(SCRIPTS_DIR)/$(STARTUP_SCRIPT_NAME)
 	@chmod +x $(SCRIPTS_DIR)/$(STARTUP_SCRIPT_NAME)
 
 build-test-script:

@@ -507,13 +507,16 @@
                     "title": "The App Schema",
                     "required": [
                         "id",
+                        "not_found",
                         "module_name",
                         "function_name",
                         "type",
-                        "title",
-                        "client_groups"
+                        "title"
                     ],
                     "properties": {
+                        "not_found": {
+                            "type": "boolean"
+                        },
                         "id": {
                             "type": "string",
                             "title": "The App ID"
@@ -546,21 +549,16 @@
                             "pattern": "^(.*)$"
                         },
                         "title": {
-                            "$id": "#/properties/jobs/items/properties/app/properties/title",
-                            "type": "string",
-                            "title": "The Title Schema",
-                            "default": "",
-                            "examples": [
-                                "My amazing method"
-                            ],
-                            "pattern": "^(.*)$"
+                            "type": "string"
                         },
-                        "client_groups": {
-                            "type": "array",
-                            "default": [],
-                            "items": {
-                                "type": "string"
-                            }
+                        "subtitle": {
+                            "type": "string"
+                        },
+                        "version": {
+                            "type": "string"
+                        },
+                        "icon_url": {
+                            "type": "string"
                         }
                     }
                 },
@@ -670,6 +668,10 @@
                     }
                 }
             }
+        },
+        "stats": {
+            "type": "object",
+            "additionalProperties": true
         }
     }
 }

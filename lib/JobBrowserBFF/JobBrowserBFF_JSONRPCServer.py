@@ -6,49 +6,19 @@ import sys
 import traceback
 from getopt import getopt, GetoptError
 from multiprocessing import Process
-from os import environ
 from wsgiref.simple_server import make_server
-
 from JobBrowserBFF.jsonrpcbase import JSONRPCService, InvalidParamsError, KeywordError, \
     JSONRPCError, InvalidRequestError
 from JobBrowserBFF.jsonrpcbase import ServerError as JSONServerError
-
 from biokbase import log
 from JobBrowserBFF.authclient import KBaseAuth as _KBaseAuth
-
-try:
-    from ConfigParser import ConfigParser
-except ImportError:
-    from configparser import ConfigParser
-
-DEPLOY = 'KB_DEPLOYMENT_CONFIG'
-SERVICE = 'KB_SERVICE_NAME'
-AUTH = 'auth-service-url'
-
-
-def get_config_file():
-    return environ.get(DEPLOY, None)
-
-
-def get_service_name():
-    return environ.get(SERVICE, None)
-
-
-def get_config():
-    if not get_config_file():
-        return None
-    retconfig = {}
-    config = ConfigParser()
-    config.read(get_config_file())
-    for nameval in config.items(get_service_name() or 'JobBrowserBFF'):
-        retconfig[nameval[0]] = nameval[1]
-    return retconfig
-
-
-config = get_config()
-
+from JobBrowserBFF.Config import Config
 from JobBrowserBFF.JobBrowserBFFImpl import JobBrowserBFF  # noqa @IgnorePep8
-impl_JobBrowserBFF = JobBrowserBFF(config)
+from JobBrowserBFF.constants import AUTH
+
+
+config = Config()
+impl_JobBrowserBFF = JobBrowserBFF(config.get_config())
 
 
 class JSONObjectEncoder(json.JSONEncoder):
@@ -267,6 +237,9 @@ class ServerError(Exception):
 def getIPAddress(environ):
     xFF = environ.get('HTTP_X_FORWARDED_FOR')
     realIP = environ.get('HTTP_X_REAL_IP')
+
+    trustXHeaders = config.test('dont_trust_x_ip_headers', 'true', True)
+
     trustXHeaders = config is None or \
         config.get('dont_trust_x_ip_headers') != 'true'
 
@@ -292,11 +265,11 @@ class Application(object):
                                    context['method'], context['call_id'])
 
     def __init__(self):
-        submod = get_service_name() or 'JobBrowserBFF'
+        submod = config.get_service_name() or 'JobBrowserBFF'
         self.userlog = log.log(
             submod, ip_address=True, authuser=True, module=True, method=True,
             call_id=True, changecallback=self.logcallback,
-            config=get_config_file())
+            config=config.get_config_file())
         self.serverlog = log.log(
             submod, ip_address=True, authuser=True, module=True, method=True,
             call_id=True, logfile=self.userlog.get_log_file())

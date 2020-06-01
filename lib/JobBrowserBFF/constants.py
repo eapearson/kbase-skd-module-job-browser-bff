@@ -1,0 +1,3 @@
+DEPLOY = 'KB_DEPLOYMENT_CONFIG'
+SERVICE = 'KB_SERVICE_NAME'
+AUTH = 'auth-service-url'

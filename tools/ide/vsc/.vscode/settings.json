@@ -10,7 +10,7 @@
             "changeProcessCWD": true
         }
     ],
-    "python.pythonPath": "/usr/bin/python3",
+    "python.pythonPath": "/Users/erikpearson/work/kbase/sprints/2020Q1/kbase-sdk-module-job-browser-bff/venvs/bin/python3.8",
     "editor.formatOnSave": true,
     "python.linting.flake8Enabled": true,
     "python.linting.enabled": true

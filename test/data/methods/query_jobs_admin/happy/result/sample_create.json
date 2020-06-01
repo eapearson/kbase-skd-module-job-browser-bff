@@ -28,9 +28,7 @@
                 "module_name": "ProkkaAnnotation",
                 "function_name": "annotate_contigs",
                 "title": "Annotate Assembly and ReAnnotate Genomes with Prokka v1.12",
-                "client_groups": [
-                    "njs"
-                ]
+                "not_found": false
             }
         }
     ],
