@@ -6,3 +6,4 @@ _attic
 deploy_local
 temp/
 venvs/
+/.vscode/
