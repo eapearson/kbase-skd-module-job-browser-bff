@@ -28,11 +28,16 @@ MAINTAINER KBase Developer
 
 # update and add system dependencies
 RUN apk upgrade --update-cache --available && \
-    apk add --update --no-cache bash g++ git libffi-dev linux-headers make openssl-dev python3 python3-dev py3-setuptools
+    apk add --update --no-cache bash g++ git libffi-dev linux-headers \
+    make openssl-dev python3 python3-dev py3-setuptools \
+    uwsgi uwsgi-http uwsgi-python3
+#   py3-yaml py3-cffi py3-coverage py3-jinja2 
 
 # install python dependencies for the service runtime.
 RUN pip3 install --upgrade pip && \
+    pip3 install wheel==0.34.2 && \
     pip3 install \
+    cachetools==4.1.0 \
     cffi==1.14.0 \
     coverage==5.1.0 \
     jinja2==2.11.2 \
@@ -43,11 +48,19 @@ RUN pip3 install --upgrade pip && \
     python-dateutil==2.8.1 \
     pytz==2020.1 \
     requests==2.23.0 \
-    uwsgi==2.0.18 \
     toml==0.10.1 \
     jsonschema==3.2.0 \
     pymongo==3.10.1 \
     pyyaml==5.3.1
+
+RUN pip3 install \
+    https://github.com/rogerbinns/apsw/releases/download/3.31.1-r1/apsw-3.31.1-r1.zip \
+    --global-option=fetch \
+    --global-option=--version \
+    --global-option=3.31.1\
+    --global-option=--all \
+    --global-option=build \
+    --global-option=--enable-all-extensions
 
 COPY --from=builder /kb /kb
 
@@ -55,6 +68,7 @@ COPY --from=builder /kb /kb
 RUN addgroup --system kbmodule && \
     adduser --system --ingroup kbmodule kbmodule && \
     chown -R kbmodule:kbmodule /kb/module && \
+    chmod a+rw /kb/module/work/cache && \
     chmod +x /kb/module/scripts/entrypoint.sh
 
 WORKDIR /kb/module

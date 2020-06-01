@@ -30,6 +30,9 @@
             "examples": [
                 22
             ]
+        },
+        "stats": {
+            "$ref": "base.json#definitions/stats"
         }
     }
 }

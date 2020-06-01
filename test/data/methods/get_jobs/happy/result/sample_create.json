@@ -18,17 +18,17 @@
                     "is_deleted": false
                 },
                 "narrative": {
-                    "title": "Another job browser test"
+                    "title": "Another job browser test",
+                    "is_temporary": false
                 }
             },
             "app": {
                 "id": "ProkkaAnnotation/annotate_contigs",
+                "type": "narrative",
                 "module_name": "ProkkaAnnotation",
                 "function_name": "annotate_contigs",
                 "title": "Annotate Assembly and ReAnnotate Genomes with Prokka v1.12",
-                "client_groups": [
-                    "njs"
-                ]
+                "not_found": false
             }
         }
     ]

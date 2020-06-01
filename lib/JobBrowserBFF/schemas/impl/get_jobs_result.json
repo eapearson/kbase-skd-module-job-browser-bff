@@ -13,6 +13,9 @@
             "items": {
                 "$ref": "base.json#definitions/job_info"
             }
+        },
+        "stats": {
+            "$ref": "base.json#definitions/stats"
         }
     }
 }

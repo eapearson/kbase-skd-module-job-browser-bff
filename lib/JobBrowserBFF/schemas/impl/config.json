@@ -21,9 +21,21 @@
     "properties": {
         "upstream-service": {
             "type": "string",
-            "enum": ["ee2", "metrics", "mock"]
+            "enum": [
+                "ee2",
+                "metrics",
+                "mock"
+            ]
         },
         "default-timeout": {
+            "type": "integer",
+            "minimum": 0
+        },
+        "cache-refresh-interval": {
+            "type": "integer",
+            "minimum": 0
+        },
+        "cache-refresh-initial-delay": {
             "type": "integer",
             "minimum": 0
         },

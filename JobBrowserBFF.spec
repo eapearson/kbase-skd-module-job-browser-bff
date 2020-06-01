@@ -26,10 +26,14 @@ module JobBrowserBFF {
     typedef string JobStatus;
 
     typedef structure {
+        string id;
+        bool not_found;
         string module_name;
         string function_name;
         string title;
-        list<string> client_groups;
+        string subtitle;
+        string icon_url;
+        string version;
     } AppInfo;
 
     /* njs, bigmem, bigmemlong, kb_import, ...*/
@@ -220,11 +224,15 @@ module JobBrowserBFF {
         bool admin;
     } QueryJobsParams;
 
+    typedef UnspecifiedObject Stats;
+
     typedef structure {
         list<JobInfo> jobs;
         int found_count;
         int total_count;
+        Stats stats;
     } QueryJobsResult;
+
 
     funcdef query_jobs(QueryJobsParams params) returns (QueryJobsResult result) authentication required;
 

@@ -4,3 +4,6 @@ sdk.cfg
 __pycache__/
 _attic
 deploy_local
+temp/
+venvs/
+/.vscode/

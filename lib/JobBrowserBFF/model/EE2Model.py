@@ -3,6 +3,7 @@ from JobBrowserBFF.model.EE2Api import EE2Api
 from JobBrowserBFF.model.KBaseServices import KBaseServices
 from JobBrowserBFF.Utils import parse_app_id
 import re
+import time
 
 
 def get_param(params, key):
@@ -137,19 +138,24 @@ def raw_job_to_job(raw_job, apps_map, users_map, workspaces_map):
     if app is not None:
         catalog_app = apps_map.get(app['id'], None)
         if catalog_app is None:
+            app['not_found'] = True
             app['title'] = app['id']
-            app['client_groups'] = []
             app['type'] = 'unknown'
         else:
-            app_info = catalog_app.get('info')
-            if app_info is None:
-                app['title'] = app['id']
-                app['client_groups'] = []
-                app['type'] = 'unknown'
-            else:
-                app['title'] = app_info['name']
-                app['client_groups'] = catalog_app['client_groups']
-                app['type'] = 'narrative'
+            app = catalog_app
+            # app['type'] = 'narrative'
+            # app_info = catalog_app.get('info')
+            # if app_info is None:
+            #     app['not_found'] = True
+            #     app['title'] = app['id']
+            #     app['type'] = 'unknown'
+            # else:
+            # app['not_found'] = False
+            # app['title'] = app_info['name']
+            # app['subtitle'] = app_info.get('subtitle')
+            # app['type'] = 'narrative'
+            # app['icon_url'] = app_info.get('icon_url')
+            # app['version'] = app_info.get('version')
 
     # Get the additional workspace info out of the workspaces map, and
     # also handle multiple types of workspace
@@ -166,8 +172,8 @@ def raw_job_to_job(raw_job, apps_map, users_map, workspaces_map):
             else:
                 job_type = 'unknown'
         else:
-            workspace = workspaces_map.get(workspace_id, None)
-            if workspace is not None and workspace['is_accessible']:
+            workspace = workspaces_map[workspace_id]
+            if workspace['is_accessible']:
                 if workspace.get('narrative'):
                     job_type = 'narrative'
                 else:
@@ -259,6 +265,7 @@ def raw_job_to_job(raw_job, apps_map, users_map, workspaces_map):
                 'type': 'unknown'
             }
         }
+
     return job
 
 
@@ -322,7 +329,9 @@ class EE2Model(object):
     #     2 - terminated by some automatic process
     #
 
-    def raw_jobs_to_jobs(self, raw_jobs):
+    def raw_jobs_to_jobs(self, raw_jobs, services=None):
+        if services is None:
+            services = KBaseServices(config=self.config, token=self.token)
         if len(raw_jobs) == 0:
             return []
 
@@ -330,6 +339,9 @@ class EE2Model(object):
         usernames = set()
         apps_to_fetch = dict()
         workspace_ids = set()
+
+        stats = dict()
+        start = time.time_ns()
 
         for raw_job in raw_jobs:
             usernames.add(raw_job['user'])
@@ -349,30 +361,37 @@ class EE2Model(object):
                 if 'wsid' in raw_job:
                     workspace_ids.add(raw_job['wsid'])
 
-        services = KBaseServices(config=self.config, token=self.token)
-
         # Get a dict of unique users for this set of jobs
         users_map = services.get_users(list(usernames))
 
+        stats['get_users'] = (time.time_ns() - start) / 1000000
+        start = time.time_ns()
+
         # Get a dict of unique users for this set of jobs.
-        apps_map = dict()
         apps = services.get_apps(list(apps_to_fetch.values()))
-        for app_id, app in apps.items():
-            # if app.get is not None:
-            apps_map[app_id] = app
+
+        stats['get_apps'] = (time.time_ns() - start) / 1000000
+        start = time.time_ns()
 
         workspace_map = dict()
         workspaces = services.get_workspaces(list(workspace_ids))
+        # print('GOT WORKSPACES', workspaces)
         for workspace in workspaces:
+            # print(f'WORKSPACE?? {workspace["id"]}')
             workspace_map[workspace['id']] = workspace
+
+        stats['get workspaces'] = (time.time_ns() - start) / 1000000
+        start = time.time_ns()
 
         # Now join them all together.
         jobs = []
         for raw_job in raw_jobs:
-            job = raw_job_to_job(raw_job, apps_map, users_map, workspace_map)
+            job = raw_job_to_job(raw_job, apps, users_map, workspace_map)
             jobs.append(job)
 
-        return jobs
+        stats['transform jobs'] = (time.time_ns() - start) / 1000000
+
+        return jobs, stats
 
     def is_admin(self):
         api = EE2Api(url=self.config['ee2-url'], token=self.token, timeout=self.timeout)
@@ -596,6 +615,8 @@ class EE2Model(object):
             })
 
     def query_jobs(self, params):
+        stats = dict()
+        start = time.time_ns()
         raw_jobs, found_count = self.ee2_query_jobs(
             offset=params['offset'],
             limit=params['limit'],
@@ -605,16 +626,20 @@ class EE2Model(object):
             time_span=params.get('time_span', None),
             admin=params.get('admin', False)
         )
+        stats['query_jobs'] = (time.time_ns() - start) / 1000000
+        start = time.time_ns()
         # The total count is not returned by ee2 a this time;
         total_count = found_count
 
         if len(raw_jobs) == 0:
             return [], 0, total_count
 
-        jobs = self.raw_jobs_to_jobs(raw_jobs)
+        jobs, stats2 = self.raw_jobs_to_jobs(raw_jobs)
+
+        stats['raw_jobs_to_jobs'] = (time.time_ns() - start) / 1000000
 
         # Now DONE!
-        return jobs, found_count, total_count
+        return jobs, found_count, total_count, {**stats, **stats2}
 
     def ee2_get_jobs(self, params):
         api = EE2Api(url=self.config['ee2-url'], token=self.token, timeout=self.timeout)
@@ -657,8 +682,18 @@ class EE2Model(object):
 
     def get_jobs(self, params):
         if len(params['job_ids']) == 0:
-            return []
+            return [], {}
+
+        stats = dict()
+        start = time.time_ns()
 
         raw_jobs = self.ee2_get_jobs(params)
 
-        return self.raw_jobs_to_jobs(raw_jobs)
+        stats['ee2_get_jobs'] = (time.time_ns() - start) / 100000
+        start = time.time_ns()
+
+        jobs, stats2 = self.raw_jobs_to_jobs(raw_jobs)
+
+        stats['raw_jobs_to_jobs'] = (time.time_ns() - start) / 1000000
+
+        return jobs,  {**stats, **stats2}
