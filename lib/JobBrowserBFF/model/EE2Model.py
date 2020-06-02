@@ -643,10 +643,15 @@ class EE2Model(object):
 
     def ee2_get_jobs(self, params):
         api = EE2Api(url=self.config['ee2-url'], token=self.token, timeout=self.timeout)
+        if params.get('admin', False):
+            as_admin = True
+        else:
+            as_admin = True
 
         try:
             jobs = api.check_jobs({
-                'job_ids': params['job_ids']
+                'job_ids': params['job_ids'],
+                'as_admin': as_admin
             })
             return jobs['job_states']
         except ServiceError as se:
