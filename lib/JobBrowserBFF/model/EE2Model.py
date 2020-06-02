@@ -632,7 +632,7 @@ class EE2Model(object):
         total_count = found_count
 
         if len(raw_jobs) == 0:
-            return [], 0, total_count
+            return [], 0, total_count, stats
 
         jobs, stats2 = self.raw_jobs_to_jobs(raw_jobs)
 
