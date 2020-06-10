@@ -78,7 +78,7 @@ class KBaseServices(object):
 
             if app_id is None:
                 app['not_found'] = True
-                app['title'] = app['name']
+                app['title'] = app['id']
                 app['type'] = 'unknown'
             else:
                 app['not_found'] = False
