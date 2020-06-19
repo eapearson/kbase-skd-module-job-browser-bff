@@ -414,11 +414,10 @@ class EE2Model(object):
         limit = get_param(params, 'limit')
         # search = params.get('search')
         # level = params.get('level')
-        admin = params.get('admin', False)
-        if admin:
-            admin = 1
+        if params.get('admin', False):
+            as_admin = 1
         else:
-            admin = 0
+            as_admin = 0
 
         api = EE2Api(url=self.config['ee2-url'], token=self.token, timeout=self.timeout)
         try:
@@ -428,7 +427,7 @@ class EE2Model(object):
                 'job_id': job_id,
                 'offset': offset,
                 'limit': limit,
-                'as_admin': admin})
+                'as_admin': as_admin})
         except ServiceError as se:
             # handle specific error mesages
             if se.code == -32000:
@@ -644,9 +643,9 @@ class EE2Model(object):
     def ee2_get_jobs(self, params):
         api = EE2Api(url=self.config['ee2-url'], token=self.token, timeout=self.timeout)
         if params.get('admin', False):
-            as_admin = True
+            as_admin = 1
         else:
-            as_admin = True
+            as_admin = 0
 
         try:
             jobs = api.check_jobs({
