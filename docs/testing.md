@@ -84,7 +84,7 @@ However, for dynamic services, we work against CI, and also in this case we are 
 
 ## run the tests
 
-The run the final tests, simply issue, in the same terminal window:
+To run the final tests, simply issue, in the same terminal window:
 
 ```bash
 kb-sdk test
@@ -103,6 +103,6 @@ Two types of tests were developed which are not currently run:
 
 These tests are especially useful for simulating conditions which cannot be done either with actual services (e.g. testing against CI), or with normal mocks.
 
-The mongodb tests utilize a snapshot of actual data which is imported into a local mongodb container. This allows a large amount of stable test data. Usage of mongodb is simply for convenience -- it is much easier to implement tests against a local database than files.
+The mongodb tests utilize a snapshot of actual data which is imported into a local mongodb container. This allows a large amount of stable test data. Usage of mongodb is simply for convenience -- it is easier to implement tests against a local database than files.
 
 The network mocks work by running a local mock http server, which can simulate various network or service conditions. E.g. failures, timeouts.
