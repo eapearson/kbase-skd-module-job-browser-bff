@@ -27,9 +27,6 @@ compile:
 		--out $(LIB_DIR) \
 		--pysrvname $(SERVICE_CAPS).$(SERVICE_CAPS)Server \
 		--pyimplname $(SERVICE_CAPS).$(SERVICE_CAPS)Impl;
-	# repair the impl file
-	@echo "Reparing impl file..."
-	@bash ./scripts/fix-impl.sh
 
 build:
 	@chmod +x $(SCRIPTS_DIR)/entrypoint.sh
