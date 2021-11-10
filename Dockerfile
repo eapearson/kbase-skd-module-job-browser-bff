@@ -21,7 +21,7 @@ RUN mkdir -p /kb/module/work/cache && \
     chmod -R a+rw /kb/module && \
     cd /kb/module && \
     PATH=$PATH:/kb/kb_sdk/bin && \
-    KB_SDK_COMPILE_REPORT_FILE=/kb/module/work/compile_report.json \
+    KB_SDK_COMPILE_REPORT_FILE=/kb/compile_report.json \
     make all
 
 # Final image
@@ -56,6 +56,11 @@ RUN python3 -m venv venv && \
     python3 -m pip install --upgrade pip && \
     pip install wheel==0.37.0 && \
     pip install -r requirements.txt
+
+USER root
+
+# Need to be as root to run some of the entry point tasks (e.g. copying compilation report)
+# Note that uwsgi will run as kbmodule
 
 ENTRYPOINT [ "./scripts/entrypoint.sh" ]
 

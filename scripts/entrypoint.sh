@@ -20,7 +20,12 @@ elif [ "${1}" = "init" ] ; then
 elif [ "${1}" = "bash" ] ; then
   bash
 elif [ "${1}" = "report" ] ; then
-  echo "Compilation report already located in /kb/module/work"
+  # The compilation report is created by the in the build phase,
+  # so we just need to copy it.
+  # Note that /kb/module/work is bind mounted to a temporary directory
+  # in order to collect the compilation report.
+  echo "Copying compilation report to /work"
+  cp /kb/compile_report.json /kb/module/work
 else
   @echo "unknown entrypoint command"
 fi
