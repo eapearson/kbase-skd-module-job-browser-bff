@@ -3,6 +3,9 @@ LABEL org.opencontainers.image.authors="KBase Developer"
 
 # The build stage needs just enough to run the KBase SDK tools.
 
+# Hack to get packages to install over https behind proxy.
+RUN sed -i 's/https\:\/\//http\:\/\//g' /etc/apk/repositories
+
 # update system and system dependencies
 RUN apk upgrade --update-cache --available && \
     apk add --update --no-cache apache-ant bash git linux-headers make openjdk8 python3 python3-dev py3-setuptools python2
@@ -25,6 +28,9 @@ RUN mkdir -p /kb/module/work/cache && \
 
 FROM alpine:3.14
 LABEL org.opencontainers.image.authors="KBase Developer"
+
+# Hack to get packages to install over https behind proxy.
+RUN sed -i 's/https\:\/\//http\:\/\//g' /etc/apk/repositories
 
 # update and add system dependencies
 RUN apk upgrade --update-cache --available && \
