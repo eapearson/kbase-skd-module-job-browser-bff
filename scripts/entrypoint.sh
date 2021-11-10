@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# . /kb/deployment/user-env.sh
+source venv/bin/activate
 
 python3 ./scripts/prepare_deploy_cfg.py ./deploy.cfg ./work/config.properties
 
