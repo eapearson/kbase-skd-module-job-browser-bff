@@ -26,12 +26,6 @@ The KBase service sdk needs to be available locally, built, and in the path. You
   git clone https://github.com/kbase/kb_sdk
   ```
 
-  > Note: At present you should use `https://github.com/eapearson/kb_sdk`, since keeps the impl file PEP8 compliant.
-
-    ```bash
-    git clone --depth=1 --branch=make-python-pep8-compliant https://github.com/eapearson/kb_sdk 
-    ```
-
 - build it
 
   ```bash
