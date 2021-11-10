@@ -46,7 +46,7 @@ WORKDIR /kb/module
 RUN addgroup --system kbmodule && \
     adduser --system --ingroup kbmodule kbmodule && \
     chown -R kbmodule:kbmodule /kb/module && \
-    chmod a+rw /kb/module/work/cache && \
+    chmod -R a+rw /kb/module/work && \
     chmod +x /kb/module/scripts/entrypoint.sh
 
 USER kbmodule
