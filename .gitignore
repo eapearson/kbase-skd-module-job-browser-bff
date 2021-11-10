@@ -5,5 +5,5 @@ __pycache__/
 _attic
 deploy_local
 temp/
-venvs/
+/venv/
 /.vscode/
