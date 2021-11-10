@@ -20,10 +20,7 @@ elif [ "${1}" = "init" ] ; then
 elif [ "${1}" = "bash" ] ; then
   bash
 elif [ "${1}" = "report" ] ; then
-  echo "Copying compilation report to /work"
-  cp ../compile_report.json ./work
-  #   export KB_SDK_COMPILE_REPORT_FILE=./work/compile_report.json
-  #   make compile
+  echo "Compilation report already located in /kb/module/work"
 else
   @echo "unknown entrypoint command"
 fi
