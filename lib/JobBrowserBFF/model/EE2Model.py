@@ -501,9 +501,11 @@ class EE2Model(object):
             'limit': limit
         }
 
-        if filter is not None:
-            raw_query = []
+        raw_query = [{
+            'batch_job': {'$ne': True}
+        }]
 
+        if filter is not None:
             status = filter.get('status', [])
             if len(status) > 0:
                 status_transform = {
@@ -569,16 +571,15 @@ class EE2Model(object):
                             for function_name in app_function]
                 })
 
-            # wrap it in a raw query for mongoengine
-            # TODO: upstream ee2 service should not be exposed like this!
-            if len(raw_query) > 0:
-                filter_query = {
-                    '__raw__': {
-                        '$and': raw_query
-                    }
-                }
+        # wrap it in a raw query for mongoengine
+        # TODO: upstream ee2 service should not be exposed like this!
+        filter_query = {
+            '__raw__': {
+                '$and': raw_query
+            }
+        }
 
-                params['filter'] = filter_query
+        params['filter'] = filter_query
 
         if sort is not None:
             # sort specs are not supported for ee2 (for now)
