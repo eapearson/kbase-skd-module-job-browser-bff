@@ -10,6 +10,7 @@ omit =
     */__init__.py
     lib/biokbase/log.py
     lib/JobBrowserBFF/authclient.py
+    venv/*
 
 [html]
 directory = work/test_coverage

@@ -1,3 +1,4 @@
 ignore:
   - "lib/installed_clients"
   - "lib/JobBrowserBFF/JobBrowserBFFServer.py"
+  - "venv"
