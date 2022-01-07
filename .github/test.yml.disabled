@@ -1,5 +1,10 @@
 name: KBase SDK Tests
 
+# This workflow is disabled until we can work out credentials
+# the tests require access to specific test data, which needs to be available 
+# for the user associated with the given token.
+# a second token requires ee2 admin access
+
 on:
   push:
     branches: [ master, 'feature-*', 'fix-*' ]
@@ -22,7 +27,6 @@ jobs:
       with:
         repository: 'kbaseapps/kb_sdk_actions'
         path: 'kb_sdk_actions'
-
 
     - name: Set up test environment
       if: "!contains(github.event.head_commit.message, 'skip ci')"
