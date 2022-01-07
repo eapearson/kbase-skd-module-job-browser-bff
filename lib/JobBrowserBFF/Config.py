@@ -26,7 +26,7 @@ class Config:
             self.__config = dict()
             config = ConfigParser()
             config.read(self.get_config_file())
-            for nameval in config.items(self.get_service_name() or 'JobBrowserBFF'):
+            for nameval in config.items(self.get_service_name() or "JobBrowserBFF"):
                 self.__config[nameval[0]] = nameval[1]
             return self.__config
 

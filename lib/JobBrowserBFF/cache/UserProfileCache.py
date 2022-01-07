@@ -1,10 +1,12 @@
 import json
 import apsw
+
 # import time
 import hashlib
 import math
 
 from biokbase.GenericClient import GenericClient
+
 # from DashboardService.Errors import ServiceError
 
 MAX_SQL_VARIABLES = 500
@@ -49,7 +51,7 @@ class UserProfileCache:
         self.sync()
 
     def create_schema(self):
-        alerts_schema = '''
+        alerts_schema = """
         drop table if exists cache;
         create table cache (
             key text not null primary key,
@@ -57,35 +59,35 @@ class UserProfileCache:
             size int not null,
             md5 blob not null
         );
-        '''
+        """
         with self.conn:
             self.conn.cursor().execute(alerts_schema)
 
     def sync(self):
-        temp_sql = '''
+        temp_sql = """
         create temporary table updater (
         key text not null primary key,
         value text not null,
         size int not null,
         md5 blob not null    
         )
-        '''
-        update_temp_sql = '''
+        """
+        update_temp_sql = """
         insert into updater
         (key, value, size, md5)
         values
         (?, ?, ?, ?)
-        '''
+        """
 
-        insert_sql = '''
+        insert_sql = """
         insert into cache
         (key, value, size, md5)
         select key, value, size, md5
         from updater where 
           not exists (select updater.key from cache where cache.key = updater.key)
-        '''
+        """
 
-        update_sql = '''
+        update_sql = """
         with updates as (select * 
                             from updater a
                             join cache b
@@ -95,7 +97,7 @@ class UserProfileCache:
         set (value, size, md5) = 
             (select value, size, md5 from updates where updates.key = cache.key)
         where cache.key in (select key from updates)
-        '''
+        """
 
         profiles = self.fetch_profiles()
         # fetched_at = time.time()
@@ -104,10 +106,10 @@ class UserProfileCache:
             self.conn.cursor().execute(temp_sql)
 
             for profile in profiles:
-                key = get_path(profile, ['user', 'username'])
+                key = get_path(profile, ["user", "username"])
                 value = json.dumps(profile)
                 hasher = hashlib.md5()
-                hasher.update(value.encode('utf-8'))
+                hasher.update(value.encode("utf-8"))
                 hash = hasher.digest()
                 params = (key, value, len(value), memoryview(hash))
                 self.conn.cursor().execute(update_temp_sql, params)
@@ -116,24 +118,22 @@ class UserProfileCache:
             self.conn.cursor().execute(update_sql)
 
     def clear_all(self):
-        schema = '''
+        schema = """
         delete * from cache;
-        '''
+        """
         with self.conn:
             self.conn.cursor().execute(schema)
 
     def fetch_profiles(self):
         rpc = GenericClient(
-            module='UserProfile',
+            module="UserProfile",
             url=self.user_profile_url,
             timeout=self.upstream_timeout,
-            token=None
+            token=None,
         )
-        users = rpc.call_func('filter_users', {
-            'filter': ''
-        })
+        users = rpc.call_func("filter_users", {"filter": ""})
 
-        usernames = [user['username'] for user in users]
+        usernames = [user["username"] for user in users]
 
         profiles = []
 
@@ -144,13 +144,11 @@ class UserProfileCache:
                 start = batch_number * 1000
                 stop = start + rem
             else:
-                start = batch_number*1000
-                stop = (batch_number+1)*1000
+                start = batch_number * 1000
+                stop = (batch_number + 1) * 1000
 
             username_group = usernames[start:stop]
-            result = rpc.call_func('get_user_profile',
-                                   username_group
-                                   )
+            result = rpc.call_func("get_user_profile", username_group)
 
             profiles.extend(result)
 
@@ -159,13 +157,13 @@ class UserProfileCache:
     # public interface
 
     def reload(self):
-        self.conn.cursor().execute('BEGIN TRANSACTION;')
+        self.conn.cursor().execute("BEGIN TRANSACTION;")
         try:
             self.clear_all()
             self.sync()
-            self.conn.cursor().execute('COMMIT;')
+            self.conn.cursor().execute("COMMIT;")
         except Exception:
-            self.conn.cursor().execute('ROLLBACK;')
+            self.conn.cursor().execute("ROLLBACK;")
 
     def get(self, usernames):
         # TODO: handle usernames > 1000
@@ -176,17 +174,21 @@ class UserProfileCache:
         for batch in range(0, batches):
             batch_from = batch * MAX_SQL_VARIABLES
             batch_to = batch_from + min(MAX_SQL_VARIABLES, num_users - batch_from)
-            usernames_to_get = usernames[batch_from: batch_to]
+            usernames_to_get = usernames[batch_from:batch_to]
 
-            placeholders = ','.join(list('?' for _ in usernames_to_get))
-            sql = '''
+            placeholders = ",".join(list("?" for _ in usernames_to_get))
+            sql = """
             select key, value
             from cache
             where key in (%s)
-            ''' % (placeholders)
+            """ % (
+                placeholders
+            )
 
             with self.conn:
-                for key, value in self.conn.cursor().execute(sql, usernames_to_get).fetchall():
+                for key, value in (
+                    self.conn.cursor().execute(sql, usernames_to_get).fetchall()
+                ):
                     profiles.append([key, json.loads(value)])
 
         return profiles

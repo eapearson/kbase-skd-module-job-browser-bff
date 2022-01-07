@@ -47,19 +47,17 @@ class GenericClient(object):
         # - version is always 1.1 (even though there was no officially published jsonrpc 1.1)
         # - params as discussed above.
         call_params = {
-            'id': str(uuid.uuid4()),
-            'method': self.module + '.' + func_name,
-            'version': '1.1',
-            'params': wrapped_params
+            "id": str(uuid.uuid4()),
+            "method": self.module + "." + func_name,
+            "version": "1.1",
+            "params": wrapped_params,
         }
 
-        header = {
-            'Content-Type': 'application/json'
-        }
+        header = {"Content-Type": "application/json"}
 
         # Calls may be authorized or not with a KBase token.
         if self.token:
-            header['Authorization'] = self.token
+            header["Authorization"] = self.token
 
         timeout = timeout or self.timeout
 
@@ -67,71 +65,77 @@ class GenericClient(object):
         # The constructor requires it, and it can be overridden in the call
         # to this method.
         try:
-            response = requests.post(self.url, headers=header,
-                                     data=json.dumps(call_params), timeout=timeout)
+            response = requests.post(
+                self.url, headers=header, data=json.dumps(call_params), timeout=timeout
+            )
         except requests.exceptions.ReadTimeout as rte:
             # Note that ServiceError mirrors (and is eventually converted to)
             # a JSONRPC 2.0 error.
             raise ServiceError(
                 code=100,
-                message='Timeout calling service endpoint',
+                message="Timeout calling service endpoint",
                 data={
-                    'url': self.url,
-                    'headers': header,
-                    'timeout': timeout,
-                    'python_exception_string': str(rte)
-                })
+                    "url": self.url,
+                    "headers": header,
+                    "timeout": timeout,
+                    "python_exception_string": str(rte),
+                },
+            )
         except requests.exceptions.ConnectionError as rte:
             # Note that ServiceError mirrors (and is eventually converted to)
             # a JSONRPC 2.0 error.
             raise ServiceError(
                 code=100,
-                message='Timeout calling service endpoint',
+                message="Timeout calling service endpoint",
                 data={
-                    'url': self.url,
-                    'headers': header,
-                    'timeout': timeout,
-                    'python_exception_string': str(rte)
-                })
+                    "url": self.url,
+                    "headers": header,
+                    "timeout": timeout,
+                    "python_exception_string": str(rte),
+                },
+            )
         except Exception as ex:
             raise ServiceError(
                 code=101,
-                message='Error calling service endpoint: ' + ex.message,
+                message="Error calling service endpoint: " + ex.message,
                 data={
-                    'url': self.url,
-                    'headers': header,
-                })
+                    "url": self.url,
+                    "headers": header,
+                },
+            )
         else:
-            if response.headers.get('content-type', '').startswith('application/json'):
+            if response.headers.get("content-type", "").startswith("application/json"):
                 try:
                     response_data = response.json()
                 except json.decoder.JSONDecodeError as err:
                     raise ServiceError(
                         code=102,
-                        message='Invalid response from upstream service - not json',
+                        message="Invalid response from upstream service - not json",
                         data={
-                            'url': self.url,
-                            'headers': header,
-                            'decoding_error': str(err),
-                            'response_text': response.content
-                        })
+                            "url": self.url,
+                            "headers": header,
+                            "decoding_error": str(err),
+                            "response_text": response.content,
+                        },
+                    )
                 else:
-                    error = response_data.get('error')
+                    error = response_data.get("error")
                     if error:
                         # Here we convert from the upstream KBase JSONRPC 1.1 error response
                         # to a JSONRPC 2.0 compatible exception. We pluck off commonly used
                         # error properties and put them into the data property. We do
                         # retain the error code (which should be JSONRPC 1.1 & 2.0 compatible).
                         error_data = {
-                            'stack': error.get('error'),
-                            'name': error.get('name')
+                            "stack": error.get("error"),
+                            "name": error.get("name"),
                         }
                         raise ServiceError(
-                            code=error.get('code'),
-                            message=error.get('message', error.get('name')),
-                            data=error_data)
+                            code=error.get("code"),
+                            message=error.get("message", error.get("name")),
+                            data=error_data,
+                        )
 
-                    result = response_data.get('result')
+                    result = response_data.get("result")
 
                     # The normal response has a result property which, like the params, is
                     # wrapped in an array. In this case the array emulates multiple value return.
@@ -150,14 +154,17 @@ class GenericClient(object):
                     else:
                         raise ServiceError(
                             code=103,
-                            message=('Unexpected type in upstream service result; '
-                                     'must be array or null'),
+                            message=(
+                                "Unexpected type in upstream service result; "
+                                "must be array or null"
+                            ),
                             data={
-                                'url': self.url,
-                                'headers': header,
-                                'result': result,
-                                'result_type': type(result).__name__
-                            })
+                                "url": self.url,
+                                "headers": header,
+                                "result": result,
+                                "result_type": type(result).__name__,
+                            },
+                        )
 
                 # Otherwise, if the service does not return json and has a 4xx or 5xx response,
                 # raise an HTTPError from requests. This will be caught by the caller and
@@ -168,12 +175,17 @@ class GenericClient(object):
                 # thus an invalid response.
                 raise ServiceError(
                     code=104,
-                    message=('Invalid response from upstream service; '
-                             'not application/json, not an error status'),
+                    message=(
+                        "Invalid response from upstream service; "
+                        "not application/json, not an error status"
+                    ),
                     data={
-                        'url': self.url,
-                        'headers': header,
-                        'response_status': response.status_code,
-                        'response_content_type': response.headers.get('content-type', None),
-                        'response_content': response.content
-                    })
+                        "url": self.url,
+                        "headers": header,
+                        "response_status": response.status_code,
+                        "response_content_type": response.headers.get(
+                            "content-type", None
+                        ),
+                        "response_content": response.content,
+                    },
+                )

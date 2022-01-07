@@ -1,10 +1,10 @@
-'''
+"""
 Created on Aug 1, 2016
 
 A very basic KBase auth client for the Python server.
 
 @author: gaprice@lbl.gov
-'''
+"""
 import time
 import requests
 import threading
@@ -12,7 +12,7 @@ import hashlib
 
 
 class TokenCache(object):
-    ''' A basic cache for tokens. '''
+    """A basic cache for tokens."""
 
     _MAX_TIME_SEC = 5 * 60  # 5 min
 
@@ -41,21 +41,20 @@ class TokenCache(object):
         return username
 
     def encode_token(self, token):
-        return hashlib.sha256(token.encode('utf-8')).hexdigest()
+        return hashlib.sha256(token.encode("utf-8")).hexdigest()
 
     def add_valid_token(self, token, username):
         if not token:
-            raise ValueError('Must supply token')
+            raise ValueError("Must supply token")
         if not username:
-            raise ValueError('Must supply username')
+            raise ValueError("Must supply username")
 
         encoded_token = self.encode_token(token)
         with self._lock:
             self._cache[encoded_token] = [username, time.time()]
             if len(self._cache) > self._maxsize:
                 sorted_items = sorted(
-                    list(self._cache.items()),
-                    key=(lambda v: v[1][1])
+                    list(self._cache.items()), key=(lambda v: v[1][1])
                 )
                 for i, (t, _) in enumerate(sorted_items):
                     if i <= self._halfmax:
@@ -65,16 +64,16 @@ class TokenCache(object):
 
 
 class KBaseAuth(object):
-    '''
+    """
     A very basic KBase auth client for the Python server.
-    '''
+    """
 
     def __init__(self, auth_url=None):
-        '''
+        """
         Constructor
-        '''
+        """
         if auth_url is None:
-            raise ValueError('auth_url not provided to auth client')
+            raise ValueError("auth_url not provided to auth client")
 
         self._authurl = auth_url
         # TODO: is it really a good idea to have a default url? I think we
@@ -86,13 +85,13 @@ class KBaseAuth(object):
 
     def get_user(self, token):
         if not token:
-            raise ValueError('Must supply token')
+            raise ValueError("Must supply token")
 
         username = self._cache.get_user(token)
         if username:
             return username
 
-        d = {'token': token, 'fields': 'user_id'}
+        d = {"token": token, "fields": "user_id"}
 
         ret = requests.post(self._authurl, data=d)
         if not ret.ok:
@@ -100,13 +99,11 @@ class KBaseAuth(object):
                 err = ret.json()
             except Exception:
                 ret.raise_for_status()
-            message = 'Error connecting to auth service: {} {}\n{}\n{}'.format(
-                ret.status_code,
-                ret.reason,
-                err['error']['message'],
-                self._authurl)
+            message = "Error connecting to auth service: {} {}\n{}\n{}".format(
+                ret.status_code, ret.reason, err["error"]["message"], self._authurl
+            )
             raise ValueError(message)
 
-        username = ret.json()['user_id']
+        username = ret.json()["user_id"]
         self._cache.add_valid_token(token, username)
         return username

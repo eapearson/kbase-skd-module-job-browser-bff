@@ -91,11 +91,12 @@ Example:
 import json
 import logging
 import types
+
 # import validation.validation as validation
 from typing import Optional
 
 
-DEFAULT_JSONRPC = '2.0'
+DEFAULT_JSONRPC = "2.0"
 
 log = logging.getLogger(__name__)
 
@@ -125,7 +126,7 @@ class JSONRPCService(object):
         else:
             fname = name
 
-        self.method_data[fname] = {'method': f}
+        self.method_data[fname] = {"method": f}
 
     def call(self, jsondata, auth=None):
         """
@@ -182,12 +183,12 @@ class JSONRPCService(object):
                     try:
                         self._fill_request(request_, rdata_)
                     except InvalidRequestError as e:
-                        err = self._get_err(e, request_['id'])
+                        err = self._get_err(e, request_["id"])
                         if err:
                             responds.append(err)
                         continue
                     except JSONRPCError as e:
-                        err = self._get_err(e, request_['id'])
+                        err = self._get_err(e, request_["id"])
                         if err:
                             responds.append(err)
                         continue
@@ -198,9 +199,7 @@ class JSONRPCService(object):
                     try:
                         respond = self._handle_request(request_, auth)
                     except JSONRPCError as e:
-                        respond = self._get_err(e,
-                                                request_['id'],
-                                                request_['jsonrpc'])
+                        respond = self._get_err(e, request_["id"], request_["jsonrpc"])
 
                     # Don't respond to notifications
                     if respond is not None:
@@ -216,32 +215,36 @@ class JSONRPCService(object):
                 raise InvalidRequestError
 
         except InvalidRequestError as e:
-            return self._get_err(e, request['id'])
+            return self._get_err(e, request["id"])
         except JSONRPCError as e:
-            return self._get_err(e, request['id'], request['jsonrpc'])
+            return self._get_err(e, request["id"], request["jsonrpc"])
 
     def _get_err(self, e, id=None, jsonrpc=DEFAULT_JSONRPC):
         """
         Returns jsonrpc error message.
         """
         # Do not respond to notifications when the request is valid.
-        if not id and not isinstance(e, ParseError) and not isinstance(e, InvalidRequestError):
+        if (
+            not id
+            and not isinstance(e, ParseError)
+            and not isinstance(e, InvalidRequestError)
+        ):
             return None
 
-        respond = {'id': id}
+        respond = {"id": id}
 
         if isinstance(jsonrpc, int):
             # v1.0 requires result to exist always.
             # No error codes are defined in v1.0 so only use the message.
             if jsonrpc == 10:
-                respond['result'] = None
-                respond['error'] = e.dumps()['message']
+                respond["result"] = None
+                respond["error"] = e.dumps()["message"]
             else:
                 self._fill_ver(jsonrpc, respond)
-                respond['error'] = e.dumps()
+                respond["error"] = e.dumps()
         else:
-            respond['jsonrpc'] = jsonrpc
-            respond['error'] = e.dumps()
+            respond["jsonrpc"] = jsonrpc
+            respond["error"] = e.dumps()
 
         return respond
 
@@ -250,9 +253,9 @@ class JSONRPCService(object):
         Fills version information to the respond from the internal integer version.
         """
         if iver == 20:
-            respond['jsonrpc'] = '2.0'
+            respond["jsonrpc"] = "2.0"
         if iver == 11:
-            respond['version'] = '1.1'
+            respond["version"] = "1.1"
 
     def _vargs(self, f):
         """
@@ -293,16 +296,16 @@ class JSONRPCService(object):
 
         InvalidRequestError will be raised if the jsonrpc value has invalid value.
         """
-        if 'jsonrpc' in rdata:
-            if rdata['jsonrpc'] == '2.0':
+        if "jsonrpc" in rdata:
+            if rdata["jsonrpc"] == "2.0":
                 return 20
             else:
                 # invalid version
                 raise InvalidRequestError
         else:
             # It's probably a JSON-RPC v1.x style call.
-            if 'version' in rdata:
-                if rdata['version'] == '1.1':
+            if "version" in rdata:
+                if rdata["version"] == "1.1":
                     return 11
 
         # Assume v1.0.
@@ -314,11 +317,13 @@ class JSONRPCService(object):
 
         InvalidRequestError will be raised if the id value has invalid type.
         """
-        id = rdata.get('id')
-        if not (isinstance(id, str) or
-                isinstance(id, int) or
-                isinstance(id, float) or
-                id is None):
+        id = rdata.get("id")
+        if not (
+            isinstance(id, str)
+            or isinstance(id, int)
+            or isinstance(id, float)
+            or id is None
+        ):
             raise InvalidRequestError
         return id
 
@@ -329,24 +334,27 @@ class JSONRPCService(object):
         InvalidRequestError will be raised if it's missing or is wrong type.
         MethodNotFoundError will be raised if a method with given method name does not exist.
         """
-        if 'method' in rdata:
-            if not isinstance(rdata['method'], str):
+        if "method" in rdata:
+            if not isinstance(rdata["method"], str):
                 raise InvalidRequestError
         else:
             raise InvalidRequestError
 
-        if rdata['method'] not in self.method_data.keys():
+        if rdata["method"] not in self.method_data.keys():
             raise MethodNotFoundError
 
-        return rdata['method']
+        return rdata["method"]
 
     def _get_params(self, rdata):
         """
         Returns a list of jsonrpc request's method parameters.
         """
-        if isinstance(rdata['params'], dict) or isinstance(rdata['params'], list) or \
-                rdata['params'] is None:
-            return rdata['params']
+        if (
+            isinstance(rdata["params"], dict)
+            or isinstance(rdata["params"], list)
+            or rdata["params"] is None
+        ):
+            return rdata["params"]
         else:
             # wrong type
             raise InvalidRequestError
@@ -356,23 +364,23 @@ class JSONRPCService(object):
         if not isinstance(rdata, dict):
             raise InvalidRequestError
 
-        request['jsonrpc'] = self._get_jsonrpc(rdata)
-        request['id'] = self._get_id(rdata)
-        request['method'] = self._get_method(rdata)
-        if 'params' in rdata:
-            request['params'] = self._get_params(rdata)
+        request["jsonrpc"] = self._get_jsonrpc(rdata)
+        request["id"] = self._get_id(rdata)
+        request["method"] = self._get_method(rdata)
+        if "params" in rdata:
+            request["params"] = self._get_params(rdata)
 
     def _call_method(self, request, auth):
         """Calls given method with given params and returns it value."""
-        method_name = request['method']
-        method = self.method_data[method_name]['method']
+        method_name = request["method"]
+        method = self.method_data[method_name]["method"]
         try:
-            if 'params' in request and request['params'] is not None:
-                if request['jsonrpc'] == 11:
+            if "params" in request and request["params"] is not None:
+                if request["jsonrpc"] == 11:
                     # KBase (nearly always) uses just the first argument.
-                    params = request['params'][0]
+                    params = request["params"][0]
                 else:
-                    params = request['params']
+                    params = request["params"]
 
                 # KBase hack alert
                 # [module_name, function_name] = method_name.split('.')
@@ -386,14 +394,14 @@ class JSONRPCService(object):
             else:
                 result = method(auth)
 
-            if request['jsonrpc'] == 11:
+            if request["jsonrpc"] == 11:
                 return [result]
             else:
                 return result
         except JSONRPCError:
             raise
         except Exception:
-            log.exception('method %s threw an exception' % request['method'])
+            log.exception("method %s threw an exception" % request["method"])
             # Exception was raised inside the method.
             raise ServerError
 
@@ -405,13 +413,13 @@ class JSONRPCService(object):
         result = self._call_method(request, auth)
 
         # Do not respond to notifications.
-        if request['id'] is None:
+        if request["id"] is None:
             return None
 
         respond = {}
-        self._fill_ver(request['jsonrpc'], respond)
-        respond['result'] = result
-        respond['id'] = request['id']
+        self._fill_ver(request["jsonrpc"], respond)
+        respond["result"] = result
+        respond["id"] = request["id"]
 
         return respond
 
@@ -431,6 +439,7 @@ class JSONRPCError(Exception):
     message - string
     data - object
     """
+
     code: int = 0
     message: Optional[str] = None
     data: Optional[dict] = None
@@ -443,11 +452,10 @@ class JSONRPCError(Exception):
     def dumps(self):
         """Return the Exception data in a format for JSON-RPC."""
 
-        error = {'code': self.code,
-                 'message': str(self.message)}
+        error = {"code": self.code, "message": str(self.message)}
 
         if self.data is not None:
-            error['data'] = self.data
+            error["data"] = self.data
 
         return error
 
@@ -462,28 +470,33 @@ class JSONRPCError(Exception):
 # for future use
 # ===============================================================================
 
+
 class ParseError(JSONRPCError):
     """Invalid JSON. An error occurred on the server while parsing the JSON text."""
+
     code = -32700
-    message = 'Parse error'
+    message = "Parse error"
 
 
 class InvalidRequestError(JSONRPCError):
     """The received JSON is not a valid JSON-RPC Request."""
+
     code = -32600
-    message = 'Invalid request'
+    message = "Invalid request"
 
 
 class MethodNotFoundError(JSONRPCError):
     """The requested remote-procedure does not exist / is not available."""
+
     code = -32601
-    message = 'Method not found'
+    message = "Method not found"
 
 
 class InvalidParamsError(JSONRPCError):
     """Invalid method parameters."""
+
     code = -32602
-    message = 'Invalid params'
+    message = "Invalid params"
 
     def __init__(self, data=None):
         self.data = data
@@ -491,8 +504,9 @@ class InvalidParamsError(JSONRPCError):
 
 class InvalidResultError(JSONRPCError):
     """Invalid method result."""
+
     code = -32602
-    message = 'Invalid result'
+    message = "Invalid result"
 
     def __init__(self, data=None):
         self.data = data
@@ -500,8 +514,10 @@ class InvalidResultError(JSONRPCError):
 
 class InternalError(JSONRPCError):
     """Internal JSON-RPC error."""
+
     code = -32603
-    message = 'Internal error'
+    message = "Internal error"
+
 
 # -32099..-32000 Server error. Reserved for implementation-defined server-errors.
 
@@ -509,11 +525,13 @@ class InternalError(JSONRPCError):
 class KeywordError(JSONRPCError):
     """The received JSON-RPC request is trying to use keyword arguments even though its
     version is 1.0."""
+
     code = -32099
-    message = 'Keyword argument error'
+    message = "Keyword argument error"
 
 
 class ServerError(JSONRPCError):
     """Generic server error."""
+
     code = -32000
-    message = 'Server error'
+    message = "Server error"

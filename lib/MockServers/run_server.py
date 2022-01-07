@@ -1,10 +1,10 @@
 import MockServers.Mocky as mocky
 import argparse
 
-if __name__ == '__main__':
-    parser = argparse.ArgumentParser(description='Run the mock server')
-    parser.add_argument('--host', help='The hostname for the server')
-    parser.add_argument('--port', type=int, help='The port number for the server')
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser(description="Run the mock server")
+    parser.add_argument("--host", help="The hostname for the server")
+    parser.add_argument("--port", type=int, help="The port number for the server")
     args = parser.parse_args()
 
     server = mocky.ServerController(args.host, args.port)
