@@ -1,6 +1,6 @@
 # JobBrowserBFF release notes
 
-## Unreleased
+## 1.1.0
 
 - add filter to exclude parent jobs [UFI-1]
 - use virtual environment in image
