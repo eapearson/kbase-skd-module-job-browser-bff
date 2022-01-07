@@ -1,4 +1,4 @@
-FROM alpine:3.14 as builder
+FROM alpine:3.15 as builder
 LABEL org.opencontainers.image.authors="KBase Developer"
 
 # The build stage needs just enough to run the KBase SDK tools.
