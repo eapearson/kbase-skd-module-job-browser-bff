@@ -9,14 +9,13 @@ from JobBrowserBFF.authclient import KBaseAuth as _KBaseAuth
 
 
 class UnitTestBase(unittest.TestCase):
-
     @classmethod
     def loadConfig(cls):
         # The standard deployment configuration
         cls.cfg = {}
         config = ConfigParser()
         config.read(cls.config_file)
-        for nameval in config.items('JobBrowserBFF'):
+        for nameval in config.items("JobBrowserBFF"):
             cls.cfg[nameval[0]] = nameval[1]
 
         # Use the test configuration, because there are test values in there which are
@@ -24,7 +23,7 @@ class UnitTestBase(unittest.TestCase):
 
         # NB: standard location for test config.
         # TODO: should this be configurable itself? E.g. from env variable?
-        test_cfg_file = '/kb/module/work/test.cfg'
+        test_cfg_file = "/kb/module/work/test.cfg"
         test_cfg_text = "[test]\n"
         with open(test_cfg_file, "r") as f:
             test_cfg_text += f.read()
@@ -34,26 +33,32 @@ class UnitTestBase(unittest.TestCase):
 
     @classmethod
     def loadEnvironment(cls):
-        cls.token = os.environ.get('KB_AUTH_TOKEN', None)
-        cls.config_file = os.environ.get('KB_DEPLOYMENT_CONFIG', None)
+        cls.token = os.environ.get("KB_AUTH_TOKEN", None)
+        cls.config_file = os.environ.get("KB_DEPLOYMENT_CONFIG", None)
 
     @classmethod
     def loadContext(cls):
         cls.ctx = MethodContext(None)
-        cls.ctx.update({'token': cls.token,
-                        'user_id': cls.user_id,
-                        'provenance': [
-                            {'service': 'JobBrowserBFF',
-                             'method': 'please_never_use_it_in_production',
-                             'method_params': []
-                             }],
-                        'authenticated': 1})
+        cls.ctx.update(
+            {
+                "token": cls.token,
+                "user_id": cls.user_id,
+                "provenance": [
+                    {
+                        "service": "JobBrowserBFF",
+                        "method": "please_never_use_it_in_production",
+                        "method_params": [],
+                    }
+                ],
+                "authenticated": 1,
+            }
+        )
 
     @classmethod
     def loadAuth(cls):
         # Getting username from Auth profile for token
         if cls.token:
-            authServiceUrl = cls.cfg['auth-service-url']
+            authServiceUrl = cls.cfg["auth-service-url"]
             auth_client = _KBaseAuth(authServiceUrl)
             cls.user_id = auth_client.get_user(cls.token)
         else:
@@ -69,7 +74,7 @@ class UnitTestBase(unittest.TestCase):
         # WARNING: don't call any logging methods on the context object,
         # it'll result in a NoneType error
         cls.serviceImpl = JobBrowserBFF(cls.cfg)
-        cls.scratch = cls.cfg['scratch']
+        cls.scratch = cls.cfg["scratch"]
 
     def getImpl(self):
         return self.__class__.serviceImpl

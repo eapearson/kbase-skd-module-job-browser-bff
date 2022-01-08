@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# . /kb/deployment/user-env.sh
+source venv/bin/activate
 
 python3 ./scripts/prepare_deploy_cfg.py ./deploy.cfg ./work/config.properties
 
@@ -20,10 +20,12 @@ elif [ "${1}" = "init" ] ; then
 elif [ "${1}" = "bash" ] ; then
   bash
 elif [ "${1}" = "report" ] ; then
+  # The compilation report is created by the in the build phase,
+  # so we just need to copy it.
+  # Note that /kb/module/work is bind mounted to a temporary directory
+  # in order to collect the compilation report.
   echo "Copying compilation report to /work"
-  cp ../compile_report.json ./work
-  #   export KB_SDK_COMPILE_REPORT_FILE=./work/compile_report.json
-  #   make compile
+  cp /kb/compile_report.json /kb/module/work
 else
   @echo "unknown entrypoint command"
 fi

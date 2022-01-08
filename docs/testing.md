@@ -18,19 +18,13 @@ git clone https://github.com/kbaseapps/kbase-sdk-module-job-browser-bff
 
 ## Set up `kb_sdk`
 
-The KBase service sdk needs to be available locally, built, and in the path. You will need to have a JDK version 8 installed and available in the system path.
+The KBase service `sdk` needs to be available locally, built, and in the path. You will need to have a JDK version 8 installed and available in the system path.
 
 - clone `kb_sdk` somewhere in your system; it is recommended to install it in the same directory in which you cloned this repo.
   
   ```bash
   git clone https://github.com/kbase/kb_sdk
   ```
-
-  > Note: At present you should use `https://github.com/eapearson/kb_sdk`, since keeps the impl file PEP8 compliant.
-
-    ```bash
-    git clone --depth=1 --branch=make-python-pep8-compliant https://github.com/eapearson/kb_sdk 
-    ```
 
 - build it
 
@@ -39,7 +33,7 @@ The KBase service sdk needs to be available locally, built, and in the path. You
   make
   ```
 
-- Add it to the current terminal path
+- Add it to the current shell path
 
   ```bash
   export PATH=$PATH:`pwd`/../kb_sdk/bin
@@ -47,7 +41,7 @@ The KBase service sdk needs to be available locally, built, and in the path. You
 
 ## run `kb-sdk test` once to generate the `test_local` directory
 
-One of the reasons we love kb_sdk is that in order to set up tests, you just need to run the test task once. This won't actually run any tests, since they are not yet set up, but it will create the `test_local` directory and populate it with scrips and `test.cfg`.
+One of the reasons we love `kb_sdk` is that in order to set up tests, you just need to run the test task once. This won't actually run any tests, since they are not yet set up, but it will create the `test_local` directory and populate it with scrips and `test.cfg`.
 
 `test.cfg` is a supplementary config file used just for testing.
 
@@ -55,7 +49,7 @@ Note that this must be run in the same terminal in which you altered the PATH.
 
 ## complete the test config file `test.cfg`
 
-By default kb_sdk creates the following configuration fields:
+By default `kb_sdk` creates the following configuration fields:
 
 ```text
 test_token=
@@ -64,7 +58,7 @@ auth_service_url=https://appdev.kbase.us/services/auth/api/legacy/KBase/Sessions
 auth_service_url_allow_insecure=false
 ```
 
-This is designed so that you can simply enter a token for an appdev user, and create tests which work against appdev services.
+This is designed so that you can simply enter a token for an `appdev` user, and create tests which work against `appdev` services.
 
 However, for dynamic services, we work against CI, and also in this case we are going to add additional test configuration.
 
@@ -98,11 +92,11 @@ You may inspect the coverage reports by opening `test_local/workdir/test_coverag
 
 Two types of tests were developed which are not currently run:
 
-- mock tests using mongodb
+- mock tests using `mongodb`
 - mock tests using mock endpoints
 
 These tests are especially useful for simulating conditions which cannot be done either with actual services (e.g. testing against CI), or with normal mocks.
 
-The mongodb tests utilize a snapshot of actual data which is imported into a local mongodb container. This allows a large amount of stable test data. Usage of mongodb is simply for convenience -- it is much easier to implement tests against a local database than files.
+The `mongodb` tests utilize a snapshot of actual data which is imported into a local `mongodb` container. This allows a large amount of stable test data. Usage of `mongodb` is simply for convenience -- it is much easier to implement tests against a local database than files.
 
 The network mocks work by running a local mock http server, which can simulate various network or service conditions. E.g. failures, timeouts.

@@ -9,17 +9,18 @@ from JobBrowserBFF.cache.AppCache import AppCache
 from JobBrowserBFF.cache.UserProfileCache import UserProfileCache
 
 from pathlib import Path
+
 # END_HEADER
 
 
 class JobBrowserBFF:
-    '''
+    """
     Module Name:
     JobBrowserBFF
 
     Module Description:
     A KBase module: JobBrowserBFF
-    '''
+    """
 
     ######## WARNING FOR GEVENT USERS ####### noqa
     # Since asynchronous IO can lead to methods - even the same method -
@@ -41,16 +42,19 @@ class JobBrowserBFF:
         self.validation = Validation(schema_dir="impl", load_schemas=True)
 
         # fix up the config because, as an INI file, everything is a string...
-        config['default-timeout'] = int(config['default-timeout'])
-        config['cache-refresh-interval'] = int(config['cache-refresh-interval'])
-        config['cache-refresh-initial-delay'] = int(config['cache-refresh-initial-delay'])
+        config["default-timeout"] = int(config["default-timeout"])
+        config["cache-refresh-interval"] = int(config["cache-refresh-interval"])
+        config["cache-refresh-initial-delay"] = int(
+            config["cache-refresh-initial-delay"]
+        )
 
         self.validation.validate_config(config)
         self.config = config
 
-        self.shared_folder = config['scratch']
-        logging.basicConfig(format='%(created)s %(levelname)s: %(message)s',
-                            level=logging.INFO)
+        self.shared_folder = config["scratch"]
+        logging.basicConfig(
+            format="%(created)s %(levelname)s: %(message)s", level=logging.INFO
+        )
 
         self.definitions = Definitions(load=True)
 
@@ -62,23 +66,23 @@ class JobBrowserBFF:
         apsw.connection_hooks.append(setwal)
 
         # Set up cache directory
-        Path(config['cache-directory']).mkdir(parents=True, exist_ok=True)
+        Path(config["cache-directory"]).mkdir(parents=True, exist_ok=True)
 
         # The app cache can be populated upon load.
         # TODO: need a process to refresh the cache periodically
-        app_cache_path = config['cache-directory'] + '/app.db'
+        app_cache_path = config["cache-directory"] + "/app.db"
         app_cache = AppCache(
             path=app_cache_path,
-            narrative_method_store_url=config['nms-url'],
-            upstream_timeout=60
+            narrative_method_store_url=config["nms-url"],
+            upstream_timeout=60,
         )
         app_cache.initialize()
 
-        user_profile_cache_path = config['cache-directory'] + '/user_profile.db'
+        user_profile_cache_path = config["cache-directory"] + "/user_profile.db"
         user_profile_cache = UserProfileCache(
             path=user_profile_cache_path,
-            user_profile_url=config['user-profile-url'],
-            upstream_timeout=60
+            user_profile_url=config["user-profile-url"],
+            upstream_timeout=60,
         )
         user_profile_cache.initialize()
         # END_CONSTRUCTOR
@@ -153,18 +157,17 @@ class JobBrowserBFF:
         # ctx is the context object
         # return variables are: result
         # BEGIN get_jobs
-        self.validation.validate_params('get_jobs', params)
+        self.validation.validate_params("get_jobs", params)
 
-        model = Model(config=self.config, context=ctx, timeout=params['timeout']).get_model(ctx)
+        model = Model(
+            config=self.config, context=ctx, timeout=params["timeout"]
+        ).get_model(ctx)
 
         jobs, stats = model.get_jobs(params)
 
-        result = {
-            'jobs': jobs,
-            'stats': stats
-        }
+        result = {"jobs": jobs, "stats": stats}
 
-        self.validation.validate_result('get_jobs', result)
+        self.validation.validate_result("get_jobs", result)
 
         return result
         # END get_jobs
@@ -246,16 +249,16 @@ class JobBrowserBFF:
         # ctx is the context object
         # return variables are: result
         # BEGIN query_jobs
-        self.validation.validate_params('query_jobs', params)
+        self.validation.validate_params("query_jobs", params)
         model = Model(self.config, ctx).get_model(ctx)
         jobs, found_count, total_count, stats = model.query_jobs(params)
         result = {
-            'jobs': jobs,
-            'found_count': found_count,
-            'total_count': total_count,
-            'stats': stats
+            "jobs": jobs,
+            "found_count": found_count,
+            "total_count": total_count,
+            "stats": stats,
         }
-        self.validation.validate_result('query_jobs', result)
+        self.validation.validate_result("query_jobs", result)
         return result
         # END query_jobs
 
@@ -277,13 +280,15 @@ class JobBrowserBFF:
         # ctx is the context object
         # return variables are: result
         # BEGIN get_job_log
-        self.validation.validate_params('get_job_log', params)
+        self.validation.validate_params("get_job_log", params)
 
-        model = Model(config=self.config, context=ctx, timeout=params['timeout']).get_model(ctx)
+        model = Model(
+            config=self.config, context=ctx, timeout=params["timeout"]
+        ).get_model(ctx)
 
         result = model.get_job_log(params)
 
-        self.validation.validate_result('get_job_log', result)
+        self.validation.validate_result("get_job_log", result)
         return result
         # END get_job_log
 
@@ -307,10 +312,12 @@ class JobBrowserBFF:
         # ctx is the context object
         # return variables are: result
         # BEGIN cancel_job
-        self.validation.validate_params('cancel_job', params)
-        model = Model(config=self.config, context=ctx, timeout=params['timeout']).get_model(ctx)
+        self.validation.validate_params("cancel_job", params)
+        model = Model(
+            config=self.config, context=ctx, timeout=params["timeout"]
+        ).get_model(ctx)
         result = model.cancel_job(params)
-        self.validation.validate_result('cancel_job', result)
+        self.validation.validate_result("cancel_job", result)
         return result
         # END cancel_job
 
@@ -326,9 +333,9 @@ class JobBrowserBFF:
         # return variables are: result
         # BEGIN get_job_types
         # No params to validate!
-        d = self.definitions.get('job_types')
-        result = {'job_types': d}
-        self.validation.validate_result('get_job_types', result)
+        d = self.definitions.get("job_types")
+        result = {"job_types": d}
+        self.validation.validate_result("get_job_types", result)
         return result
         # END get_job_types
 
@@ -343,9 +350,9 @@ class JobBrowserBFF:
         # ctx is the context object
         # return variables are: result
         # BEGIN get_job_states
-        d = self.definitions.get('job_states')
-        result = {'job_states': d}
-        self.validation.validate_result('get_job_states', result)
+        d = self.definitions.get("job_states")
+        result = {"job_states": d}
+        self.validation.validate_result("get_job_states", result)
         return result
         # END get_job_states
 
@@ -361,7 +368,7 @@ class JobBrowserBFF:
         # BEGIN get_client_groups
         model = Model(self.config, ctx).get_model(ctx)
         result = model.get_client_groups()
-        self.validation.validate_result('get_client_groups', result)
+        self.validation.validate_result("get_client_groups", result)
         return result
         # END get_client_groups
 
@@ -376,9 +383,9 @@ class JobBrowserBFF:
         # ctx is the context object
         # return variables are: result
         # BEGIN get_searchable_job_fields
-        d = self.definitions.get('searchable_job_fields')
-        result = {'searchable_job_fields': d}
-        self.validation.validate_result('get_searchable_job_fields', result)
+        d = self.definitions.get("searchable_job_fields")
+        result = {"searchable_job_fields": d}
+        self.validation.validate_result("get_searchable_job_fields", result)
         return result
         # END get_searchable_job_fields
 
@@ -393,9 +400,9 @@ class JobBrowserBFF:
         # ctx is the context object
         # return variables are: result
         # BEGIN get_sort_specs
-        d = self.definitions.get('sort_specs')
-        result = {'sort_specs': d}
-        self.validation.validate_result('get_sort_specs', result)
+        d = self.definitions.get("sort_specs")
+        result = {"sort_specs": d}
+        self.validation.validate_result("get_sort_specs", result)
         return result
         # END get_sort_specs
 
@@ -410,9 +417,9 @@ class JobBrowserBFF:
         # ctx is the context object
         # return variables are: result
         # BEGIN get_log_levels
-        d = self.definitions.get('log_levels')
-        result = {'log_levels': d}
-        self.validation.validate_result('get_log_levels', result)
+        d = self.definitions.get("log_levels")
+        result = {"log_levels": d}
+        self.validation.validate_result("get_log_levels", result)
         return result
         # END get_log_levels
 
@@ -428,17 +435,19 @@ class JobBrowserBFF:
         model = Model(self.config, ctx).get_model(ctx)
 
         is_admin = model.is_admin()
-        result = {'is_admin': is_admin}
-        self.validation.validate_result('is_admin', result)
+        result = {"is_admin": is_admin}
+        self.validation.validate_result("is_admin", result)
         return result
         # END is_admin
 
     def status(self, ctx):
         # BEGIN_STATUS
-        returnVal = {'state': "OK",
-                     'message': "",
-                     'version': self.VERSION,
-                     'git_url': self.GIT_URL,
-                     'git_commit_hash': self.GIT_COMMIT_HASH}
+        returnVal = {
+            "state": "OK",
+            "message": "",
+            "version": self.VERSION,
+            "git_url": self.GIT_URL,
+            "git_commit_hash": self.GIT_COMMIT_HASH,
+        }
         return returnVal
         # END_STATUS

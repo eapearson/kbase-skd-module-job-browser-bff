@@ -1,8 +1,7 @@
-
 import os
 import json
 
-DEFAULT_DATA_DIR = 'json'
+DEFAULT_DATA_DIR = "json"
 
 
 class DefinitionError(Exception):
@@ -18,7 +17,7 @@ class Definitions(object):
 
     def load(self, data_dir=None):
         if data_dir is None:
-            data_dir = os.path.dirname(__file__) + '/' + DEFAULT_DATA_DIR
+            data_dir = os.path.dirname(__file__) + "/" + DEFAULT_DATA_DIR
         definitions = {}
         for file_name in os.listdir(data_dir):
             file_path = os.path.join(data_dir, file_name)
