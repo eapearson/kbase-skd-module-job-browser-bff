@@ -407,9 +407,6 @@ class JSONRPCService(object):
 
     def _handle_request(self, request, auth):
         """Handles given request and returns its response."""
-        # if 'types' in self.method_data[request['method']]:
-        #     self._validate_params_types(request['method'], request['params'])
-
         result = self._call_method(request, auth)
 
         # Do not respond to notifications.
