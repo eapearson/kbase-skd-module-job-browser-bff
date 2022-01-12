@@ -1,5 +1,9 @@
 # JobBrowserBFF release notes
 
+## 1.1.1
+
+- Revert Alpine Linux to 3.1.3 [UFI-4]
+
 ## 1.1.0
 
 - add filter to exclude parent jobs [UFI-1]
