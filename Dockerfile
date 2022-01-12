@@ -1,9 +1,6 @@
 FROM alpine:3.13 as builder
 LABEL org.opencontainers.image.authors="KBase Developer"
 
-RUN echo "Docker version: $(docker --version)"
-RUN echo "OS version $(uname -a)"
-
 # The build stage needs just enough to run the KBase SDK tools.
 
 # Hack to get packages to install over https behind proxy.
@@ -57,7 +54,7 @@ USER kbmodule
 RUN python3 -m venv venv && \
     source venv/bin/activate && \
     python3 -m pip install --upgrade pip && \
-    pip install wheel==0.37.0 && \
+    pip install wheel==0.37.1 && \
     pip install -r requirements.txt
 
 USER root
