@@ -1,5 +1,8 @@
-FROM alpine:3.15 as builder
+FROM alpine:3.13 as builder
 LABEL org.opencontainers.image.authors="KBase Developer"
+
+RUN echo "Docker version: $(docker --version)"
+RUN echo "OS version $(uname -a)"
 
 # The build stage needs just enough to run the KBase SDK tools.
 
@@ -26,7 +29,7 @@ RUN mkdir -p /kb/module/work/cache && \
 
 # Final image
 
-FROM alpine:3.14
+FROM alpine:3.13
 LABEL org.opencontainers.image.authors="KBase Developer"
 
 # Hack to get packages to install over https behind proxy.
