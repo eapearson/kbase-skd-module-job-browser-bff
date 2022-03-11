@@ -1,8 +1,12 @@
 # JobBrowserBFF release notes
 
-## 1.1.2
+## 1.2.0
 
 - Update dependences; a transitive dependency (markupsafe) has a breaking change for jinja2 2.x; updating to 3.x fixes it.
+
+## 1.1.2
+
+- Pin markupsafe to 2.0.1 to avoid a breaking change in 2.1.0
 
 ## 1.1.1
 
